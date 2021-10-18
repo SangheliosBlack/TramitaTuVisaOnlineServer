@@ -15,25 +15,30 @@ const updateDireccionFavorita = async(req,res = response)=>{
 
 const guardarFotoPerfil = async(req,res = response)=>{
     
-    const usario = await Usuario.findById(req.uid);
+    const usuario = await Usuario.findById(req.uid);
 
-    const readFile =  await fs.readFile(req.file);
+    fs.readFile(req.file.path,async function( err, data)  {
+        
+        const s3Client = s3.s3Client;
 
-    const s3Client = s3.s3Client;
-    const params = s3.uploadParams;
-
-    params.Bucket      =env.Bucket,
-    params.Key         = `DATA/${usario.uid}/`+`profile${Date.now()}`,
-    params.Body        = readFile.data,
-    params.ContentType ='image/jpeg'
-
-    console.log('aqui meño',readFile);
-
-    const complete = await Promise((resolve,reject)=>{
-         return s3Client.upload(params);
+        const params = s3.uploadParams;
+    
+        params.Bucket      =process.env.Bucket,
+        params.Key         = `storage/${usuario._id}/`+`profile${Date.now()}`,
+        params.Body        = data,
+        params.ContentType ='image/jpeg'
+    
+        const complete = new Promise((resolve)=>{
+              s3Client.upload(params,(err,data)=>{
+                 resolve(data);
+             });
+        });
+    
+        complete.then((data)=>{
+            res.json(data);
+        });
     });
 
-    console.log(complete);
 
 }  
 
