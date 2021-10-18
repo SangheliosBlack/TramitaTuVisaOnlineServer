@@ -17,7 +17,7 @@ const guardarFotoPerfil = async(req,res = response)=>{
     
     const usario = await Usuario.findById(req.uid);
 
-    const readFile =  await fs.readFile(req.file.path);
+    const readFile =  await fs.readFile(req.file);
 
     const s3Client = s3.s3Client;
     const params = s3.uploadParams;
