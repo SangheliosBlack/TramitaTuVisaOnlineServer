@@ -19,17 +19,8 @@ const guardarFotoPerfil = async(req,res = response)=>{
 
     const outputFilePath = Date.now() + "output." + ".png";
 
-    const imageSharp = await sharp(req.file.path).resize({
-        width: 600,
-        height: 600,
-        fit: sharp.fit.cover,
-    })
-    .toFormat("jpeg")
-    .jpeg({ quality: 100 })
-    .withMetadata()
-    .toFile(outputFilePath);
 
-    const readFile =  await fs.readFile(imageSharp);
+    const readFile =  await fs.readFile(req.file.path);
 
     const s3Client = s3.s3Client;
     const params = s3.uploadParams;
