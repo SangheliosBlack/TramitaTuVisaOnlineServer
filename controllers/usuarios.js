@@ -17,9 +17,6 @@ const guardarFotoPerfil = async(req,res = response)=>{
     
     const usario = await Usuario.findById(req.uid);
 
-    const outputFilePath = Date.now() + "output." + ".png";
-
-
     const readFile =  await fs.readFile(req.file.path);
 
     const s3Client = s3.s3Client;
@@ -29,6 +26,8 @@ const guardarFotoPerfil = async(req,res = response)=>{
     params.Key         = `DATA/${usario.uid}/`+`profile${Date.now()}`,
     params.Body        = readFile.data,
     params.ContentType ='image/jpeg'
+
+    console.log('aqui meño',readFile);
 
     const complete = await Promise((resolve,reject)=>{
          return s3Client.upload(params);
