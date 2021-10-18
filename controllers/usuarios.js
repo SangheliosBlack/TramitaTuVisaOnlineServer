@@ -1,9 +1,8 @@
 const {response} = require('express');
 const mongoose = require('mongoose');
-/*const sharp = require('sharp');*/
 const Usuario = require('../models/usuario');
-/*const fs = require("fs");
-const s3 = require("../config/s3.config.js");*/
+const fs = require("fs");
+const s3 = require("../config/s3.config.js");
 const usuario = require('../models/usuario');
 
 const updateDireccionFavorita = async(req,res = response)=>{

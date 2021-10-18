@@ -10,6 +10,6 @@ router.get('/',validarJWT,getUsuarios);
 
 router.post('/updateDireccionFavorita',validarJWT,updateDireccionFavorita);
 
-/*router.post('/guardarFotoPerfil',validarJWT,upload.single("photo"),guardarFotoPerfil)*/
+router.post('/guardarFotoPerfil',validarJWT,upload.single("photo"),guardarFotoPerfil)
 
 module.exports = router;

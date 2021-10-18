@@ -18,12 +18,14 @@
     "url": "https://github.com/SangheliosBlack/delivery_server/issues"
   },
   "dependencies": {
+    "aws-sdk": "^2.1010.0",
     "axios": "^0.21.4",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-validator": "^6.12.0",
+    "fs": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
     "mongoose": "^5.12.14",
