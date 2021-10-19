@@ -1,6 +1,10 @@
 const {Schema,model} = require ('mongoose');
 
 const UsuarioSchema =  Schema({
+    profile_photo_key:{
+        type:String,
+        require: false
+    },
     customerID:{
         type:String,
         required:false
