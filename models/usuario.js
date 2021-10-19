@@ -1,7 +1,7 @@
 const {Schema,model} = require ('mongoose');
 
 const UsuarioSchema =  Schema({
-    profile_photo_key:{
+    profilePhotoKey:{
         type:String,
         require: false
     },

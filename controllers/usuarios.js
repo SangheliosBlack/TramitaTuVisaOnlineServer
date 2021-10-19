@@ -20,7 +20,7 @@ const guardarFotoPerfil = async(req,res = response)=>{
     const ext = path.extname(req.file.path);
     
     const s3Client = s3.s3Client;
-    var paramsDelete= {  Bucket:process.env.Bucket , Key: usuario.profile_photo_key};
+    var paramsDelete= {  Bucket:process.env.Bucket , Key: usuario.profilePhotoKey};
     const params = s3.uploadParams;
     
     fs.readFile(req.file.path,async function( err, data)  {
@@ -38,7 +38,7 @@ const guardarFotoPerfil = async(req,res = response)=>{
     
         complete.then( async (newData)=>{
 
-            if(usuario.profile_photo_key){
+            if(usuario.profilePhotoKey){
 
                 const deleteComplete = new Promise((resolve)=>{
                     s3Client.deleteObject(paramsDelete,(err,data)=>{
@@ -48,7 +48,7 @@ const guardarFotoPerfil = async(req,res = response)=>{
 
                 deleteComplete.then(async(deleteObject)=>{
 
-                    await Usuario.findByIdAndUpdate(req.uid,{$set:{profile_photo_key:newData.Key}});
+                    await Usuario.findByIdAndUpdate(req.uid,{$set:{profilePhotoKey:newData.Key}});
 
                     return res.json({ok:true,url:newData.Key});
 
@@ -56,7 +56,7 @@ const guardarFotoPerfil = async(req,res = response)=>{
                 
             }else{
                 
-                await Usuario.findByIdAndUpdate(req.uid,{$set:{profile_photo_key:newData.Key}});
+                await Usuario.findByIdAndUpdate(req.uid,{$set:{profilePhotoKey:newData.Key}});
     
                 return res.json({ok:true,url:newData.Key});
                 
