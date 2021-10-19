@@ -23,13 +23,12 @@ const guardarFotoPerfil = async(req,res = response)=>{
     var paramsDelete= {  Bucket:process.env.Bucket , Key: usuario.profile_photo_key};
     const params = s3.uploadParams;
     
-    
     fs.readFile(req.file.path,async function( err, data)  {
         
         params.Bucket      =process.env.Bucket,
         params.Key         = `storage/${usuario._id}/`+`profile_image_${Date.now()}`+ext,
         params.Body        = data,
-        params.ContentType =req.file.ContentType
+        params.ContentType =req.file.mimetype
 
         const complete = new Promise((resolve)=>{
               s3Client.upload(params,(err,data)=>{
