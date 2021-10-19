@@ -59,7 +59,8 @@ const guardarFotoPerfil = async(req,res = response)=>{
                 
                 await Usuario.findByIdAndUpdate(req.uid,{$set:{profile_photo_key:newData.Key}});
     
-                return res.json(newData);
+                return res.json({ok:true,url:newData.Key});
+                
             }
 
             
