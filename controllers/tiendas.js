@@ -14,6 +14,25 @@ const getTiendas = async (req,res = response)=>{
     });
 }
 
+const modificarNombreTienda = async(req,res = response)=>{
+
+    await Tienda.findByIdAndUpdate({_id:req.body.tienda},{$set:{nombre:req.body.nombre}});
+
+    return res.json({
+        ok:true
+    })
+}
+
+const modificarStatus = async (req,res = response )=>{
+
+    await Tienda.findByIdAndUpdate({_id:req.uid},{$set:{disponible:req.body.disponible}});
+
+    return res.json({
+        ok:true
+    });
+
+}
+
 const modificarAniversario = async(req,res = response) =>{
 
     const aniversario = await  Tienda.findByIdAndUpdate({_id:req.body.tienda},{$set:{aniversario:req.body.aniversario}});
@@ -32,7 +51,7 @@ const modificarHorarioTienda = async(req,res = response) =>{
 
     const nuevoHorario = new Horario(data);
 
-    const horario = await  Tienda.findByIdAndUpdate({_id:req.body.tienda},{$set:{horario:nuevoHorario}});
+    await  Tienda.findByIdAndUpdate({_id:req.body.tienda},{$set:{horario:nuevoHorario}});
 
     res.json({
         ok:true,
@@ -55,6 +74,8 @@ const nuevaTienda = async(req,res = response ) =>{
 
     req.body.propietario = req.uid;
 
+    req.body.disponible = false;
+
     const nuevaTienda = new Tienda(req.body);
 
     await nuevaTienda.save();
@@ -71,4 +92,4 @@ const nuevaTienda = async(req,res = response ) =>{
     });
 }
 
-module.exports = {getTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario};
+module.exports = {getTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus};
