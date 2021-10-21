@@ -13,6 +13,15 @@ const updateDireccionFavorita = async(req,res = response)=>{
     });
   }
 
+const modificarTiendaFavorita  = async( req,res = response ) => {
+
+    await Usuario.findOneAndUpdate({_id:req.uid},{$set:{tiendaFavorita:req.body.tienda}});
+
+    res.json({
+        ok:true
+    });
+}
+
 const guardarFotoPerfil = async(req,res = response)=>{
     
     const usuario = await Usuario.findById(req.uid);
@@ -116,4 +125,4 @@ const getUsuarios = async (req,res = response)=>{
 
 
 
-module.exports = {getUsuarios,updateDireccionFavorita,guardarFotoPerfil};
+module.exports = {getUsuarios,updateDireccionFavorita,guardarFotoPerfil,modificarTiendaFavorita};
