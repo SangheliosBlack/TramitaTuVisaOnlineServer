@@ -38,7 +38,7 @@ const TiendasSchema = Schema({
         require:false
     },
     aniversario:{
-        type:String,
+        type:Date,
         require:false
     },
     disponible:{
