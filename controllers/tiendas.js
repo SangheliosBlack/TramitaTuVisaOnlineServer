@@ -25,7 +25,7 @@ const modificarNombreTienda = async(req,res = response)=>{
 
 const modificarStatus = async (req,res = response )=>{
 
-    await Tienda.findByIdAndUpdate({_id:req.uid},{$set:{disponible:req.body.disponible}});
+    await Tienda.findByIdAndUpdate({_id:req.body.tienda},{$set:{disponible:req.body.disponible}});
 
     return res.json({
         ok:true
@@ -35,7 +35,7 @@ const modificarStatus = async (req,res = response )=>{
 
 const modificarAniversario = async(req,res = response) =>{
 
-    const aniversario = await  Tienda.findByIdAndUpdate({_id:req.body.tienda},{$set:{aniversario:req.body.aniversario}});
+     await Tienda.findByIdAndUpdate({_id:req.body.tienda},{$set:{aniversario:req.body.aniversario}});
 
     res.json({
         ok:true,
