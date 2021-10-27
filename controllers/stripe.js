@@ -42,7 +42,7 @@ const createPaymentMethod = async(req,res = response)=>{
                 {customer: usuario.customerID}
             );
     
-            res.json({
+            res.status(200).json({
                 ok:true,
                 paymentMethod:paymentMethodAttach
             });
@@ -60,7 +60,7 @@ const createPaymentMethod = async(req,res = response)=>{
         
             await Usuario.findOneAndUpdate({'_id':req.uid},{'$set':{'customerID':customer.id}});
         
-            res.json({
+            res.status(200).json({
                 ok:true,
                 paymentMethod:paymentMethodAttach
             });
@@ -69,7 +69,7 @@ const createPaymentMethod = async(req,res = response)=>{
 
     }catch(error){
 
-        return res.json({
+        return res.status(402).json({
             ok:false,
             paymentMethod:null
         });
