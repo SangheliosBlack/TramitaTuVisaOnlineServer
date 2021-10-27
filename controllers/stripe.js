@@ -1,4 +1,5 @@
-const { response } = require('express');
+const { response, json } = require('express');
+const { body } = require('express-validator');
 const Usuario = require('../models/usuario');
 
 const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
@@ -16,47 +17,67 @@ const getListCustomerPaymentsMethods = async (req,res = response) =>{
     })
 }
 
-const createNewCustomer = async (req,res = response) =>{
+const createPaymentMethod = async(req,res = response)=>{
 
-    console.log(req.body.paymentMethod);
+    const data = req.body;
+
     const usuario = await Usuario.findById(req.uid);
 
-    if(usuario.customerID){
+    try{
+
+        const paymentMethod = await stripe.paymentMethods.create({
+            type: 'card',
+            card: {
+              number:body.card,
+              exp_month: body.cardExpMonth,
+              exp_year: body.cardExpYear,
+              cvc: body.cardCvc,
+            },
+        });
+
+        if(usuario.customerID){
         
-        const paymentMethodAttach = await stripe.paymentMethods.attach(
-            req.body.paymentMethod,
-            {customer: usuario.customerID}
-        );
+            const paymentMethodAttach = await stripe.paymentMethods.attach(
+                paymentMethod.id,
+                {customer: usuario.customerID}
+            );
+    
+            res.json({
+                ok:true,
+                paymentMethod:paymentMethodAttach
+            });
+    
+        }else{
+    
+            const customer = await stripe.customers.create({
+                description: 'Cliente generado con el ID : '+req.uid,
+            });
+        
+            const paymentMethodAttach = await stripe.paymentMethods.attach(
+                req.body.paymentMethod,
+                {customer: customer.id}
+            );
+        
+            await Usuario.findOneAndUpdate({'_id':req.uid},{'$set':{'customerID':customer.id}});
+        
+            res.json({
+                ok:true,
+                paymentMethod:paymentMethodAttach
+            });
 
-            console.log(paymentMethodAttach);
+        }
 
-        res.json(
-            paymentMethodAttach
-        );
+    }catch(error){
 
-    }else{
-        const customer = await stripe.customers.create({
-            description: 'Cliente generado con el ID : '+req.uid,
-            email:usuario.email,
-            name:usuario.name
+        return res.json({
+            ok:false,
+            paymentMethod:null
         });
-    
-    
-        const paymentMethodAttach = await stripe.paymentMethods.attach(
-            req.body.paymentMethod,
-            {customer: customer.id}
-        );
-    
-    
-        await Usuario.findOneAndUpdate({'_id':req.uid},{'$set':{'customerID':customer.id}});
-    
-        res.json({
-            paymentMethodAttach
-        });
+
     }
 
-
-    
 }
 
-module.exports = {getListCustomerPaymentsMethods,createNewCustomer};
+
+
+module.exports = {getListCustomerPaymentsMethods,createPaymentMethod};
