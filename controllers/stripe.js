@@ -1,5 +1,5 @@
 const { response, json } = require('express');
-const { body } = require('express-validator');
+const { body: data } = require('express-validator');
 const Usuario = require('../models/usuario');
 
 const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
@@ -28,10 +28,10 @@ const createPaymentMethod = async(req,res = response)=>{
         const paymentMethod = await stripe.paymentMethods.create({
             type: 'card',
             card: {
-              number:body.card,
-              exp_month: body.cardExpMonth,
-              exp_year: body.cardExpYear,
-              cvc: body.cardCvc,
+              number:data.card,
+              exp_month: data.cardExpMonth,
+              exp_year: data.cardExpYear,
+              cvc: data.cardCvc,
             },
         });
 
