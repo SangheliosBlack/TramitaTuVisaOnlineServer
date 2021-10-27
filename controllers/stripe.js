@@ -68,7 +68,7 @@ const createPaymentMethod = async(req,res = response)=>{
         }
 
     }catch(error){
-
+        console.log(error);
         return res.status(402).json({
             ok:false,
             paymentMethod:null
