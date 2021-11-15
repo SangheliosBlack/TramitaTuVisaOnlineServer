@@ -25,6 +25,7 @@ app.use('/api/usuarios',require('./routes/usuarios'));
 app.use('/api/direcciones',require('./routes/direcciones'));
 app.use('/api/tiendas',require('./routes/tiendas'));
 app.use('/api/productos',require('./routes/productos'));
+app.use('/api/puntoventa',require('./routes/productos_fake'));
 app.use('/api/stripe',require('./routes/stripe'));
 
 server.listen( process.env.PORT, ( err ) => {

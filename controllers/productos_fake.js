@@ -1,0 +1,21 @@
+const ProductoFake = require("../models/producto_fake");
+
+const nuevoProductoFake = async (req,res = response) =>{
+    const producto_fake = new ProductoFake(req.body);
+
+    producto_fake.cantidad = 0;
+
+    producto_fake.precio = 0;
+
+    await producto_fake.save();
+
+    return res.json({
+
+        ok:true
+    
+    });
+}
+
+module.exports = {
+    nuevoProductoFake
+}
