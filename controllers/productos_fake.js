@@ -9,9 +9,12 @@ const nuevoProductoFake = async (req,res = response) =>{
 
     await producto_fake.save();
 
+    console.log(producto_fake);
+
     return res.json({
 
-        ok:true
+        ok:true,
+        producto_fake
     
     });
 }
