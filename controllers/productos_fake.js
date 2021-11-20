@@ -10,6 +10,13 @@ const nuevoProductoFake = async (req,res = response) =>{
     await producto_fake.save();
 
     console.log(producto_fake);
+    console.log(producto_fake);
+    console.log(producto_fake);
+    console.log(producto_fake);
+    console.log(producto_fake);
+    console.log(producto_fake);
+    console.log(producto_fake);
+    console.log(producto_fake);
 
     return res.json({
 
