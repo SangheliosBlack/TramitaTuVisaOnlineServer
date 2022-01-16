@@ -57,7 +57,7 @@ const guardarFotoPerfil = async(req,res = response)=>{
 
                 deleteComplete.then(async(deleteObject)=>{
 
-                    await Usuario.findByIdAndUpdate(req.uid,{$set:{profilePhotoKey:newData.Key}});
+                    await Usuario.findByIdAndUpdate(req.uid,{$set:{profile_photo_key:newData.Key}});
 
                     return res.json({ok:true,url:newData.Key});
 
@@ -65,7 +65,7 @@ const guardarFotoPerfil = async(req,res = response)=>{
                 
             }else{
                 
-                await Usuario.findByIdAndUpdate(req.uid,{$set:{profilePhotoKey:newData.Key}});
+                await Usuario.findByIdAndUpdate(req.uid,{$set:{profile_photo_key:newData.Key}});
     
                 return res.json({ok:true,url:newData.Key});
                 
@@ -123,6 +123,24 @@ const getUsuarios = async (req,res = response)=>{
 
 }
 
+const ModificarNombre = async(req, res)=>{
+    
+    await Usuario.findOneAndUpdate({_id:req.uid},{$set:{nombre:req.body.nombre}});
 
+    res.json({
+        ok:true
+    });
 
-module.exports = {getUsuarios,updateDireccionFavorita,guardarFotoPerfil,modificarTiendaFavorita};
+}
+
+const ModificarNombreUsuario = async(req, res)=>{
+    
+    await Usuario.findOneAndUpdate({_id:req.uid},{$set:{nombre_usuario:req.body.nombre_usuario}});
+
+    res.json({
+        ok:true
+    });
+
+}
+
+module.exports = {getUsuarios,updateDireccionFavorita,guardarFotoPerfil,modificarTiendaFavorita,ModificarNombreUsuario,ModificarNombre};

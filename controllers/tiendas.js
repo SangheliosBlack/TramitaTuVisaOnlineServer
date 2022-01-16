@@ -3,6 +3,103 @@ const moment = require('moment');
 const Tienda = require('../models/tiendas');
 const Usuario = require('../models/usuario');
 const Horario = require('../models/horario');
+const ListaProductos = require('../models/lista_productos');
+
+const construirPantallaPrincipalTiendas = async (req,res)=>{
+
+    const tiendas = await Tienda.aggregate(
+        [
+            {
+                $match:{}
+            
+            },
+            {
+                $addFields:{
+                    "uid": "$_id",
+                    "fotografias": "$fotografias",
+                    "inventario": [],
+                    "equipo": "$equipo",
+                    "ventas": "$ventas",
+                    "nombre": "$nombre",
+                    "propietario": "$propietario",
+                    "disponible": "$disponible",
+                    "productos": [],
+                    "createdAt": "$createdAt",
+                    "updatedAt": "$updatedAt",
+                    "horario": "$horario",
+                    "aniversario": "$aniversario"
+                }
+            }
+        ]
+    );
+
+        console.log(
+           'logrado' 
+        );
+
+    return res.json({
+        ok:true,        
+        tiendas:tiendas,
+    });
+
+}
+
+
+const construirPantallaPrincipalCategorias = async (req,res)=>{
+
+    const categorias = await ListaProductos.aggregate(
+        [
+            {
+                $match:{}
+            },{
+                $unwind:'$productos'
+            },{
+                $group:{
+                    _id:0,
+                    categorias:{$addToSet:'$productos.categoria'}
+                }
+            }
+        ]
+    );
+
+    return res.json(
+            categorias[0].categorias
+    );
+
+}
+
+const construirPantallaPrincipalProductos = async (req,res)=>{
+
+    const productos = await ListaProductos.aggregate(
+        [
+            {
+                $match:{}
+            },{
+                $unwind:'$productos'
+            },{
+                $project:{
+                    _id:'$productos._id',
+                    categorias:'$productos.categoria',
+                    nombre:'$productos.nombre',
+                    precio:'$productos.precio',
+                    descripcion:'$productos.descripcion',
+                    descuentoP:'$productos.descuentoP',
+                    descuentoC:'$productos.descuentoC',
+                    disponible:'$productos.disponible',
+                    comentarios:'$productos.comentarios',
+
+                }
+            }
+        ]
+    );
+
+
+    return res.json({
+        ok:true,
+        productos
+    });
+
+}
 
 const getTiendas = async (req,res = response)=>{
 
@@ -20,7 +117,8 @@ const modificarNombreTienda = async(req,res = response)=>{
 
     return res.json({
         ok:true
-    })
+    });
+
 }
 
 const modificarStatus = async (req,res = response )=>{
@@ -35,7 +133,7 @@ const modificarStatus = async (req,res = response )=>{
 
 const modificarAniversario = async(req,res = response) =>{
 
-     await Tienda.findByIdAndUpdate({_id:req.body.tienda},{$set:{aniversario:req.body.aniversario}});
+    await Tienda.findByIdAndUpdate({_id:req.body.tienda},{$set:{aniversario:req.body.aniversario}});
 
     res.json({
         ok:true,
@@ -44,6 +142,7 @@ const modificarAniversario = async(req,res = response) =>{
 }
 
 const modificarHorarioTienda = async(req,res = response) =>{
+
     const apertura = moment(req.body.apertura,'hh:mm').format();
     const cierre = moment(req.body.cierre,'hh:mm').format();
 
@@ -70,26 +169,39 @@ const searchOne = async (req,res = resposne) =>{
     );
 }
 
-const nuevaTienda = async(req,res = response ) =>{
+const nuevaTienda = async (req,res) =>{
+
+
+    const newLista = await new ListaProductos();
+
+    const newHorario = await new Horario();
+
+    newHorario.apertura == new Date();
+    newHorario.cierre == new Date();
+    
+    await newLista.save();
+
+    req.body.horario = newHorario;
 
     req.body.propietario = req.uid;
 
     req.body.disponible = false;
+
+    req.body.aniversario = new Date();
+
+    req.body.productos = newLista._id;
 
     const nuevaTienda = new Tienda(req.body);
 
     await nuevaTienda.save();
 
     await Usuario.findOneAndUpdate({_id:req.uid},{$push:{tiendas:nuevaTienda._id}});
-    
-    await Usuario.findOneAndUpdate({_id:req.uid},{$set:{tiendaFavorita:nuevaTienda._id}});
-
-
 
     res.json({
         ok:true,
-        tienda,
+        nuevaTienda,
     });
+
 }
 
-module.exports = {getTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus};
+module.exports = {getTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos};

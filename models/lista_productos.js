@@ -1,0 +1,93 @@
+const { Schema,model } = require('mongoose');
+
+const ListaProductosSchema = Schema({
+    productos:[
+        {
+            categoria:{
+                type:String,
+                require:true
+            },
+            comentarios:[
+                {
+                    usuario:{
+                        type:Schema.Types.ObjectId,
+                        require:true
+                    },
+                    comentario:{
+                        type:String,
+                        require:true
+                    },
+                    encabezado:{
+                        type:String,
+                        require:true
+                    },
+                    calificacion:{
+                        type:Number,
+                        require:true
+                    },
+                    reacciones:{
+                        type:Number,
+                        require:true
+                    },
+                    destacado:{
+                        type:Boolean,
+                        require:true
+                    },
+                    sub_respuesta:{
+                        type:Boolean,
+                        require:true
+                    },
+                    eliminado:{
+                        type:Boolean,
+                        require:true
+                    }
+                }
+            ],
+            nombre:{
+                type:String,
+                require:true
+            },
+            precio:{
+                type:Number,
+                require:true,
+            },
+            descripcion:{
+                type:String,
+                require:true
+            },
+            descuentoP:{
+                type:Number,
+                require:true
+            },
+            descuentoC:{
+                type:Number,
+                require:true
+            },
+            sku:{
+                type:String,
+                require:false
+            },
+            promocion:{
+                type:Schema.Types.ObjectId,
+                require:false
+            },
+            disponible:{
+                type:Boolean,
+                require:true
+            },
+            foto:{
+                type:String,
+                require:false
+            }
+        }
+    ]
+},{
+    timestamps:true
+});
+
+ListaProductosSchema.method('toJSON',function(){
+    const {__v,_id,...object} = this.toObject();
+    return object;
+}); 
+
+module.exports = model('ListaProductos',ListaProductosSchema);

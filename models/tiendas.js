@@ -1,58 +1,60 @@
 const {Schema,model} = require('mongoose');
 
 const TiendasSchema = Schema({
-    propietario:{
-        type:Schema.Types.ObjectId,
-        require:true
+    fotografias:{
+        type:Array,
+        require:false
+    },
+    inventario:{
+        type:Array,
+        require: false
+    },
+    equipo:{
+        type:Array,
+        require:false
     },
     nombre:{
         type:String,
         require:true
     },
-    icono:{
-        type:String,
-        require:false
+    propietario:{
+        type:Schema.Types.ObjectId,
+        require:true
     },
-    fotografias:{
-        type:Array,
-        require:false
+    disponible:{
+        type:Boolean,
+        require:true
     },
-    productos:{
-        type:Array,
-        require:false
-    },
-    direccion:{
-        type:String,
-        require:false
-    },
-    coordenadas:{
-        type:Object,
+    aniversario:{
+        type:Date,
         require:false
     },
     horario:{
         type:Object,
         require:false
     },
-    equipo:{
+    icono:{
+        type:Number,
+        require:false
+    },
+    productos:{
+        type:Schema.Types.ObjectId,
+        require:false
+    },
+    direccion:{
+        type:String,
+        require:false
+    },
+    ventas:{
         type:Array,
         require:false
     },
-    aniversario:{
-        type:Date,
-        require:false
-    },
-    disponible:{
-        type:Boolean,
-        require:false
-    }
-    
-
 },{
     timestamps:true
 });
 
 TiendasSchema.method('toJSON',function(){
-    const {__v,_id,password,...object} = this.toObject();
+    const {__v,_id,...object} = this.toObject();
     object.uid = _id;
     return object;
 });

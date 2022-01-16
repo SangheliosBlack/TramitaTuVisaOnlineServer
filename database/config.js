@@ -8,10 +8,10 @@ const dbConnection = async()=>{
             useCreateIndex:true,
             useFindAndModify: false
         });
-        console.log('DB Online')
+        console.log('Base de datos conectada');
     }catch(error){
-        console.log(console.error);
-        throw new Error('Error en la base de datos - Hable con el Admin')
+        console.log(error);
+        throw new Error('Error en la base de datos - Hable con el Admin');
     }
 }
 

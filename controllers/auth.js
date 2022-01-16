@@ -2,20 +2,22 @@ const { response } = require("express");
 const bcrypt = require("bcryptjs");
 const Usuario = require("../models/usuario");
 const { generarJWT } = require("../helpers/jwt");
+const { generarNombre } = require("../helpers/generar_nombre");
 
 const crearUsuario = async (req, res = response) => {
-  const { email, password } = req.body;
+
+  const { correo, contrasena } = req.body;
 
   try {
-    const existeEmail = await Usuario.findOne({ email: email.toLowerCase() });
+    const existeEmail = await Usuario.findOne({correo: correo.toLowerCase()});
 
     if (existeEmail) {
       res.status(400).json({
         ok: false,
         errores: {
-          value: email,
+          value: correo,
           msg: "Este correo ya se encuentra registrado",
-          param: "email",
+          param: "correo",
           location: "session",
         },
       });
@@ -23,12 +25,19 @@ const crearUsuario = async (req, res = response) => {
 
     const usuario = new Usuario(req.body);
 
+    console.log(usuario);
+
     const salt = bcrypt.genSaltSync();
-    usuario.password = bcrypt.hashSync(password, salt);
-    usuario.email.toLowerCase();
-    usuario.admin = true;
+
+    usuario.contrasena = bcrypt.hashSync(contrasena, salt);
+    usuario.correo = req.body.correo.toLowerCase();
+    usuario.nombre_usuario = generarNombre(usuario.nombre);
+    usuario.socio = false;
+    usuario.online = false;
+
 
     await usuario.save();
+
 
     const token = await generarJWT(usuario.id);
 
@@ -37,10 +46,12 @@ const crearUsuario = async (req, res = response) => {
       usuario,
       token,
     });
+
   } catch (error) {
     console.log(error);
     res.status(500).json({
       ok: false,
+      error,
       errors: {
         session: {
           value: null,
@@ -53,31 +64,30 @@ const crearUsuario = async (req, res = response) => {
   }
 };
 
-const loginUsuario = async (req, res = response) => {
-  const { email, password } = req.body;
+const iniciarUsuario = async (req, res = response) => {
+  const { correo, contrasena } = req.body;
   try {
-    const usuarioDB = await Usuario.findOne({ email });
+    const usuarioDB = await Usuario.findOne({ correo });
     if (!usuarioDB) {
       return res.status(404).json({
         ok: false,
         errores:[{
           value:"",
           msg:"Email no encontrado",
-          param:"email",
+          param:"correo",
           location: "",
-
         }],
       });
     }
 
-    const validarPassword = bcrypt.compareSync(password, usuarioDB.password);
+    const validarPassword = bcrypt.compareSync(contrasena, usuarioDB.contrasena);
     if (!validarPassword) {
       return res.status(404).json({
         ok: false,
         errores:[{
           value:"",
           msg:"La contraseña no coincide",
-          param:"password",
+          param:"contrasena",
           location: "",
 
         }],
@@ -85,7 +95,6 @@ const loginUsuario = async (req, res = response) => {
     }
 
     const token = await generarJWT(usuarioDB.id);
-    console.log('esta bien'+usuarioDB+token);
 
     res.status(200).json({
       ok: true,
@@ -103,7 +112,8 @@ const loginUsuario = async (req, res = response) => {
 };
 
 
-const renewToken = async (req, res = response) => {
+const renovarToken = async (req, res = response) => {
+
   const uid = req.uid;
 
   const token = await generarJWT(uid);
@@ -119,6 +129,6 @@ const renewToken = async (req, res = response) => {
 
 module.exports = {
   crearUsuario,
-  loginUsuario,
-  renewToken,
-  };
+  iniciarUsuario,
+  renovarToken,
+};

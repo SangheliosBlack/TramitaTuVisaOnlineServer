@@ -1,58 +1,61 @@
 const {Schema,model} = require ('mongoose');
 
 const UsuarioSchema =  Schema({
-    profilePhotoKey:{
+    nombre_usuario:{
+        type:String,
+        require:true
+    },
+    nombre:{
+        type:String,
+        require:true
+    },
+    online:{
+        type:Boolean,
+        default:false
+    },
+    correo:{
+        type:String,
+        require:true,
+        
+        unique:true
+    },
+    contrasena:{
+        type:String,
+        required:true
+    },
+    direcciones:{
+        type:Array,
+        required:false
+    },
+    socio:{
+        type:Boolean,
+        required:true
+    },
+    customer_id:{
+        type:String,
+        required:false,
+        sparse:true,
+        unique:true,
+    },
+    profile_photo_key:{
         type:String,
         require: false
     },
-    customerID:{
+    numero_celular:{
         type:String,
+        unique:true,
         required:false
     },
     tiendas:{
         type:Array,
         required:false
     },
-    tiendaFavorita:{
-        type:Schema.Types.ObjectId,
-        required:false
-    },
-    direccionFavorita:{
-        type:Schema.Types.ObjectId,
-        required:false
-    },
-    name:{
-        type:String,
-        require:true
-    },
-    email:{
-        type:String,
-        require:true,
-        unique:true
-    },
-    password:{
-        type:String,
-        required:true
-    },
-    online:{
-        type:Boolean,
-        default:false
-    },
-    hokage:{
-        type:Boolean,
-        require:true
-    },
-    direcciones:{
-        type:Array,
-        required:false
-    }
-    
 },{
     timestamps:true
 });
 
 UsuarioSchema.method('toJSON',function(){
-    const {__v,_id,password,...object} = this.toObject();
+    const {__v,_id,contrasena,...object} = this.toObject();
     object.uid = _id;
     return object;
 });
