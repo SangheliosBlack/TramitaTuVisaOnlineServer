@@ -5,7 +5,7 @@ const {getDirecciones, nuevaDireccion, searchOne, updateIcon, updateName} = requ
 const router = Router();
 
 router.get('/',validarJWT,getDirecciones);
-router.post('/new',validarJWT,nuevaDireccion);
+router.post('/nuevaDireccion',validarJWT,nuevaDireccion);
 router.post('/search',validarJWT,searchOne);
 router.post('/updateIcon',validarJWT,updateIcon);
 router.post('/updateName',validarJWT,updateName);

@@ -71,8 +71,7 @@ const nuevaDireccion = async (req,res = response)=>{
 
     const direccion = new Direccion(req.body);
     
-    var nuevaDireccion = await Usuario.findByIdAndUpdate({_id:req.uid},{$push:{direcciones:direccion}});
-    
+    await Usuario.findByIdAndUpdate({_id:req.uid},{$push:{direcciones:direccion}});
 
     res.json({
         ok:true,

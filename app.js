@@ -17,7 +17,8 @@ class Server {
             usuario:'/api/usuario',
             tienda:'/api/tienda',
             producto:'/api/productos',
-            comentarios:'/api/comentarios'
+            comentarios:'/api/comentarios',
+            direcciones:'/api/direcciones'
         }
 
         this.conectarDB();
@@ -49,6 +50,7 @@ class Server {
         this.app.use(this.paths.tienda,require('./routes/tiendas'));
         this.app.use(this.paths.comentarios,require('./routes/comentarios'));
         this.app.use(this.paths.producto,require('./routes/productos'));
+        this.app.use(this.paths.direcciones,require('./routes/direcciones'));
 
     }
 
