@@ -4,6 +4,7 @@ const Tienda = require('../models/tiendas');
 const Usuario = require('../models/usuario');
 const Horario = require('../models/horario');
 const ListaProductos = require('../models/lista_productos');
+const mongoose = require('mongoose');
 
 const construirPantallaPrincipalTiendas = async (req,res)=>{
 
@@ -23,7 +24,8 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
                     "nombre": "$nombre",
                     "propietario": "$propietario",
                     "disponible": "$disponible",
-                    "productos": [],
+                    "productos": "$productos",
+                    "listaProductos": [],
                     "createdAt": "$createdAt",
                     "updatedAt": "$updatedAt",
                     "horario": "$horario",
@@ -101,14 +103,21 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
 
 }
 
-const getTiendas = async (req,res = response)=>{
+const obtenerTiendas = async (req,res = response)=>{
 
-    const tienda = await Tienda.find({'propietario':req.uid});
+    const usuario = await Usuario.findById(req.uid);
 
-    res.json({
-        ok:true,
+    const tienda = await Tienda.findById(usuario.tienda);
+
+    const productos = await ListaProductos.findById(tienda.productos);
+
+    tienda.listaProductos = productos.productos;
+
+    console.log(tienda);
+
+    res.json(
         tienda
-    });
+    );
 }
 
 const modificarNombreTienda = async(req,res = response)=>{
@@ -171,13 +180,13 @@ const searchOne = async (req,res = resposne) =>{
 
 const nuevaTienda = async (req,res) =>{
 
-
     const newLista = await new ListaProductos();
 
     const newHorario = await new Horario();
 
-    newHorario.apertura == new Date();
-    newHorario.cierre == new Date();
+    newHorario.apertura = new Date();
+    
+    newHorario.cierre = new Date();
     
     await newLista.save();
 
@@ -204,4 +213,4 @@ const nuevaTienda = async (req,res) =>{
 
 }
 
-module.exports = {getTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos};
+module.exports = {obtenerTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos};

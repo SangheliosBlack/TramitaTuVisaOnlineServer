@@ -49,6 +49,14 @@ const TiendasSchema = Schema({
         type:Array,
         require:false
     },
+    coordenadas:{
+        type:Object,
+        require:true,
+    },
+    listaProductos:{
+        type:Array,
+        require:false
+    }
 },{
     timestamps:true
 });

@@ -9,16 +9,18 @@ const {dbConnection} = require('./database/config');
 class Server {
 
     constructor(){
+        
         this.app = express();
         this.port = process.env.PORT;
 
         this.paths = {
             auth:'/api/autentificacion',
             usuario:'/api/usuario',
-            tienda:'/api/tienda',
+            tienda:'/api/tiendas',
             producto:'/api/productos',
             comentarios:'/api/comentarios',
-            direcciones:'/api/direcciones'
+            direcciones:'/api/direcciones',
+            stripe:'/api/stripe'
         }
 
         this.conectarDB();
@@ -51,6 +53,7 @@ class Server {
         this.app.use(this.paths.comentarios,require('./routes/comentarios'));
         this.app.use(this.paths.producto,require('./routes/productos'));
         this.app.use(this.paths.direcciones,require('./routes/direcciones'));
+        this.app.use(this.paths.stripe,require('./routes/stripe'));
 
     }
 

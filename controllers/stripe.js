@@ -9,12 +9,25 @@ const getListCustomerPaymentsMethods = async (req,res = response) =>{
     const usuario = await Usuario.findById(req.uid);
 
     const paymentMethods = await stripe.paymentMethods.list({
-        customer: usuario.customerID,
+        customer: usuario.customer_id,
         type: 'card',
     });
+
+
     res.json({
         paymentMethods
     })
+}
+
+const obtenerCliente = async(req,res)=>{
+
+    const usuario = await Usuario.findById(req.uid);
+
+    const customer = await stripe.customers.retrieve(
+        usuario.customer_id
+    );
+
+    return res.json(customer);
 }
 
 const createPaymentMethod = async(req,res = response)=>{
@@ -35,38 +48,36 @@ const createPaymentMethod = async(req,res = response)=>{
             },
         });
 
-        if(usuario.customerID){
+        if(usuario.customer_id){
         
             const paymentMethodAttach = await stripe.paymentMethods.attach(
                 paymentMethod.id,
-                {customer: usuario.customerID}
+                {customer: usuario.customer_id}
             );
     
-            res.status(200).json(res.status(200).json(
-                paymentMethodAttach
-            ));
-    
-        }else{
-    
-            const customer = await stripe.customers.create({
-                description: 'Cliente generado con el ID : '+req.uid,
-            });
-        
-            const paymentMethodAttach = await stripe.paymentMethods.attach(
-                req.body.paymentMethod,
-                {customer: customer.id}
-            );
-        
-            await Usuario.findOneAndUpdate({'_id':req.uid},{'$set':{'customerID':customer.id}});
-        
             res.status(200).json(
                 paymentMethodAttach
             );
 
+        }else{
+    
+            const customer = await stripe.customers.create({
+                description: 'Cliente generado con el ID : '+req.uid,
+                email:usuario.correo,
+                name:usuario.nombre
+            });
+        
+            const paymentMethodAttach = await stripe.paymentMethods.attach(
+                paymentMethod.id,
+                {customer: customer.id}
+            );
+        
+            await Usuario.findOneAndUpdate({'_id':req.uid},{'$set':{'customer_id':customer.id}});
+        
+            
         }
 
     }catch(error){
-        console.log(error);
         return res.status(402).json(res.status(200).json(
             paymentMethodAttach
         ));
@@ -77,4 +88,4 @@ const createPaymentMethod = async(req,res = response)=>{
 
 
 
-module.exports = {getListCustomerPaymentsMethods,createPaymentMethod};
+module.exports = {getListCustomerPaymentsMethods,createPaymentMethod,obtenerCliente};

@@ -66,8 +66,6 @@ const nuevaDireccion = async (req,res = response)=>{
     const coodernadas = new Coordendas(req.body);
 
     req.body.coordenadas = coodernadas;
-    req.body.favorito = false;
-    req.body.titulo = 'Casa';
 
     const direccion = new Direccion(req.body);
     

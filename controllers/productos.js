@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 
 const nuevoProducto = async (req,res = response)=>{
 
+    console.log(req.body);
+
     req.body.descuentoP = 0.00;
     req.body.descuentoC = 0.00;
     req.body.disponible = true;

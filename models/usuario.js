@@ -46,8 +46,8 @@ const UsuarioSchema =  Schema({
         unique:true,
         required:false
     },
-    tiendas:{
-        type:Array,
+    tienda:{
+        type:Schema.Types.ObjectId,
         required:false
     },
 },{

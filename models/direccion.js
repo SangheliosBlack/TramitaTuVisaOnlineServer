@@ -13,12 +13,12 @@ const DireccionSchema = Schema({
         type:String,
         require:true
     },
-    titulo:{
-        type:String,
-        require:true
-    },
     icono:{
         type:Number,
+        require:true
+    },
+    predeterminado:{
+        type:Boolean,
         require:true
     }
 },{
