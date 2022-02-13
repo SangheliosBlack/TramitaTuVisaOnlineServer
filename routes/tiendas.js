@@ -1,6 +1,6 @@
 const {Router} = require('express');
 const {validarJWT} = require('../middlewares/validar-jwt');
-const {searchOne, obtenerTiendas, nuevaTienda, modificarHorarioTienda, modificarAniversario, modificarNombreTienda, modificarStatus, construirPantallaPrincipal, construirPantallaPrincipalCategorias, construirPantallaPrincipalTiendas, construirPantallaPrincipalProductos } = require('../controllers/tiendas');
+const {obtenerProductosTienda,searchOne, obtenerTiendas, nuevaTienda, modificarHorarioTienda, modificarAniversario, modificarNombreTienda, modificarStatus, construirPantallaPrincipal, construirPantallaPrincipalCategorias, construirPantallaPrincipalTiendas, construirPantallaPrincipalProductos } = require('../controllers/tiendas');
 
 const router = Router();
 
@@ -13,6 +13,8 @@ router.post('/modificarAniversario',validarJWT,modificarAniversario);
 router.post('/modificarStatus',validarJWT,modificarStatus);
 
 router.post('/getTienda',validarJWT,searchOne);
+
+router.get('/obtenerProductosTienda',validarJWT,obtenerProductosTienda);
 
 /*GET*/
 

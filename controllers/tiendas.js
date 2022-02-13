@@ -16,33 +16,92 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
             },
             {
                 $addFields:{
-                    "uid": "$_id",
-                    "fotografias": "$fotografias",
-                    "inventario": [],
-                    "equipo": "$equipo",
-                    "ventas": "$ventas",
-                    "nombre": "$nombre",
-                    "propietario": "$propietario",
-                    "disponible": "$disponible",
-                    "productos": "$productos",
-                    "listaProductos": [],
-                    "createdAt": "$createdAt",
-                    "updatedAt": "$updatedAt",
-                    "horario": "$horario",
-                    "aniversario": "$aniversario"
+                    'uid':'$_id',
+                    'listaProductos':[]
+                }
+            }
+            
+            
+        ]
+    );
+
+    return res.json({
+        ok:true,        
+        tiendas,
+    });
+
+}
+const obtenerProductosTienda = async (req,res)=>{
+
+    const body = req.body;
+
+    const tienda = await ListaProductos.aggregate(
+        [
+            {
+                $match:{
+                    '_id':mongoose.Types.ObjectId('61feb3738c928f18cc164f6f')
+                }
+            
+            },
+            {
+                $lookup:{
+                    from: 'listaproductos',
+                    localField: 'productos',
+                    foreignField: '_id',
+                    as:'listaProductos'
+                }
+            }
+            
+            
+        ]
+    );
+
+    const categorias = await ListaProductos.aggregate(
+        [
+            {
+                $match:{
+                    '_id':mongoose.Types.ObjectId('61feb3738c928f18cc164f6f')
+                }
+            },{
+                $unwind:'$productos'
+            },{
+                $group:{
+                    _id:0,
+                    categorias:{$addToSet:'$productos.categoria'}
                 }
             }
         ]
     );
 
-        console.log(
-           'logrado' 
-        );
+    var definitivo =  [];
 
-    return res.json({
-        ok:true,        
-        tiendas:tiendas,
+    
+
+    categorias[0].categorias.forEach(function(currentValue1, index1){
+
+        var pre = {};
+        
+        pre.titulo = currentValue1;
+        pre.productos = [];
+
+        definitivo.push(pre);
+
+        tienda[0].productos.forEach(function(currentValue2, index2){
+            console.log(currentValue1+ currentValue2.categoria)
+            if(currentValue1 == currentValue2.categoria){
+                definitivo[index1].productos.push(currentValue2);
+            }
+            
+        });
+        
     });
+
+    return res.json(
+        {
+            ok:true,
+            productos:definitivo
+        }
+    );
 
 }
 
@@ -113,7 +172,6 @@ const obtenerTiendas = async (req,res = response)=>{
 
     tienda.listaProductos = productos.productos;
 
-    console.log(tienda);
 
     res.json(
         tienda
@@ -213,4 +271,4 @@ const nuevaTienda = async (req,res) =>{
 
 }
 
-module.exports = {obtenerTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos};
+module.exports = {obtenerTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
