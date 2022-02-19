@@ -153,11 +153,36 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
             }
         ]
     );
+    var index = 0;
+    var separados = [];
+    var contador = 1;
+
+    var limite = 0;
+
+    do{
+        if(index==0){
+            var nuevo = {};
+            nuevo.linea = limite;
+            nuevo.productos = [];
+            separados.push(nuevo);
+        }else if(contador >= 4){
+            limite ++;
+            contador = 1;
+            var nuevo = {};
+            nuevo.linea = limite;
+            nuevo.productos = [];
+            separados.push(nuevo);
+        }
+        separados[limite].productos.push(productos[index])
+        index++;
+        contador ++;
+        console.log(separados);
+    }while(index<productos.length);
 
 
     return res.json({
         ok:true,
-        productos
+        separados
     });
 
 }
