@@ -1,6 +1,6 @@
 const {Router} = require('express');
 const {validarJWT} = require('../middlewares/validar-jwt');
-const {obtenerProductosTienda,searchOne, obtenerTiendas, nuevaTienda, modificarHorarioTienda, modificarAniversario, modificarNombreTienda, modificarStatus, construirPantallaPrincipal, construirPantallaPrincipalCategorias, construirPantallaPrincipalTiendas, construirPantallaPrincipalProductos } = require('../controllers/tiendas');
+const {obtenerProductosTienda,searchOne, obtenerTiendas, nuevaTienda, modificarHorarioTienda, modificarAniversario, modificarNombreTienda, modificarStatus, construirPantallaPrincipal, construirPantallaPrincipalCategorias, construirPantallaPrincipalTiendas, construirPantallaPrincipalProductos, obtenerProductosCategoria } = require('../controllers/tiendas');
 
 const router = Router();
 
@@ -21,6 +21,9 @@ router.get('/obtenerProductosTienda',validarJWT,obtenerProductosTienda);
 router.get('/construirPantallaPrincipalCategorias',validarJWT,construirPantallaPrincipalCategorias);
 router.get('/construirPantallaPrincipalTiendas',validarJWT,construirPantallaPrincipalTiendas);
 router.get('/construirPantallaPrincipalProductos',validarJWT,construirPantallaPrincipalProductos);
+
+
+router.post('/obtenerProductosCategoria',validarJWT,obtenerProductosCategoria);
 
 
 module.exports = router;

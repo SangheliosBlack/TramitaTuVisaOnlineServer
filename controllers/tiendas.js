@@ -129,6 +129,65 @@ const construirPantallaPrincipalCategorias = async (req,res)=>{
 
 }
 
+const obtenerProductosCategoria = async(req,res)=>{
+
+
+    const productos = await ListaProductos.aggregate(
+        [
+            {
+                $match:{}
+            },{
+                $project:{
+                   productos:{
+                           $filter:{
+                               input:'$productos',
+                               as:'item',
+                               cond:{$eq:['$$item.categoria',req.body.filtro]}
+                           }
+                   }
+                }
+            },
+            {
+                $unwind:'$productos'
+            },{
+                $lookup:{
+                    from:'tiendas',
+                    localField:'_id',
+                    foreignField:'productos',
+                    as:'tienda'
+                }
+            },{
+                $project:{
+                    producto:'$productos',
+                    tienda:{$first:'$tienda'},
+                    index:'$index'
+                }
+            }
+
+            
+        ]
+    );
+
+    var index = 0;
+    var contador = 1;
+
+    do{
+         if(contador >= 7){
+            contador = 1;
+        }
+        productos[index].index= contador;
+        index++;
+        contador ++;
+    }while(index<productos.length);
+
+    console.log(productos);
+
+    return res.json({
+        ok:true,
+        productos
+    })
+}
+
 const construirPantallaPrincipalProductos = async (req,res)=>{
 
     const productos = await ListaProductos.aggregate(
@@ -156,7 +215,6 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
     var index = 0;
     var separados = [];
     var contador = 1;
-
     var limite = 0;
 
     do{
@@ -296,4 +354,4 @@ const nuevaTienda = async (req,res) =>{
 
 }
 
-module.exports = {obtenerTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
+module.exports = {obtenerProductosCategoria,obtenerTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};

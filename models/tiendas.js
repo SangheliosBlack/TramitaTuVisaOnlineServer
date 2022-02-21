@@ -1,6 +1,10 @@
 const {Schema,model} = require('mongoose');
 
 const TiendasSchema = Schema({
+    imagen_perfil:{
+        type:String,
+        require:false
+    },
     fotografias:{
         type:Array,
         require:false
