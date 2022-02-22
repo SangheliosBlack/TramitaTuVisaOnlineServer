@@ -269,7 +269,7 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
 
 }
 
-const obtenerTiendas = async (req,res = response)=>{
+const obtenerTienda = async (req,res = response)=>{
 
     const usuario = await Usuario.findById(req.uid);
 
@@ -378,4 +378,4 @@ const nuevaTienda = async (req,res) =>{
 
 }
 
-module.exports = {obtenerTiendas,obtenerProductosCategoria,obtenerTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
+module.exports = {obtenerTienda,obtenerProductosCategoria,obtenerTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
