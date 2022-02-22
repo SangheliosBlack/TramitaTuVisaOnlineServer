@@ -31,6 +31,30 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
     });
 
 }
+const obtenerTiendas = async (req,res)=>{
+
+    const tiendas = await Tienda.aggregate(
+        [
+            {
+                $match:{}
+            
+            },
+            {
+                $addFields:{
+                    'uid':'$_id',
+                }
+            }
+            
+            
+        ]
+    );
+
+    return res.json({
+        ok:true,        
+        tiendas,
+    });
+
+}
 const obtenerProductosTienda = async (req,res)=>{
 
     const body = req.body;
@@ -354,4 +378,4 @@ const nuevaTienda = async (req,res) =>{
 
 }
 
-module.exports = {obtenerProductosCategoria,obtenerTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
+module.exports = {obtenerTiendas,obtenerProductosCategoria,obtenerTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};

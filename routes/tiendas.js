@@ -24,6 +24,7 @@ router.get('/construirPantallaPrincipalProductos',validarJWT,construirPantallaPr
 
 
 router.post('/obtenerProductosCategoria',validarJWT,obtenerProductosCategoria);
+router.post('/obtenerTiendas',validarJWT,obtenerTiendas);
 
 
 module.exports = router;
