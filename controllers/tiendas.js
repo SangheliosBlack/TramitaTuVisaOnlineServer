@@ -31,28 +31,62 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
     });
 
 }
-const obtenerTiendas = async (req,res)=>{
+const verTodo = async (req,res)=>{
 
-    const tiendas = await Tienda.aggregate(
-        [
-            {
-                $match:{}
-            
-            },
-            {
-                $addFields:{
-                    'uid':'$_id',
+    if(req.body.busqueda = true){
+
+        const tiendas = await Tienda.aggregate(
+            [
+                {
+                    $match:{}
+                
+                },
+                {
+                    $addFields:{
+                        'uid':'$_id',
+                    }
                 }
-            }
-            
-            
-        ]
-    );
+                
+                
+            ]
+        );
 
-    return res.json({
-        ok:true,        
-        tiendas,
-    });
+        return res.json({
+            ok:true,        
+            tiendas,
+        });
+    }else{
+
+        const productos = await ListaProductos.aggregate(
+            [
+                {
+                    $match:{}
+                },{
+                    $unwind:'$productos'
+                },{
+                    $project:{
+                        _id:'$productos._id',
+                        categorias:'$productos.categoria',
+                        nombre:'$productos.nombre',
+                        precio:'$productos.precio',
+                        descripcion:'$productos.descripcion',
+                        descuentoP:'$productos.descuentoP',
+                        descuentoC:'$productos.descuentoC',
+                        disponible:'$productos.disponible',
+                        comentarios:'$productos.comentarios',
+    
+                    }
+                }
+            ]
+        );
+    
+        return res.json({
+            ok:true,        
+            productos
+        });
+    }
+
+
 
 }
 const obtenerProductosTienda = async (req,res)=>{
@@ -378,4 +412,4 @@ const nuevaTienda = async (req,res) =>{
 
 }
 
-module.exports = {obtenerTienda,obtenerProductosCategoria,obtenerTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
+module.exports = {obtenerTienda,obtenerProductosCategoria,verTodo,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
