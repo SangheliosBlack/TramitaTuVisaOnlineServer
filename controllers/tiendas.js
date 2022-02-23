@@ -31,11 +31,42 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
     });
 
 }
-const verTodo = async (req,res)=>{
 
-    if(req.body.busqueda = true){
+const verTodoProductos = async(req,res)=>{
 
-        const tiendas = await Tienda.aggregate(
+    const productos = await ListaProductos.aggregate(
+        [
+            {
+                $match:{}
+            },{
+                $unwind:'$productos'
+            },{
+                $project:{
+                    _id:'$productos._id',
+                    categorias:'$productos.categoria',
+                    nombre:'$productos.nombre',
+                    precio:'$productos.precio',
+                    descripcion:'$productos.descripcion',
+                    descuentoP:'$productos.descuentoP',
+                    descuentoC:'$productos.descuentoC',
+                    disponible:'$productos.disponible',
+                    comentarios:'$productos.comentarios',
+
+                }
+            }
+        ]
+    );
+
+    return res.json({
+        ok:true,        
+        productos
+    });
+
+}
+
+const verTodoTiendas = async (req,res)=>{
+
+  const tiendas = await Tienda.aggregate(
             [
                 {
                     $match:{}
@@ -55,36 +86,6 @@ const verTodo = async (req,res)=>{
             ok:true,        
             tiendas,
         });
-    }else{
-
-        const productos = await ListaProductos.aggregate(
-            [
-                {
-                    $match:{}
-                },{
-                    $unwind:'$productos'
-                },{
-                    $project:{
-                        _id:'$productos._id',
-                        categorias:'$productos.categoria',
-                        nombre:'$productos.nombre',
-                        precio:'$productos.precio',
-                        descripcion:'$productos.descripcion',
-                        descuentoP:'$productos.descuentoP',
-                        descuentoC:'$productos.descuentoC',
-                        disponible:'$productos.disponible',
-                        comentarios:'$productos.comentarios',
-    
-                    }
-                }
-            ]
-        );
-    
-        return res.json({
-            ok:true,        
-            productos
-        });
-    }
 
 
 
@@ -412,4 +413,4 @@ const nuevaTienda = async (req,res) =>{
 
 }
 
-module.exports = {obtenerTienda,obtenerProductosCategoria,verTodo,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
+module.exports = {verTodoProductos,obtenerTienda,obtenerProductosCategoria,verTodoTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
