@@ -74,7 +74,6 @@ const busqueda = async(req,res)=>{
         ]
     );
 
-    req.body.busqueda = 'Pro';
 
     var busqueda = req.body.busqueda.toLowerCase();
 
