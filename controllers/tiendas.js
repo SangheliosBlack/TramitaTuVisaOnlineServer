@@ -5,6 +5,7 @@ const Usuario = require('../models/usuario');
 const Horario = require('../models/horario');
 const ListaProductos = require('../models/lista_productos');
 const mongoose = require('mongoose');
+const { json } = require('express/lib/response');
 
 const construirPantallaPrincipalTiendas = async (req,res)=>{
 
@@ -32,7 +33,92 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
 
 }
 
+const busqueda = async(req,res)=>{
+
+    const listaTiendas = await Tienda.aggregate(
+        [
+            {
+                $match:{}
+            
+            },
+            {
+                $addFields:{
+                    'uid':'$_id',
+                }
+            }
+            
+            
+        ]
+    );
+
+    const listaProductos = await ListaProductos.aggregate(
+        [
+            {
+                $match:{}
+            },{
+                $unwind:'$productos'
+            },{
+                $project:{
+                    _id:'$productos._id',
+                    categorias:'$productos.categoria',
+                    nombre:'$productos.nombre',
+                    precio:'$productos.precio',
+                    descripcion:'$productos.descripcion',
+                    descuentoP:'$productos.descuentoP',
+                    descuentoC:'$productos.descuentoC',
+                    disponible:'$productos.disponible',
+                    comentarios:'$productos.comentarios',
+
+                }
+            }
+        ]
+    );
+
+    req.body.busqueda = 'Pro';
+
+    var busqueda = req.body.busqueda.toLowerCase();
+
+    function autocompleteMatchProductos(input) {
+        if (input == '') {
+          return [];
+        }
+        var reg = new RegExp(input)
+        
+        return listaProductos.filter(function(term) {
+            if (term.nombre.toLowerCase().match(reg)) {
+              return term;
+            }
+        });
+      }
+
+    function autocompleteMatchTiendas(input) {
+        if (input == '') {
+          return [];
+        }
+        var reg = new RegExp(input)
+        
+        return listaTiendas.filter(function(term) {
+            if (term.nombre.toLowerCase().match(reg)) {
+              return term;
+            }
+        });
+      }
+
+    var productos = autocompleteMatchProductos(busqueda)
+
+    var tiendas = autocompleteMatchTiendas(busqueda);
+
+    return res.json({
+        ok:true,
+        productos,
+        tiendas
+    })
+
+}
+
 const verTodoProductos = async(req,res)=>{
+
+
 
     const productos = await ListaProductos.aggregate(
         [
@@ -146,7 +232,6 @@ const obtenerProductosTienda = async (req,res)=>{
         definitivo.push(pre);
 
         tienda[0].productos.forEach(function(currentValue2, index2){
-            console.log(currentValue1+ currentValue2.categoria)
             if(currentValue1 == currentValue2.categoria){
                 definitivo[index1].productos.push(currentValue2);
             }
@@ -239,7 +324,6 @@ const obtenerProductosCategoria = async(req,res)=>{
         contador ++;
     }while(index<productos.length);
 
-    console.log(productos);
 
     return res.json({
         ok:true,
@@ -293,7 +377,6 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
         separados[limite].productos.push(productos[index])
         index++;
         contador ++;
-        console.log(separados);
     }while(index<productos.length);
 
 
@@ -413,4 +496,4 @@ const nuevaTienda = async (req,res) =>{
 
 }
 
-module.exports = {verTodoProductos,obtenerTienda,obtenerProductosCategoria,verTodoTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
+module.exports = {busqueda,verTodoProductos,obtenerTienda,obtenerProductosCategoria,verTodoTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};

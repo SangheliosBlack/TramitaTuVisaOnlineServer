@@ -16,4 +16,6 @@ router.post('/guardarFotoPerfil',validarJWT,upload.single("photo"),guardarFotoPe
 router.post('/modificarNombreUsuario',validarJWT,ModificarNombreUsuario);
 router.post('/modificarNombre',validarJWT,ModificarNombre);
 
+
+
 module.exports = router;
