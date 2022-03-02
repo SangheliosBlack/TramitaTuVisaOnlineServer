@@ -4,8 +4,8 @@ const {validarJWT} = require('../middlewares/validar-jwt');
 const controller = require('../controllers/twilio');
 const router = Router();
 
-router.get('/testTwilio',validarJWT,controller.twilioTest);
-router.post('/enviarSMS',validarJWT,controller.enviarSms);
-router.post('/verificarSms',validarJWT,controller.verificarSms);
+router.get('/testTwilio',   controller.twilioTest);
+router.post('/enviarSMS',   controller.enviarSms);
+router.post('/verificarSms',controller.verificarSms);
 
 module.exports = router;
