@@ -31,8 +31,9 @@
     "mongoose": "^5.12.14",
     "multer": "^1.4.3",
     "path": "^0.12.7",
-    "socket.io": "^4.1.2",
-    "stripe": "^8.182.0"
+    "socket.io": "^4.4.1",
+    "stripe": "^8.182.0",
+    "twilio": "^3.75.0"
   },
   "homepage": "https://github.com/SangheliosBlack/delivery_server#readme"
 }

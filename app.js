@@ -5,6 +5,7 @@ const path = require('path');
 require('dotenv').config();
 
 const {dbConnection} = require('./database/config');
+const twilio = require('twilio');
 
 class Server {
 
@@ -20,7 +21,8 @@ class Server {
             producto:'/api/productos',
             comentarios:'/api/comentarios',
             direcciones:'/api/direcciones',
-            stripe:'/api/stripe'
+            stripe:'/api/stripe',
+            twilio:'/api/twilio'
         }
 
         this.conectarDB();
@@ -54,6 +56,7 @@ class Server {
         this.app.use(this.paths.producto,require('./routes/productos'));
         this.app.use(this.paths.direcciones,require('./routes/direcciones'));
         this.app.use(this.paths.stripe,require('./routes/stripe'));
+        this.app.use(this.paths.twilio,require('./routes/twilio'));
 
     }
 
