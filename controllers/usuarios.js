@@ -143,4 +143,6 @@ const ModificarNombreUsuario = async(req, res)=>{
 
 }
 
+
+
 module.exports = {getUsuarios,updateDireccionFavorita,guardarFotoPerfil,modificarTiendaFavorita,ModificarNombreUsuario,ModificarNombre};

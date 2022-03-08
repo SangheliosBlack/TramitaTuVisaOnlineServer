@@ -1,6 +1,6 @@
 const {Router} = require('express');
 const { validarJWT } = require('../middlewares/validar-jwt');
-const { getUsuarios,updateDireccionFavorita, guardarFotoPerfil, modificarTiendaFavorita, ModificarNombreUsuario,ModificarNombre  } = require('../controllers/usuarios');
+const { getUsuarios,updateDireccionFavorita, guardarFotoPerfil, modificarTiendaFavorita, ModificarNombreUsuario,ModificarNombre, BuscarNumero  } = require('../controllers/usuarios');
 
 const upload = require("../multer");
 
@@ -15,6 +15,8 @@ router.post('/modificarTiendaFavorita',validarJWT,modificarTiendaFavorita);
 router.post('/guardarFotoPerfil',validarJWT,upload.single("photo"),guardarFotoPerfil)
 router.post('/modificarNombreUsuario',validarJWT,ModificarNombreUsuario);
 router.post('/modificarNombre',validarJWT,ModificarNombre);
+
+
 
 
 

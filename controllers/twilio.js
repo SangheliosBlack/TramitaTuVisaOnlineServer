@@ -13,6 +13,7 @@ var controller ={
     },
     enviarSms:function(req,res){
         var body = req.body;
+        console.log(body);
         client
             .verify
             .services(process.env.SERVICE_ID)
@@ -32,8 +33,11 @@ var controller ={
         client.verify.services(process.env.SERVICE_ID)
         .verificationChecks
         .create({to: '+52'+body.to, code: body.code})
-        .then(verification_check => res.json(verification_check))
-        .catch((e)=>{
+        .then((data)=>{
+            console.log(data);
+            res.json(data);
+        }).catch((e)=>{
+            console.log(e);
             return res.status(400).json(e);
         });
     }

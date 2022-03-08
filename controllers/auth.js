@@ -127,8 +127,29 @@ const renovarToken = async (req, res = response) => {
   });
 };
 
+const iniciarUsuarioTelefono = async(req,res= response) =>{
+  const {numero} = req.body;
+  const usuarioDB = await Usuario.findOne({numero_celular:numero});
+  if(!usuarioDB){
+
+    return res.status(404).json({ok:false});
+    
+  }else{
+    
+    const token = await generarJWT(usuarioDB.id);
+
+    res.status(200).json({
+      ok: true,
+      usuario: usuarioDB,
+      token,
+    });
+
+  }
+
+}
 module.exports = {
   crearUsuario,
   iniciarUsuario,
   renovarToken,
+  iniciarUsuarioTelefono
 };
