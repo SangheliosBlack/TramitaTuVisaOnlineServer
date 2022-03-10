@@ -23,8 +23,10 @@ var controller ={
                 channel:'sms',
                 appHash:body.hash
             }).then((data)=>{
+                console.log(data);
                 res.json(data);
             }).catch((e)=>{
+                console.log(e);
                 return res.status(400).json(e);
             });
     },
