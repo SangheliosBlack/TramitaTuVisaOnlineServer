@@ -290,43 +290,14 @@ const obtenerProductosCategoria = async(req,res)=>{
                    }
                 }
             },
-            {
-                $unwind:'$productos'
-            },{
-                $lookup:{
-                    from:'tiendas',
-                    localField:'_id',
-                    foreignField:'productos',
-                    as:'tienda'
-                }
-            },{
-                $project:{
-                    producto:'$productos',
-                    tienda:{$first:'$tienda'},
-                    index:'$index'
-                }
-            }
-
-            
         ]
     );
 
-    var index = 0;
-    var contador = 1;
-
-    do{
-         if(contador >= 7){
-            contador = 1;
-        }
-        productos[index].index= contador;
-        index++;
-        contador ++;
-    }while(index<productos.length);
-
+    console.log(productos[0].productos);
 
     return res.json({
         ok:true,
-        productos
+        productos:productos[0].productos
     })
 }
 
