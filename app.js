@@ -22,7 +22,8 @@ class Server {
             comentarios:'/api/comentarios',
             direcciones:'/api/direcciones',
             stripe:'/api/stripe',
-            twilio:'/api/twilio'
+            twilio:'/api/twilio',
+            google:'/api/google'
         }
 
         this.conectarDB();
@@ -57,7 +58,7 @@ class Server {
         this.app.use(this.paths.direcciones,require('./routes/direcciones'));
         this.app.use(this.paths.stripe,require('./routes/stripe'));
         this.app.use(this.paths.twilio,require('./routes/twilio'));
-
+        this.app.use(this.paths.google,require('./routes/google'));
     }
 
     listen(){
