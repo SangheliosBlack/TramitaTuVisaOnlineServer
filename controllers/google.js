@@ -19,7 +19,7 @@ var controller = {
                 strictbounds:true
             }
         }).then(function(response){
-            return res.json({response:response.data});
+            return res.json(response.data);
         }).catch(function(e){
             console.log(e)  ;
             return res.json({
