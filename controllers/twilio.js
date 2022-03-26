@@ -13,7 +13,6 @@ var controller ={
     },
     enviarSms:function(req,res){
         var body = req.body;
-        console.log(body);
         client
             .verify
             .services(process.env.SERVICE_ID)
@@ -26,7 +25,7 @@ var controller ={
                 console.log(data);
                 res.json(data);
             }).catch((e)=>{
-                console.log(e);
+                console.log("erroe"+e);
                 return res.status(400).json(e);
             });
     },
@@ -39,7 +38,7 @@ var controller ={
             console.log(data);
             res.json(data);
         }).catch((e)=>{
-            console.log(e);
+            console.log("erroe"+e);
             return res.status(400).json(e);
         });
     }
