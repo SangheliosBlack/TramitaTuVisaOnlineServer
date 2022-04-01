@@ -14,7 +14,6 @@ var controller = {
                 key: process.env.GOOGLE_GEOCODE_API,
                 language:'es-419',
                 location_type:'ROOFTOP'
-
             }
         }).then(function(response){
             console.log(response.data);
@@ -25,6 +24,26 @@ var controller = {
                 ok:false
             })
         });
+    },
+
+    busquedaID: async function(req,res) {
+        const id = req.body.id;
+
+        Axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+            params:{
+                place_id:'ChIJeRpOeF67j4AR9ydy_PIzPuM',
+                key: process.env.GOOGLE_GEOCODE_API,
+            }
+        }).then(function(response){
+            console.log(response.data);
+            return res.json(response.data);
+        }).catch(function(e){
+            console.log(e)  ;
+            return res.json({
+                ok:false
+            })
+        });
+
     },
 
     busqueda: async function(req,res){
@@ -40,6 +59,7 @@ var controller = {
                 location:'21.3533019 -101.952672',
                 radius:7000,
                 strictbounds:true,
+
             }
         }).then(function(response){
             return res.json(response.data);

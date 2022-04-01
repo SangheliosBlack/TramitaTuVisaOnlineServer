@@ -5,16 +5,8 @@ const DireccionSchema = Schema({
         type:Object,
         require:true,
     },
-    texto:{
+    titulo:{
         type:String,
-        require:true
-    },
-    descripcion:{
-        type:String,
-        require:true
-    },
-    icono:{
-        type:Number,
         require:true
     },
     predeterminado:{

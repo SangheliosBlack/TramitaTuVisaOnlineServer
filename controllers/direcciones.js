@@ -3,35 +3,13 @@ const mongoose = require('mongoose');
 const Direccion = require('../models/direccion');
 const Coordendas = require('../models/coodernadas');
 const Usuario = require('../models/usuario');
+const Axios = require('axios');
 
-
-
-const updateName = async(req,res = response) =>{
-    await Usuario.findOneAndUpdate(
-        {_id:req.uid,'direcciones._id':mongoose.Types.ObjectId(req.body.direccionUid)},
-        {$set:{'direcciones.$.titulo':req.body.nuevoTitulo}}
-    )
-    res.json({
-        ok:true
-    });
-}
-
-const updateIcon = async (req,res = response) =>{
-
-    await Usuario.findOneAndUpdate(
-        {_id:req.uid,'direcciones._id':mongoose.Types.ObjectId(req.body.direccionUid)},
-        {$set:{'direcciones.$.icono':req.body.nuevoIcono}}
-    );
-
-    res.json({
-        ok:true,
-    });
-
-};
 
 const getDirecciones = async (req,res = response)=>{
 
     var direcciones = await Usuario.findById({_id:req.uid});
+
 
     res.json({
         ok:true,
@@ -41,7 +19,6 @@ const getDirecciones = async (req,res = response)=>{
 
 const searchOne = async (req,res = response)=>{
 
-    console.log(req.body.uid);
 
     var direccion = await Usuario.aggregate([
         {$match:{_id:mongoose.Types.ObjectId(req.uid)}},
@@ -54,27 +31,110 @@ const searchOne = async (req,res = response)=>{
         }}
     ])
 
-    console.log(direccion);
-
     res.json(
         direccion[0].list[0]
     );
 }
 
-const nuevaDireccion = async (req,res = response)=>{
-
-    const coodernadas = new Coordendas(req.body);
-
-    req.body.coordenadas = coodernadas;
-
-    const direccion = new Direccion(req.body);
+const eliminarDireccion = async (req,res)=>{
     
-    await Usuario.findByIdAndUpdate({_id:req.uid},{$push:{direcciones:direccion}});
+    const id = req.body.id;
 
-    res.json({
-        ok:true,
-        direcciones:[direccion]
-    });
+    try {
+        await Usuario.findByIdAndUpdate(req.uid,{$pull:{direcciones:{_id:mongoose.Types.ObjectId(id)}}});
+        return res.json({ok:true});
+    } catch (error) {
+        console.log(error);
+        return res.json({ok:true});
+    }
+
+
 }
 
-module.exports = { getDirecciones,nuevaDireccion,searchOne,updateIcon,updateName};
+const direccionPredeterminada = async(req,res)=>{
+
+    try {
+        await Usuario.findOneAndUpdate(
+            {
+                _id:req.uid,'direcciones._id':mongoose.Types.ObjectId(req.body.id)
+            },
+            {
+                $set:{
+                    'direcciones.$.predeterminado':req.body.estado,
+                }
+            }
+        );
+
+        return res.json({ok:true});
+
+    } catch (error) {
+        
+        return res.status(400).json({ok:false});
+    }
+
+
+}
+
+const nuevaDireccion = async (req,res = response)=>{
+
+    const id = req.body.id;
+
+
+    if(req.body.sugerencia){
+
+        const coodernadas = new Coordendas(req.body);
+    
+            req.body.coordenadas = coodernadas;
+
+            req.body.predeterminado = false;
+    
+            const direccion = new Direccion(req.body);
+    
+            direccion.titulo =response.data.results[0].formatted_address;
+    
+            await Usuario.findByIdAndUpdate({_id:req.uid},{$push:{direcciones:direccion}});
+    
+            res.json({
+                ok:true,
+                direcciones:[direccion],
+            });
+
+    }else{
+        Axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+            params:{
+                place_id:id,
+                key: process.env.GOOGLE_GEOCODE_API,
+            }
+        }).then( async function(response){
+            
+            const coodernadas = new Coordendas(response.data.results[0].geometry.location);
+    
+            req.body.coordenadas = coodernadas;
+
+            req.body.predeterminado = false;
+    
+            const direccion = new Direccion(req.body);
+    
+            direccion.titulo =response.data.results[0].formatted_address;
+    
+            await Usuario.findByIdAndUpdate({_id:req.uid},{$push:{direcciones:direccion}});
+    
+            res.json({
+                ok:true,
+                direcciones:[direccion],
+            });
+            
+        }).catch(function(e){
+            console.log(e)  ;
+            return res.status(400).json({
+                ok:false
+            })
+        });
+    }
+
+
+}
+
+
+
+module.exports = { getDirecciones,nuevaDireccion,searchOne,eliminarDireccion,direccionPredeterminada};

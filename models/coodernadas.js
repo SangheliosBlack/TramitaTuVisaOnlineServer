@@ -4,11 +4,11 @@ const mongoose = require('mongoose');
 var SchemaTypes = mongoose.Schema.Types;
 
 const CoordenadasSchema = Schema({
-    latitud:{
+    lat:{
         type: Number,
         require:true
     },
-    longitud:{
+    lng:{
         type: Number,
         require:true
     }
