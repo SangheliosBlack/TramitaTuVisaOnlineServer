@@ -53,7 +53,23 @@ const eliminarDireccion = async (req,res)=>{
 
 const direccionPredeterminada = async(req,res)=>{
 
-    try {
+    console.log(req.body);
+
+        if(req.body.actual != 'NA'){
+
+            await Usuario.findOneAndUpdate(
+                {
+                    _id:req.uid,'direcciones._id':mongoose.Types.ObjectId(req.body.actual)
+                },
+                {
+                    $set:{
+                        'direcciones.$.predeterminado':false,
+                    }
+                }
+            );
+
+        }
+
         await Usuario.findOneAndUpdate(
             {
                 _id:req.uid,'direcciones._id':mongoose.Types.ObjectId(req.body.id)
@@ -65,13 +81,7 @@ const direccionPredeterminada = async(req,res)=>{
             }
         );
 
-        return res.json({ok:true});
-
-    } catch (error) {
-        
-        return res.status(400).json({ok:false});
-    }
-
+        return res.status(200);
 
 }
 
