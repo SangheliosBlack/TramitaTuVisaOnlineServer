@@ -25,7 +25,6 @@ const crearUsuario = async (req, res = response) => {
 
     const usuario = new Usuario(req.body);
 
-    console.log(usuario);
 
     const salt = bcrypt.genSaltSync();
 
@@ -48,7 +47,6 @@ const crearUsuario = async (req, res = response) => {
     });
 
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       ok: false,
       error,
@@ -103,7 +101,6 @@ const iniciarUsuario = async (req, res = response) => {
     });
 
   } catch (error) {
-    console.log('esta mal'+error);
     res.status(500).json({
       ok: false,
       msg: "Hable con el administrador",
@@ -119,6 +116,7 @@ const renovarToken = async (req, res = response) => {
   const token = await generarJWT(uid);
 
   const usuario = await Usuario.findById(uid);
+
 
   res.json({
     ok: true,

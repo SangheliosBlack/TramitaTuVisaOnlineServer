@@ -50,6 +50,10 @@ const UsuarioSchema =  Schema({
         type:Schema.Types.ObjectId,
         required:false
     },
+    cesta:{
+        type:Object,
+        require :true
+    }
 },{
     timestamps:true
 });

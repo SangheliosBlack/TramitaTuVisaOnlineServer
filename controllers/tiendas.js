@@ -293,7 +293,6 @@ const obtenerProductosCategoria = async(req,res)=>{
         ]
     );
 
-    console.log(productos[0].productos);
 
     return res.json({
         ok:true,
@@ -320,11 +319,13 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
                     descuentoC:'$productos.descuentoC',
                     disponible:'$productos.disponible',
                     comentarios:'$productos.comentarios',
-
+                    tienda:'$tienda',
                 }
             }
         ]
     );
+
+    console.log(productos);
     var index = 0;
     var separados = [];
     var contador = 1;
@@ -348,6 +349,8 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
         index++;
         contador ++;
     }while(index<productos.length);
+
+
 
 
     return res.json({

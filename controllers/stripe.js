@@ -19,6 +19,24 @@ const getListCustomerPaymentsMethods = async (req,res = response) =>{
     })
 }
 
+const deletePaymethMethod = async (req,res)=>{
+
+    try {
+
+        await stripe.paymentMethods.detach(
+            req.body.paymentMethodID
+        );
+
+        return res.status(200).json({ok:true});
+
+    }catch (error) {
+
+        return res.status(400).json({ok:false});
+
+    }
+
+}
+
 const obtenerCliente = async(req,res)=>{
 
     const usuario = await Usuario.findById(req.uid);
@@ -28,6 +46,25 @@ const obtenerCliente = async(req,res)=>{
     );
 
     return res.json(customer);
+}
+
+const updateCustomerPaymethDefault = async(req,res)=>{
+
+    try {
+        
+        await stripe.customers.update(
+            req.body.customer_id,
+            {invoice_settings: {default_payment_method: req.body.paymentMethodID}}
+        );
+
+        return res.status(200).json({ok:true});
+
+    } catch (error) {
+        
+        return res.status(400).json({ok:false});
+
+    }
+
 }
 
 const createPaymentMethod = async(req,res = response)=>{
@@ -73,14 +110,15 @@ const createPaymentMethod = async(req,res = response)=>{
             );
         
             await Usuario.findOneAndUpdate({'_id':req.uid},{'$set':{'customer_id':customer.id}});
-        
+
+            res.status(200).json(
+                paymentMethodAttach
+            );
             
         }
 
     }catch(error){
-        return res.status(402).json(res.status(200).json(
-            paymentMethodAttach
-        ));
+        return res.status(402).json({ok:false});
 
     }
 
@@ -88,4 +126,4 @@ const createPaymentMethod = async(req,res = response)=>{
 
 
 
-module.exports = {getListCustomerPaymentsMethods,createPaymentMethod,obtenerCliente};
+module.exports = {getListCustomerPaymentsMethods,createPaymentMethod,obtenerCliente,updateCustomerPaymethDefault,deletePaymethMethod};
