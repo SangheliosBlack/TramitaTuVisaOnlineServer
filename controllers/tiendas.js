@@ -5,7 +5,6 @@ const Usuario = require('../models/usuario');
 const Horario = require('../models/horario');
 const ListaProductos = require('../models/lista_productos');
 const mongoose = require('mongoose');
-const { json } = require('express/lib/response');
 
 const construirPantallaPrincipalTiendas = async (req,res)=>{
 
