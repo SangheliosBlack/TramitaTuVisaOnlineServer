@@ -320,6 +320,7 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
                     disponible:'$productos.disponible',
                     comentarios:'$productos.comentarios',
                     tienda:'$tienda',
+                    opciones:'$productos.opciones'
                 }
             }
         ]

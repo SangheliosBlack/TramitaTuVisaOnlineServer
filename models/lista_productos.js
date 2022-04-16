@@ -3,6 +3,10 @@ const { Schema,model } = require('mongoose');
 const ListaProductosSchema = Schema({
     productos:[
         {
+            opciones:{
+                type:Array,
+                required:false
+            },
             categoria:{
                 type:String,
                 require:true
