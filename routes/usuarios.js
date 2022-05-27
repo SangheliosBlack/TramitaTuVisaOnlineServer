@@ -1,23 +1,29 @@
 const {Router} = require('express');
 const { validarJWT } = require('../middlewares/validar-jwt');
-const { getUsuarios,updateDireccionFavorita, guardarFotoPerfil, modificarTiendaFavorita, ModificarNombreUsuario,ModificarNombre, BuscarNumero  } = require('../controllers/usuarios');
+const controller = require('../controllers/usuarios');
 
 const upload = require("../multer");
 
 const router = Router();
 
-router.get('/',validarJWT,getUsuarios);
+router.get('/',validarJWT,controller.getUsuarios);
 
-router.post('/updateDireccionFavorita',validarJWT,updateDireccionFavorita);
+router.post('/updateDireccionFavorita',validarJWT,controller.updateDireccionFavorita);
 
-router.post('/modificarTiendaFavorita',validarJWT,modificarTiendaFavorita);
+router.post('/modificarTiendaFavorita',validarJWT,controller.modificarTiendaFavorita);
 
-router.post('/guardarFotoPerfil',validarJWT,upload.single("photo"),guardarFotoPerfil)
-router.post('/modificarNombreUsuario',validarJWT,ModificarNombreUsuario);
-router.post('/modificarNombre',validarJWT,ModificarNombre);
+router.post('/guardarFotoPerfil',validarJWT,upload.single("photo"),controller.guardarFotoPerfil)
+router.post('/modificarNombreUsuario',validarJWT,controller.modificarNombreUsuario);
+router.post('/modificarNombre',validarJWT,controller.modificarNombre);
 
+router.post('cambiarAvatar',validarJWT,validarJWT,controller.modificarAvatar);
+router.post('/agregarProductoCesta',validarJWT,controller.agregarProductoCesta);
+router.post('/eliminarCestaProductos',validarJWT,controller.eliminarCestaProductos);
+router.post('/eliminarProductoCesta',validarJWT,controller.eliminarProductoCesta);
+router.post('/modificarCantidadProductoCesta',validarJWT,controller.modificarCantidadProductoCesta);
+router.post('/buscarCodigo',validarJWT,controller.buscarCodigo);
 
-
+router.get('/ordenes',validarJWT,controller.ordenes);
 
 
 module.exports = router;

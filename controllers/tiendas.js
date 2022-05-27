@@ -5,25 +5,196 @@ const Usuario = require('../models/usuario');
 const Horario = require('../models/horario');
 const ListaProductos = require('../models/lista_productos');
 const mongoose = require('mongoose');
+const e = require('cors');
+
+const Pedido = require('../models/pedido');
+const Venta = require('../models/venta');
+
+const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
+
+const crearPedido = async (req,res)=>{
+
+    
+    var {tarjeta,productos,efectivo} = JSON.parse(req.body.cesta);
+    
+
+    var {usuario} = req.body;
+
+    var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
+
+    const decimalCount = num => {
+        const numStr = String(num);
+        if (numStr.includes('.')) {
+           return numStr.split('.')[1].length;
+        };
+        return 0;
+    }
+
+    /*PAGO*/
+
+    var venta = new Venta();
+
+    venta.total = totalConfirmar;
+    venta.ganancia = totalConfirmar*.10;
+    venta.efectivo = efectivo;
+    venta.gananciaEnvio = 15;
+    venta.usuario = usuario;
+    envio
+
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount: decimalCount(totalConfirmar) == 0 || decimalCount(totalConfirmar) == 1  ? totalConfirmar*100: totalConfirmar.replace('.',''),
+        currency: 'mxn',
+        customer:'cus_L2nXkWfsiWlaX1',
+        payment_method_types: ['card'],
+        transfer_group: venta.id
+    });
+
+    const paymentIntentConfirm = await stripe.paymentIntents.confirm(
+        paymentIntent.id,
+        {payment_method: tarjeta}
+    );
+
+    venta.metodoPago = paymentIntentConfirm;
+
+    await stripe.transfers.create({
+        amount: 10,
+        currency: 'mxn',
+        destination: 'acct_1JOjHVPOnuOXNxOm',
+        transfer_group: venta.id
+    });
+    
+    /*PAGO*/
+
+
+    /*CREAR PEDIDO*/
+
+    var pedidos = [];
+
+    for(const element in productos){
+
+
+        if(!pedidos.includes(productos[element].tienda)){
+
+            var subElement = {};
+
+            var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
+
+            subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
+            subElement.tienda = productos[element].tienda;
+            subElement.productos = productos[element];
+            subElement.repartidor = 'Pendiente';
+            subElement.imagen = datos_tienda.imagen_perfil;
+            subElement.ubicacion = datos_tienda.coordenadas;
+
+            console.log(subElement);
+
+            pedidos.push(subElement);
+        }else{
+
+            var objIndex = pedidos.findIndex((obj => obj.tienda == productos[element].tienda));
+            pedidos[objIndex].total = pedidos[objIndex].total + ((productos[element].precio + productos[element].extra) * productos[element].cantidad);
+            pedidos[objIndex].productos.push(productos[element]);
+            
+        }
+    }
+
+
+
+    var pedidosSchema = [];
+
+    
+    for(const element in pedidos){
+        
+        var pedidosModel = new Pedido(pedidos[element]);
+
+
+        pedidosModel.pagado = true;
+        pedidosModel.preparado = false;
+        pedidosModel.enviado = false;
+        pedidosModel.entregado = false;
+        
+        pedidosSchema.push(pedidosModel);
+        
+        
+    }
+    
+    venta.pedidos = pedidosSchema;
+    
+    await venta.save();
+    /*CREAR PEDIDO*/
+    
+
+    
+
+    return res.json({venta});
+
+}
 
 const construirPantallaPrincipalTiendas = async (req,res)=>{
+
 
     const tiendas = await Tienda.aggregate(
         [
             {
                 $match:{}
             
+            },{
+                $lookup:{
+                    from: 'listaproductos',
+                    localField: 'productos',
+                    foreignField: '_id',
+                    as:'listaProductos'
+                }
             },
             {
-                $addFields:{
-                    'uid':'$_id',
-                    'listaProductos':[]
+                $project:{
+                    nombre:'$nombre',
+                    propietario:'$propietario',
+                    disponible:'$disponible',
+                    productos:'$productos',
+                    aniversario:'$aniversario',
+                    createdAt:'$createdAt',
+                    updatedAt:'$updatedAt',
+                    uid:'$uid',
+                    horario:'$horario',
+                    coordenadas:'$coordenadas',
+                    fotografias:'$fotografias',
+                    inventario:'$inventario',
+                    equipo:'$equipo',
+                    ventas:'$ventas',
+                    imagen_perfil:'$imagen_perfil',
+                    listaProductos:{
+                        $arrayElemAt:['$listaProductos',0]
+                    }
                 }
-            }
-            
+            },
+            {
+                $project:{
+                    nombre:'$nombre',
+                    propietario:'$propietario',
+                    disponible:'$disponible',
+                    productos:'$productos',
+                    aniversario:'$aniversario',
+                    createdAt:'$createdAt',
+                    updatedAt:'$updatedAt',
+                    uid:'$uid',
+                    horario:'$horario',
+                    coordenadas:'$coordenadas',
+                    fotografias:'$fotografias',
+                    inventario:'$inventario',
+                    equipo:'$equipo',
+                    ventas:'$ventas',
+                    imagen_perfil:'$imagen_perfil',
+                    listaProductos:'$listaProductos.productos'
+            },
+
+        }
             
         ]
     );
+
+    
+
 
     return res.json({
         ok:true,        
@@ -39,13 +210,57 @@ const busqueda = async(req,res)=>{
             {
                 $match:{}
             
+            },{
+                $lookup:{
+                    from: 'listaproductos',
+                    localField: 'productos',
+                    foreignField: '_id',
+                    as:'listaProductos'
+                }
             },
             {
-                $addFields:{
-                    'uid':'$_id',
+                $project:{
+                    nombre:'$nombre',
+                    propietario:'$propietario',
+                    disponible:'$disponible',
+                    productos:'$productos',
+                    aniversario:'$aniversario',
+                    createdAt:'$createdAt',
+                    updatedAt:'$updatedAt',
+                    uid:'$uid',
+                    horario:'$horario',
+                    coordenadas:'$coordenadas',
+                    fotografias:'$fotografias',
+                    inventario:'$inventario',
+                    equipo:'$equipo',
+                    ventas:'$ventas',
+                    imagen_perfil:'$imagen_perfil',
+                    listaProductos:{
+                        $arrayElemAt:['$listaProductos',0]
+                    }
                 }
-            }
-            
+            },
+            {
+                $project:{
+                    nombre:'$nombre',
+                    propietario:'$propietario',
+                    disponible:'$disponible',
+                    productos:'$productos',
+                    aniversario:'$aniversario',
+                    createdAt:'$createdAt',
+                    updatedAt:'$updatedAt',
+                    uid:'$uid',
+                    horario:'$horario',
+                    coordenadas:'$coordenadas',
+                    fotografias:'$fotografias',
+                    inventario:'$inventario',
+                    equipo:'$equipo',
+                    imagen_perfil:'$imagen_perfil',
+                    ventas:'$ventas',
+                    listaProductos:'$listaProductos.productos'
+            },
+
+        }
             
         ]
     );
@@ -67,6 +282,7 @@ const busqueda = async(req,res)=>{
                     descuentoC:'$productos.descuentoC',
                     disponible:'$productos.disponible',
                     comentarios:'$productos.comentarios',
+                    opciones:'$productos.opciones',
 
                 }
             }
@@ -106,6 +322,7 @@ const busqueda = async(req,res)=>{
 
     var tiendas = autocompleteMatchTiendas(busqueda);
 
+
     return res.json({
         ok:true,
         productos,
@@ -135,6 +352,9 @@ const verTodoProductos = async(req,res)=>{
                     descuentoC:'$productos.descuentoC',
                     disponible:'$productos.disponible',
                     comentarios:'$productos.comentarios',
+                    tienda:'$productos.tienda',
+                    
+                    opciones:'$productos.opciones',
 
                 }
             }
@@ -159,12 +379,14 @@ const verTodoTiendas = async (req,res)=>{
                 {
                     $addFields:{
                         'uid':'$_id',
+                        'listaProductos':[]
                     }
                 }
                 
                 
             ]
         );
+
 
         return res.json({
             ok:true,        
@@ -178,11 +400,13 @@ const obtenerProductosTienda = async (req,res)=>{
 
     const body = req.body;
 
+
+
     const tienda = await ListaProductos.aggregate(
         [
             {
                 $match:{
-                    '_id':mongoose.Types.ObjectId('61feb3738c928f18cc164f6f')
+                    '_id':mongoose.Types.ObjectId(body.id)
                 }
             
             },
@@ -199,11 +423,12 @@ const obtenerProductosTienda = async (req,res)=>{
         ]
     );
 
+
     const categorias = await ListaProductos.aggregate(
         [
             {
                 $match:{
-                    '_id':mongoose.Types.ObjectId('61feb3738c928f18cc164f6f')
+                    '_id':mongoose.Types.ObjectId(body.id)
                 }
             },{
                 $unwind:'$productos'
@@ -215,6 +440,7 @@ const obtenerProductosTienda = async (req,res)=>{
             }
         ]
     );
+
 
     var definitivo =  [];
 
@@ -274,7 +500,7 @@ const construirPantallaPrincipalCategorias = async (req,res)=>{
 const obtenerProductosCategoria = async(req,res)=>{
 
 
-    const productos = await ListaProductos.aggregate(
+    var productos = await ListaProductos.aggregate(
         [
             {
                 $match:{}
@@ -292,10 +518,14 @@ const obtenerProductosCategoria = async(req,res)=>{
         ]
     );
 
+    
+    var productosFilter = productos.filter(function(obj){
+        return obj.productos.length > 0;
+    });
 
     return res.json({
         ok:true,
-        productos:productos[0].productos
+        productos:productosFilter[0].productos
     })
 }
 
@@ -325,7 +555,6 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
         ]
     );
 
-    console.log(productos);
     var index = 0;
     var separados = [];
     var contador = 1;
@@ -469,4 +698,4 @@ const nuevaTienda = async (req,res) =>{
 
 }
 
-module.exports = {busqueda,verTodoProductos,obtenerTienda,obtenerProductosCategoria,verTodoTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
+module.exports = {crearPedido,busqueda,verTodoProductos,obtenerTienda,obtenerProductosCategoria,verTodoTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};

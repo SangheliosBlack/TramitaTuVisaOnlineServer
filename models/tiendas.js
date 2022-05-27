@@ -6,7 +6,7 @@ const TiendasSchema = Schema({
         require:false
     },
     fotografias:{
-        type:Array,
+        type:String,
         require:false
     },
     inventario:{

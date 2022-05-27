@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const Usuario = require("../models/usuario");
 const { generarJWT } = require("../helpers/jwt");
 const { generarNombre } = require("../helpers/generar_nombre");
+const usuario = require("../models/usuario");
 
 const crearUsuario = async (req, res = response) => {
 
@@ -126,8 +127,15 @@ const renovarToken = async (req, res = response) => {
 };
 
 const iniciarUsuarioTelefono = async(req,res= response) =>{
+
   const {numero} = req.body;
+
+  console.log(numero);
+
   const usuarioDB = await Usuario.findOne({numero_celular:numero});
+
+  console.log(usuarioDB.cesta.productos[0]);
+
   if(!usuarioDB){
 
     return res.status(404).json({ok:false});

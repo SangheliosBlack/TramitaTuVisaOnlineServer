@@ -2,10 +2,53 @@ const { Schema,model } = require('mongoose');
 
 const ListaProductosSchema = Schema({
     productos:[
-        {
-            opciones:{
-                type:Array,
-                required:false
+        {   tienda:{
+            type:String,
+            required:true
+        }
+        ,opciones:[
+            {
+                titulo:{
+                    type:String,
+                    require:true
+                },
+                maximo:{
+                    type:Number,
+                    require:true
+                },
+                minimo:{
+                    type:Number,
+                    require:true
+                },
+                listado:[{
+                    precio:{
+                        type:Number,
+                        require:true
+                    },
+                    tipo:{
+                        type:String,
+                        require:true
+                    },
+                    activo:{
+                        type:Boolean,
+                        require:true
+                    },
+                    auto:{
+                        type:Boolean,
+                        require:true,
+                        
+                    },
+                    fijo:{
+                        type:Boolean,
+                        require:true,
+    
+                    }
+                }]
+            }
+        ],
+            cantidad:{
+                type:Number,
+                required:true
             },
             categoria:{
                 type:String,

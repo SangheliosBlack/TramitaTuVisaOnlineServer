@@ -5,7 +5,6 @@ const path = require('path');
 require('dotenv').config();
 
 const {dbConnection} = require('./database/config');
-const twilio = require('twilio');
 
 class Server {
 
@@ -13,6 +12,10 @@ class Server {
         
         this.app = express();
         this.port = process.env.PORT;
+
+        this.server = require('http').createServer(this.app);
+        module.exports.io = require('socket.io')(this.server);
+        require('./sockets/socket');
 
         this.paths = {
             auth:'/api/autentificacion',
@@ -63,7 +66,7 @@ class Server {
 
     listen(){
 
-        this.app.listen(this.port,()=>{
+        this.server.listen(this.port,()=>{
             console.log('Servidor corriendo en puerto', this.port );
         });
     }

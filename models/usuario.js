@@ -1,6 +1,20 @@
 const {Schema,model} = require ('mongoose');
 
 const UsuarioSchema =  Schema({
+    envio_promo:{
+        type:Boolean,
+        required:true
+    },
+    codigo:{
+        type:String,
+        required:false,
+        unique:true,
+        sparse:true,
+    },
+    avatar:{
+        type:Object,
+        required:true
+    },
     nombre_usuario:{
         type:String,
         require:true
