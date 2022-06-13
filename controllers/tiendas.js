@@ -95,7 +95,7 @@ const crearPedido = async (req,res)=>{
         
         await venta.save();
 
-        await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[]});
+        await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
     
         console.log(venta);
 
@@ -175,7 +175,7 @@ const crearPedido = async (req,res)=>{
             
             await venta.save();
     
-            await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[]});
+            await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
         
             console.log(venta);
     
