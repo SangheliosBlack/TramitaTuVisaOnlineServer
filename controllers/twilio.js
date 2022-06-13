@@ -12,6 +12,8 @@ var controller ={
         
     },
     enviarSms:function(req,res){
+
+        console.log(process.env.SERVICE_ID);
         var body = req.body;
         client
             .verify

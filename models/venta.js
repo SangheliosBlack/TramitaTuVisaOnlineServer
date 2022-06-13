@@ -9,20 +9,8 @@ const VentaSchema = Schema({
         type:Number,
         require:true
     },
-    ganancia:{
-        type:Number,
-        require:true
-    },
-    gananciaEnvio:{
-        type:Number,
-        require:true
-    },
     efectivo:{
         type:Boolean,
-        require:true
-    },
-    imagen:{
-        type:String,
         require:true
     },
     metodoPago:{
@@ -37,10 +25,15 @@ const VentaSchema = Schema({
         type:Number,
         require:true,
     },
-    envioDescuento:{
+    servicio:{
         type:Number,
         require:true,
-    }
+    },
+    envioPromo:{
+        type:Number,
+        require:true,
+    },
+    
 },{
     timestamps:true
 });

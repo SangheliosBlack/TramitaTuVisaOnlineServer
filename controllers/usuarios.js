@@ -243,7 +243,11 @@ const Venta = require('../models/venta');
     },
     ordenes:async(req,res)=>{
 
-        return res.json(await Venta.find({'usuario':mongoose.Types.ObjectId(req.uid)}));
+
+        const ordenes = await Venta.find({'usuario':mongoose.Types.ObjectId(req.uid)}).sort({'updatedAt':-1});
+        console.log(ordenes);
+        
+        return res.json(ordenes);
         
     },
     buscarCodigo:async(req,res)=>{

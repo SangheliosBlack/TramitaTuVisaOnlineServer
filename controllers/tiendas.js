@@ -13,12 +13,11 @@ const Venta = require('../models/venta');
 const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
 
 const crearPedido = async (req,res)=>{
-
     
-    var {tarjeta,productos,efectivo} = JSON.parse(req.body.cesta);
-    
+    var {total,tarjeta,productos,efectivo,codigo} = JSON.parse(req.body.cesta);
 
-    var {usuario} = req.body;
+    var {envio,usuario,servicio,customer} = req.body;
+
 
     var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
 
@@ -30,103 +29,168 @@ const crearPedido = async (req,res)=>{
         return 0;
     }
 
-    /*PAGO*/
-
     var venta = new Venta();
 
-    venta.total = totalConfirmar;
-    venta.ganancia = totalConfirmar*.10;
+    venta.total = total;
     venta.efectivo = efectivo;
-    venta.gananciaEnvio = 15;
+    venta.envio = envio;
     venta.usuario = usuario;
-    envio
+    venta.servicio = servicio;
+    venta.envioPromo = codigo ? envio :0;
 
-    const paymentIntent = await stripe.paymentIntents.create({
-        amount: decimalCount(totalConfirmar) == 0 || decimalCount(totalConfirmar) == 1  ? totalConfirmar*100: totalConfirmar.replace('.',''),
-        currency: 'mxn',
-        customer:'cus_L2nXkWfsiWlaX1',
-        payment_method_types: ['card'],
-        transfer_group: venta.id
-    });
+    if(efectivo){
 
-    const paymentIntentConfirm = await stripe.paymentIntents.confirm(
-        paymentIntent.id,
-        {payment_method: tarjeta}
-    );
-
-    venta.metodoPago = paymentIntentConfirm;
-
-    await stripe.transfers.create({
-        amount: 10,
-        currency: 'mxn',
-        destination: 'acct_1JOjHVPOnuOXNxOm',
-        transfer_group: venta.id
-    });
+        await stripe.transfers.create({
+            amount: 10,
+            currency: 'mxn',
+            destination: 'acct_1JOjHVPOnuOXNxOm',
+            transfer_group: venta.id
+        });
+        
+        var pedidos = [];
     
-    /*PAGO*/
-
-
-    /*CREAR PEDIDO*/
-
-    var pedidos = [];
-
-    for(const element in productos){
-
-
-        if(!pedidos.includes(productos[element].tienda)){
-
-            var subElement = {};
-
-            var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
-
-            subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
-            subElement.tienda = productos[element].tienda;
-            subElement.productos = productos[element];
-            subElement.repartidor = 'Pendiente';
-            subElement.imagen = datos_tienda.imagen_perfil;
-            subElement.ubicacion = datos_tienda.coordenadas;
-
-            console.log(subElement);
-
-            pedidos.push(subElement);
-        }else{
-
-            var objIndex = pedidos.findIndex((obj => obj.tienda == productos[element].tienda));
-            pedidos[objIndex].total = pedidos[objIndex].total + ((productos[element].precio + productos[element].extra) * productos[element].cantidad);
-            pedidos[objIndex].productos.push(productos[element]);
+        for(const element in productos){
+    
+            if(!pedidos.some(elem=> elem.tienda == productos[element].tienda)){
+    
+                var subElement = {};
+    
+                var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
+    
+                subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
+                subElement.tienda = productos[element].tienda;
+                subElement.productos = [productos[element]];
+                subElement.repartidor = 'Pendiente';
+                subElement.imagen = datos_tienda.imagen_perfil;
+                subElement.ubicacion = datos_tienda.coordenadas;
+    
+    
+                pedidos.push(subElement);
+            }else{
+    
+                var objIndex = pedidos.findIndex((obj => obj.tienda == productos[element].tienda));
+                pedidos[objIndex].total = pedidos[objIndex].total + ((productos[element].precio + productos[element].extra) * productos[element].cantidad);
+                pedidos[objIndex].productos.push(productos[element]);
+                
+            }
+        }
+    
+        var pedidosSchema = [];
+        
+        for(const element in pedidos){
+            
+            var pedidosModel = new Pedido(pedidos[element]);
+    
+    
+            pedidosModel.pagado = true;
+            pedidosModel.preparado = false;
+            pedidosModel.enviado = false;
+            pedidosModel.entregado = false;
+            
+            pedidosSchema.push(pedidosModel);
             
         }
+        
+        venta.pedidos = pedidosSchema;
+        
+        await venta.save();
+
+        await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[]});
+    
+        console.log(venta);
+
+        return res.status(200).json(venta);
+
+    }else{
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: decimalCount(total) == 0 || decimalCount(total) == 1  ? total*100: total.replace('.',''),
+            currency: 'mxn',
+            customer:customer,
+            payment_method_types: ['card'],
+            transfer_group: venta.id
+        });
+    
+        const paymentIntentConfirm = await stripe.paymentIntents.confirm(
+            paymentIntent.id,
+            {payment_method: tarjeta}
+        );
+    
+        if(paymentIntentConfirm.status == 'succeeded'){
+    
+            venta.metodoPago = paymentIntentConfirm;
+        
+            await stripe.transfers.create({
+                amount: 10,
+                currency: 'mxn',
+                destination: 'acct_1JOjHVPOnuOXNxOm',
+                transfer_group: venta.id
+            });
+            
+            var pedidos = [];
+        
+            for(const element in productos){
+        
+                if(!pedidos.some(elem=> elem.tienda == productos[element].tienda)){
+    
+                    var subElement = {};
+        
+                    var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
+        
+                    subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
+                    subElement.tienda = productos[element].tienda;
+                    subElement.productos = [productos[element]];
+                    subElement.repartidor = 'Pendiente';
+                    subElement.imagen = datos_tienda.imagen_perfil;
+                    subElement.ubicacion = datos_tienda.coordenadas;
+        
+        
+                    pedidos.push(subElement);
+                }else{
+        
+                    var objIndex = pedidos.findIndex((obj => obj.tienda == productos[element].tienda));
+                    pedidos[objIndex].total = pedidos[objIndex].total + ((productos[element].precio + productos[element].extra) * productos[element].cantidad);
+                    pedidos[objIndex].productos.push(productos[element]);
+                    
+                }
+            }
+        
+            var pedidosSchema = [];
+            
+            for(const element in pedidos){
+                
+                var pedidosModel = new Pedido(pedidos[element]);
+        
+        
+                pedidosModel.pagado = true;
+                pedidosModel.preparado = false;
+                pedidosModel.enviado = false;
+                pedidosModel.entregado = false;
+                
+                pedidosSchema.push(pedidosModel);
+                
+            }
+            
+            venta.pedidos = pedidosSchema;
+            
+            await venta.save();
+    
+            await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[]});
+        
+            console.log(venta);
+    
+            return res.status(200).json(venta);
+    
+        }else{
+    
+            return res.status(400).json({ok:false,msg:paymentIntentConfirm.status});
+    
+        }
+
     }
 
-
-
-    var pedidosSchema = [];
-
-    
-    for(const element in pedidos){
-        
-        var pedidosModel = new Pedido(pedidos[element]);
-
-
-        pedidosModel.pagado = true;
-        pedidosModel.preparado = false;
-        pedidosModel.enviado = false;
-        pedidosModel.entregado = false;
-        
-        pedidosSchema.push(pedidosModel);
-        
-        
-    }
-    
-    venta.pedidos = pedidosSchema;
-    
-    await venta.save();
-    /*CREAR PEDIDO*/
     
 
-    
-
-    return res.json({venta});
 
 }
 
@@ -162,6 +226,7 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
                     inventario:'$inventario',
                     equipo:'$equipo',
                     ventas:'$ventas',
+                    direccion:'$direccion',
                     imagen_perfil:'$imagen_perfil',
                     listaProductos:{
                         $arrayElemAt:['$listaProductos',0]
@@ -180,6 +245,7 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
                     uid:'$uid',
                     horario:'$horario',
                     coordenadas:'$coordenadas',
+                    direccion:'$direccion',
                     fotografias:'$fotografias',
                     inventario:'$inventario',
                     equipo:'$equipo',
@@ -233,6 +299,7 @@ const busqueda = async(req,res)=>{
                     fotografias:'$fotografias',
                     inventario:'$inventario',
                     equipo:'$equipo',
+                    direccion:'$direccion',
                     ventas:'$ventas',
                     imagen_perfil:'$imagen_perfil',
                     listaProductos:{
@@ -250,6 +317,7 @@ const busqueda = async(req,res)=>{
                     createdAt:'$createdAt',
                     updatedAt:'$updatedAt',
                     uid:'$uid',
+                    direccion:'$direccion',
                     horario:'$horario',
                     coordenadas:'$coordenadas',
                     fotografias:'$fotografias',

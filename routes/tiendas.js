@@ -30,7 +30,7 @@ router.get('/verTodoProductos',validarJWT,verTodoProductos);
 
 router.post('/busqueda',validarJWT,busqueda);
 
-router.post('/crearPedido',crearPedido);
+router.post('/crearPedido',validarJWT,crearPedido);
 
 
 module.exports = router;
