@@ -5,9 +5,13 @@ const { generarJWT } = require("../helpers/jwt");
 const { generarNombre } = require("../helpers/generar_nombre");
 const usuario = require("../models/usuario");
 
+const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
+
 const crearUsuario = async (req, res = response) => {
 
   const { correo, contrasena } = req.body;
+
+  console.log(req.body);
 
   try {
     const existeEmail = await Usuario.findOne({correo: correo.toLowerCase()});
@@ -24,8 +28,16 @@ const crearUsuario = async (req, res = response) => {
       });
     }
 
-    const usuario = new Usuario(req.body);
 
+    
+    const usuario = new Usuario(req.body);
+    
+    const customer = await stripe.customers.create({
+      description: `Cliente creado con el ID : ${usuario._id}`,
+      email:correo,
+      name:req.body.nombre,
+      phone:req.body.numero_celular
+    });
 
     const salt = bcrypt.genSaltSync();
 
@@ -34,6 +46,24 @@ const crearUsuario = async (req, res = response) => {
     usuario.nombre_usuario = generarNombre(usuario.nombre);
     usuario.socio = false;
     usuario.online = false;
+    usuario.envio_promo = false;
+    usuario.customer_id = customer.id;
+    usuario.cesta ={
+      productos:[],
+      total:0,
+      tarjeta:'',
+      efectivo:false,
+      direccion:{
+        titulo:'',
+        coordenadas:{
+          lat:21.354396,
+          lng:-101.9467424
+        },
+        predeterminado:false,
+        _id:''
+      },
+      codigo:''
+    }
 
 
     await usuario.save();
@@ -41,13 +71,14 @@ const crearUsuario = async (req, res = response) => {
 
     const token = await generarJWT(usuario.id);
 
-    res.json({
+    res.status(200).json({
       ok: true,
       usuario,
       token,
     });
 
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       ok: false,
       error,
@@ -134,7 +165,6 @@ const iniciarUsuarioTelefono = async(req,res= response) =>{
 
   const usuarioDB = await Usuario.findOne({numero_celular:numero});
 
-  console.log(usuarioDB.cesta.productos[0]);
 
   if(!usuarioDB){
 

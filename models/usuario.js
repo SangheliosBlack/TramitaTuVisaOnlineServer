@@ -13,7 +13,7 @@ const UsuarioSchema =  Schema({
     },
     avatar:{
         type:Object,
-        required:true
+        required:false
     },
     nombre_usuario:{
         type:String,
