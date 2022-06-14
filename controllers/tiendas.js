@@ -21,6 +21,7 @@ const crearPedido = async (req,res)=>{
     var {envio,usuario,servicio,customer} = req.body;
 
     console.log(efectivo);
+    console.log(tarjeta);
 
 
     var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
@@ -36,6 +37,8 @@ const crearPedido = async (req,res)=>{
     if(!tarjeta){
         efectivo = true;
     }
+
+    console.log(efectivo);
 
     var venta = new Venta();
 
