@@ -13,10 +13,14 @@ const Venta = require('../models/venta');
 const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
 
 const crearPedido = async (req,res)=>{
+
+    
     
     var {total,tarjeta,productos,efectivo,codigo} = JSON.parse(req.body.cesta);
 
     var {envio,usuario,servicio,customer} = req.body;
+
+    console.log(efectivo);
 
 
     var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
@@ -27,6 +31,10 @@ const crearPedido = async (req,res)=>{
            return numStr.split('.')[1].length;
         };
         return 0;
+    }
+
+    if(!tarjeta){
+        efectivo = true;
     }
 
     var venta = new Venta();
