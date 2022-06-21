@@ -45,13 +45,9 @@ class Server {
 
     middlewares(){
 
-        var corsOptions = {
-            origin: ["http://localhost:53682","http://192.168.100.12:53682","http://192.168.100.12"],
-            optionsSuccessStatus: 200 // For legacy browser support
-        }
-            
+      
 
-        this.app.use(cors(corsOptions));
+        this.app.use(cors());
 
         this.app.use(express.json());
 
