@@ -4,7 +4,6 @@ var controller = {
 
     sugerencia: async function(req,res){
 
-        console.log(req.body.coordenadas);
 
         const coordenadas = req.body.coordenadas;
 
@@ -16,10 +15,8 @@ var controller = {
                 location_type:'ROOFTOP'
             }
         }).then(function(response){
-            console.log(response.data);
             return res.json(response.data);
         }).catch(function(e){
-            console.log(e)  ;
             return res.json({
                 ok:false
             })
@@ -35,10 +32,8 @@ var controller = {
                 key: process.env.GOOGLE_GEOCODE_API,
             }
         }).then(function(response){
-            console.log(response.data);
             return res.json(response.data);
         }).catch(function(e){
-            console.log(e)  ;
             return res.json({
                 ok:false
             })
@@ -64,7 +59,6 @@ var controller = {
         }).then(function(response){
             return res.json(response.data);
         }).catch(function(e){
-            console.log(e)  ;
             return res.json({
                 ok:false
             })

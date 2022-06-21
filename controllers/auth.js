@@ -11,7 +11,6 @@ const crearUsuario = async (req, res = response) => {
 
   const { correo, contrasena } = req.body;
 
-  console.log(req.body);
 
   try {
     const existeEmail = await Usuario.findOne({correo: correo.toLowerCase()});
@@ -78,7 +77,6 @@ const crearUsuario = async (req, res = response) => {
     });
 
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       ok: false,
       error,
@@ -143,6 +141,7 @@ const iniciarUsuario = async (req, res = response) => {
 
 const renovarToken = async (req, res = response) => {
 
+
   const uid = req.uid;
 
   const token = await generarJWT(uid);
@@ -155,13 +154,13 @@ const renovarToken = async (req, res = response) => {
     usuario,
     token,
   });
+  
 };
 
 const iniciarUsuarioTelefono = async(req,res= response) =>{
 
   const {numero} = req.body;
 
-  console.log(numero);
 
   const usuarioDB = await Usuario.findOne({numero_celular:numero});
 

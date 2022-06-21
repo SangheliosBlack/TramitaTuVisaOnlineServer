@@ -208,7 +208,6 @@ const Venta = require('../models/venta');
     },
     modificarCantidadProductoCesta:async(req,res)=>{
 
-        console.log(req.body);
 
         await Usuario.updateMany(
             
@@ -245,7 +244,6 @@ const Venta = require('../models/venta');
 
 
         const ordenes = await Venta.find({'usuario':mongoose.Types.ObjectId(req.uid)}).sort({'updatedAt':-1});
-        console.log(ordenes);
         
         return res.json(ordenes);
         

@@ -26,7 +26,8 @@ class Server {
             direcciones:'/api/direcciones',
             stripe:'/api/stripe',
             twilio:'/api/twilio',
-            google:'/api/google'
+            google:'/api/google',
+            test:'/api/test'
         }
 
         this.conectarDB();
@@ -44,7 +45,13 @@ class Server {
 
     middlewares(){
 
-        this.app.use(cors());
+        var corsOptions = {
+            origin: ["http://localhost:53682","http://192.168.100.12:53682","http://192.168.100.12"],
+            optionsSuccessStatus: 200 // For legacy browser support
+        }
+            
+
+        this.app.use(cors(corsOptions));
 
         this.app.use(express.json());
 
@@ -53,6 +60,7 @@ class Server {
     }
 
     routes(){
+
         this.app.use(this.paths.auth,require('./routes/autentificacion'));
         this.app.use(this.paths.usuario,require('./routes/usuarios'));
         this.app.use(this.paths.tienda,require('./routes/tiendas'));
@@ -62,6 +70,8 @@ class Server {
         this.app.use(this.paths.stripe,require('./routes/stripe'));
         this.app.use(this.paths.twilio,require('./routes/twilio'));
         this.app.use(this.paths.google,require('./routes/google'));
+        this.app.use(this.paths.test,require('./routes/test'));
+
     }
 
     listen(){

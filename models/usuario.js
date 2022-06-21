@@ -19,6 +19,10 @@ const UsuarioSchema =  Schema({
         type:String,
         require:true
     },
+    dialCode:{
+        type:String,
+        require:true
+    },
     nombre:{
         type:String,
         require:true
@@ -60,14 +64,14 @@ const UsuarioSchema =  Schema({
         unique:true,
         required:false
     },
-    tienda:{
-        type:Schema.Types.ObjectId,
+    negocios:{
+        type:Array,
         required:false
     },
     cesta:{
         type:Object,
         require :true
-    }
+    },
 },{
     timestamps:true
 });

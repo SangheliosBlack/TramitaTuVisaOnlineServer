@@ -44,7 +44,6 @@ const eliminarDireccion = async (req,res)=>{
         await Usuario.findByIdAndUpdate(req.uid,{$pull:{direcciones:{_id:mongoose.Types.ObjectId(id)}}});
         return res.json({ok:true});
     } catch (error) {
-        console.log(error);
         return res.json({ok:true});
     }
 
@@ -53,7 +52,6 @@ const eliminarDireccion = async (req,res)=>{
 
 const direccionPredeterminada = async(req,res)=>{
 
-    console.log(req.body);
 
         if(req.body.actual != 'NA'){
 
@@ -135,7 +133,6 @@ const nuevaDireccion = async (req,res = response)=>{
             });
             
         }).catch(function(e){
-            console.log(e)  ;
             return res.status(400).json({
                 ok:false
             })

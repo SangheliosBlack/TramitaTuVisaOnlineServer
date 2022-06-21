@@ -28,7 +28,6 @@ const eliminarComentario = async(req,res)=>{
 
     } catch (error) {
         
-        console.log(error);
 
         return res.json({
             error
@@ -64,7 +63,6 @@ const noDestacarComentario = async(req,res)=>{
 
     } catch (error) {
         
-        console.log(error);
 
         return res.json({
             error
@@ -100,7 +98,6 @@ const destacarComentario = async(req,res)=>{
 
     } catch (error) {
         
-        console.log(error);
 
         return res.json({
             error

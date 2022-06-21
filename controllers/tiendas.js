@@ -1,3 +1,6 @@
+const Notificacion = require('../notificaciones');
+
+
 const {response} = require('express');
 const moment = require('moment');
 const Tienda = require('../models/tiendas');
@@ -20,9 +23,6 @@ const crearPedido = async (req,res)=>{
 
     var {envio,usuario,servicio,customer} = req.body;
 
-    console.log(efectivo);
-    console.log(tarjeta);
-
 
     var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
 
@@ -37,8 +37,6 @@ const crearPedido = async (req,res)=>{
     if(!tarjeta){
         efectivo = true;
     }
-
-    console.log(efectivo);
 
     var venta = new Venta();
 
@@ -107,9 +105,15 @@ const crearPedido = async (req,res)=>{
         await venta.save();
 
         await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
-    
-        console.log(venta);
 
+        const data = {
+            tokenId:'dQxN2WlUR_uGZytPuCVDQ9:APA91bHKyK0mPb1Xwi_ebSj1mL_DT99TakDp601kkYukud1Ns0VsXP2DbkI2wy8AIUaR-4Yl3wypf5FzIkeXXbl4iV2Y1-q_Welb59pAnqyrCiBDIq8rDrCMTKy_s_vYfMotYcnxlakk',
+            titulo:'Enviado desde NodeJS',
+            mensaje:'Si puede perros 7u7',
+        };
+
+        Notificacion.sendPushToOneUser(data);
+    
         return res.status(200).json(venta);
 
     }else{
@@ -188,8 +192,6 @@ const crearPedido = async (req,res)=>{
     
             await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
         
-            console.log(venta);
-    
             return res.status(200).json(venta);
     
         }else{
@@ -672,12 +674,11 @@ const obtenerTienda = async (req,res = response)=>{
 
     const usuario = await Usuario.findById(req.uid);
 
-    const tienda = await Tienda.findById(usuario.tienda);
+    const tienda = await Tienda.findById('61feb3738c928f18cc164f72');
 
     const productos = await ListaProductos.findById(tienda.productos);
 
     tienda.listaProductos = productos.productos;
-
 
     res.json(
         tienda
