@@ -676,6 +676,8 @@ const obtenerTienda = async (req,res = response)=>{
 
     const tienda = await Tienda.findById('61feb3738c928f18cc164f72');
 
+    console.log(tienda);
+
     const productos = await ListaProductos.findById(tienda.productos);
 
     tienda.listaProductos = productos.productos;
