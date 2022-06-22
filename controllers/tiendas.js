@@ -240,6 +240,7 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
                     equipo:'$equipo',
                     ventas:'$ventas',
                     direccion:'$direccion',
+                    online:'$online',
                     imagen_perfil:'$imagen_perfil',
                     listaProductos:{
                         $arrayElemAt:['$listaProductos',0]
@@ -261,6 +262,7 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
                     direccion:'$direccion',
                     fotografias:'$fotografias',
                     inventario:'$inventario',
+                    online:'$online',
                     equipo:'$equipo',
                     ventas:'$ventas',
                     imagen_perfil:'$imagen_perfil',
@@ -670,21 +672,38 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
 
 }
 
-const obtenerTienda = async (req,res = response)=>{
+const  obtenerTienda = async (req,res = response)=>{
+
 
     const usuario = await Usuario.findById(req.uid);
 
-    const tienda = await Tienda.findById('61feb3738c928f18cc164f72');
+    if(req.body.tienda){
 
-    console.log(tienda);
+        const tienda = await Tienda.findById(req.body.tienda);
 
-    const productos = await ListaProductos.findById(tienda.productos);
+        const productos = await ListaProductos.findById(tienda.productos);
 
-    tienda.listaProductos = productos.productos;
+        tienda.listaProductos = productos.productos;
 
-    res.json(
-        tienda
-    );
+        res.json(   
+            tienda
+        );
+
+    }else{
+        
+        const tienda = await Tienda.findById(usuario.negocios[0]);
+
+        const productos = await ListaProductos.findById(tienda.productos);
+
+        tienda.listaProductos = productos.productos;
+
+        res.json(   
+            tienda
+        );
+    }
+
+
+    
 }
 
 const modificarNombreTienda = async(req,res = response)=>{

@@ -60,6 +60,10 @@ const TiendasSchema = Schema({
     listaProductos:{
         type:Array,
         require:false
+    },
+    online:{
+        type:Boolean,
+        require:true
     }
 },{
     timestamps:true

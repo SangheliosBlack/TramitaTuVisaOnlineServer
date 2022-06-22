@@ -2,8 +2,8 @@ const { response } = require("express");
 const bcrypt = require("bcryptjs");
 const Usuario = require("../models/usuario");
 const { generarJWT } = require("../helpers/jwt");
+const mongoose = require('mongoose');
 const { generarNombre } = require("../helpers/generar_nombre");
-const usuario = require("../models/usuario");
 
 const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
 
@@ -148,10 +148,48 @@ const renovarToken = async (req, res = response) => {
 
   const usuario = await Usuario.findById(uid);
 
+  const usuario2 = await Usuario.aggregate(
+    [
+      {$match:{_id:mongoose.Types.ObjectId(uid)}},
+      {$unwind:'$negocios'},
+      {
+        $lookup:{
+            from: 'tiendas',
+            localField: 'negocios',
+            foreignField: '_id',
+            as:'negocioPro'
+        },
+      },
+    ]
+  )
+
+  usuario.negocios = listado;
+
+
+  var listado = [];
+
+  for (let index = 0; index < usuario2.length; index++) {
+    var actual = usuario2[index];
+    
+    var element = {};
+
+    element.nombre = actual.negocioPro[0].nombre;
+    element.imagen = actual.negocioPro[0].imagen_perfil;
+    element.uid = actual.negocioPro[0]._id;
+
+
+    listado.push(element);
+    
+  }
+
+
+  usuario.negocios = listado;
+  console.log(usuario);
+    
 
   res.json({
     ok: true,
-    usuario,
+    usuario: usuario,
     token,
   });
   

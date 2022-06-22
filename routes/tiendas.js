@@ -4,7 +4,7 @@ const {obtenerProductosTienda,searchOne,obtenerTienda, verTodoTiendas, nuevaTien
 
 const router = Router();
 
-router.get('/obtenerTienda',validarJWT,obtenerTienda);
+router.post('/obtenerTienda',validarJWT,obtenerTienda);
 
 router.post('/nuevaTienda',validarJWT,nuevaTienda);
 router.post('/modificarNombre',validarJWT,modificarNombreTienda);
