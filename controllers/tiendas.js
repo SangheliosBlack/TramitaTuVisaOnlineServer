@@ -487,7 +487,6 @@ const obtenerProductosTienda = async (req,res)=>{
     const body = req.body;
 
 
-
     const tienda = await ListaProductos.aggregate(
         [
             {
@@ -509,6 +508,8 @@ const obtenerProductosTienda = async (req,res)=>{
         ]
     );
 
+    console.log( tienda[0].productos);
+
 
     const categorias = await ListaProductos.aggregate(
         [
@@ -527,6 +528,8 @@ const obtenerProductosTienda = async (req,res)=>{
         ]
     );
 
+
+    console.log(categorias);
 
     var definitivo =  [];
 
