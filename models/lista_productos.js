@@ -110,6 +110,10 @@ const ListaProductosSchema = Schema({
                 type:Number,
                 require:true
             },
+            subCategoria:{
+                type:String,
+                require:false
+            },
             sku:{
                 type:String,
                 require:false
