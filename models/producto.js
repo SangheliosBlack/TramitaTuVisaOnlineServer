@@ -88,6 +88,10 @@ const ProductosSchema = Schema({
             }]
         }
     ],
+    subcCategoria:{
+        type:String,
+        require:true
+    },
     extra:{
         type:Number,
         require:true,

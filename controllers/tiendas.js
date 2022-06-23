@@ -438,6 +438,7 @@ const verTodoProductos = async(req,res)=>{
                     disponible:'$productos.disponible',
                     comentarios:'$productos.comentarios',
                     tienda:'$productos.tienda',
+                    subCategoria:'$productos.subCategoria',
                     
                     opciones:'$productos.opciones',
 
@@ -520,7 +521,7 @@ const obtenerProductosTienda = async (req,res)=>{
             },{
                 $group:{
                     _id:0,
-                    categorias:{$addToSet:'$productos.categoria'}
+                    categorias:{$addToSet:'$productos.subCategoria'}
                 }
             }
         ]
@@ -634,7 +635,8 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
                     disponible:'$productos.disponible',
                     comentarios:'$productos.comentarios',
                     tienda:'$tienda',
-                    opciones:'$productos.opciones'
+                    opciones:'$productos.opciones',
+                    subCategoria:'$productos.subCategoria'
                 }
             }
         ]
