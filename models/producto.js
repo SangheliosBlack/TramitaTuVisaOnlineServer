@@ -88,7 +88,7 @@ const ProductosSchema = Schema({
             }]
         }
     ],
-    subcCategoria:{
+    subCategoria:{
         type:String,
         require:true
     },
