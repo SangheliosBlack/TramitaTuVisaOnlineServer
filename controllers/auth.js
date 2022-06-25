@@ -65,6 +65,8 @@ const crearUsuario = async (req, res = response) => {
     }
 
 
+    usuario.negocios = [];
+
     await usuario.save();
 
 
@@ -204,8 +206,38 @@ const iniciarUsuarioTelefono = async(req,res= response) =>{
 
   const usuarioDB = await Usuario.findOne({numero_celular:numero});
 
-  console.log(usuarioDB);
+  const usuario2 = await Usuario.aggregate(
+    [
+      {$match:{_id:mongoose.Types.ObjectId(usuarioDB._id)}},
+      {$unwind:'$negocios'},
+      {
+        $lookup:{
+            from: 'tiendas',
+            localField: 'negocios',
+            foreignField: '_id',
+            as:'negocioPro'
+        },
+      },
+    ]
+  )
 
+  var listado = [];
+
+  for (let index = 0; index < usuario2.length; index++) {
+    var actual = usuario2[index];
+    
+    var element = {};
+
+    element.nombre = actual.negocioPro[0].nombre;
+    element.imagen = actual.negocioPro[0].imagen_perfil;
+    element.uid = actual.negocioPro[0]._id;
+
+
+    listado.push(element);
+    
+  }
+
+  usuarioDB.negocios = listado;
 
   if(!usuarioDB){
 
