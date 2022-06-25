@@ -533,28 +533,30 @@ const obtenerProductosTienda = async (req,res)=>{
 
     var definitivo =  [];
 
-    
+if(categorias.length > 0){
 
     categorias[0].categorias.forEach(function(currentValue1, index1){
 
-        var pre = {};
-        
-        pre.titulo = currentValue1;
-        pre.productos = [];
+      var pre = {};
+      
+      pre.titulo = currentValue1;
+      pre.productos = [];
 
-        definitivo.push(pre);
+      definitivo.push(pre);
 
-        tienda[0].productos.forEach(function(currentValue2, index2){
+      tienda[0].productos.forEach(function(currentValue2, index2){
 
-            console.log(currentValue2);
-            
-            if(currentValue1 == currentValue2.subCategoria){
-                definitivo[index1].productos.push(currentValue2);
-            }
-            
-        });
-        
-    });
+          console.log(currentValue2);
+          
+          if(currentValue1 == currentValue2.subCategoria){
+              definitivo[index1].productos.push(currentValue2);
+          }
+          
+      });
+      
+  });
+  
+}
 
     return res.json(
         {
