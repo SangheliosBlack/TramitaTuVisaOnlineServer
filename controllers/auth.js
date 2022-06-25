@@ -204,6 +204,8 @@ const iniciarUsuarioTelefono = async(req,res= response) =>{
 
   const usuarioDB = await Usuario.findOne({numero_celular:numero});
 
+  console.log(usuarioDB);
+
 
   if(!usuarioDB){
 
