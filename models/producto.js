@@ -92,6 +92,10 @@ const ProductosSchema = Schema({
         type:String,
         require:true
     },
+    imagen:{
+        type:String,
+        require:true
+    },
     extra:{
         type:Number,
         require:true,

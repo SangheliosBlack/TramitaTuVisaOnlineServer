@@ -197,6 +197,8 @@ const renovarToken = async (req, res = response) => {
 
 const iniciarUsuarioTelefono = async(req,res= response) =>{
 
+  console.log(req.body);
+
   const {numero} = req.body;
 
 

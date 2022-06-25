@@ -114,6 +114,10 @@ const ListaProductosSchema = Schema({
                 type:String,
                 require:false
             },
+            imagen:{
+                type:String,
+                require:false
+            },
             sku:{
                 type:String,
                 require:false

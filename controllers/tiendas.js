@@ -545,6 +545,9 @@ const obtenerProductosTienda = async (req,res)=>{
         definitivo.push(pre);
 
         tienda[0].productos.forEach(function(currentValue2, index2){
+
+            console.log(currentValue2);
+            
             if(currentValue1 == currentValue2.subCategoria){
                 definitivo[index1].productos.push(currentValue2);
             }

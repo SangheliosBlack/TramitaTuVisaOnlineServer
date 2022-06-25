@@ -45,7 +45,6 @@ class Server {
 
     middlewares(){
 
-      
 
         this.app.use(cors());
 
