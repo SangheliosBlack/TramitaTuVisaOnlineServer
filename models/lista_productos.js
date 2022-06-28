@@ -42,6 +42,10 @@ const ListaProductosSchema = Schema({
                         type:Boolean,
                         require:true,
     
+                    },
+                    hot:{
+                        type:Number,
+                        require:true,
                     }
                 }]
             }

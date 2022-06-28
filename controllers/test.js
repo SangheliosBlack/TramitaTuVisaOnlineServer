@@ -20,7 +20,7 @@ const add = async(req,res)=>{
 
     const nuevoProducto = new Producto(req.body);
 
-    await ListaProductos.findOneAndUpdate({_id:'61feb3738c928f18cc164f6f'},{$push:{'productos':nuevoProducto}});
+    await ListaProductos.findOneAndUpdate({_id:'62b759abb404a358d356d6a1'},{$push:{'productos':nuevoProducto}});
 
     return res.status(200).json({ok:true,producto:nuevoProducto});
     

@@ -45,6 +45,10 @@ const TiendasSchema = Schema({
         type:Schema.Types.ObjectId,
         require:false
     },
+    punto_venta:{
+        type:String,
+        require:false
+    },
     direccion:{
         type:String,
         require:false
