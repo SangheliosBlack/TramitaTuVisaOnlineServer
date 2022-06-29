@@ -227,9 +227,9 @@ const renovarToken = async (req, res = response) => {
 
 const iniciarUsuarioTelefono = async(req,res= response) =>{
 
-
-
   const {numero,tokenFB} = req.body;
+
+  numero.replaceAll(' ', '')
 
 
   const usuarioDB = await Usuario.findOne({numero_celular:numero});
