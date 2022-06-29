@@ -72,6 +72,10 @@ const UsuarioSchema =  Schema({
         type:Object,
         require :true
     },
+    tokenFB:{
+        type:String,
+        require:false
+    }
 },{
     timestamps:true
 });

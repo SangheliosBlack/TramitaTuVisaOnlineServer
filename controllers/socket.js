@@ -1,4 +1,5 @@
 const Usuario = require("../models/usuario");
+const Tienda = require("../models/tiendas");
 const Mensaje = require("../models/mensaje");
 const bcrypt = require('bcryptjs');
 
@@ -8,6 +9,23 @@ const usuarioConectado = async (uid = "") => {
   await usuario.save();
   return usuario;
 };
+
+const conectarNegocio = async (token="")=>{
+  const tienda = await Tienda.findOne({punto_venta:token});
+  tienda.online = true;
+  await tienda.save();
+  return tienda;
+}
+
+const desconectarNegocio = async (token="")=>{
+  const tienda = await Tienda.findOne({punto_venta:token});
+  if(tienda){
+    tienda.online = false;
+    await tienda.save();
+  }
+  return tienda;
+}
+
 const usuarioDesconectado = async (uid = "") => {
   const usuario = await Usuario.findById(uid);
   usuario.online = false;
@@ -36,24 +54,19 @@ const findUser = async (payload) => {
 
 const agregarUsuario = async (payload) => {
   try {
-      console.log('si entro');
     const existeEmail = await Usuario.findOne({ email:payload.email });
 
     if (existeEmail) {
-        console.log('existe');
         return false;
     }
-    console.log('no existe');
 
     const usuario = new Usuario(payload);
 
-    console.log(usuario);
     
     const salt = bcrypt.genSaltSync();
     usuario.password = bcrypt.hashSync(payload.password, salt);
     usuario.admin = false;
     
-    console.log(usuario);
 
     await usuario.save();
 
@@ -68,5 +81,7 @@ module.exports = {
   usuarioDesconectado,
   grabarMensaje,
   agregarUsuario,
-  findUser
+  findUser,
+  desconectarNegocio,
+  conectarNegocio
 };

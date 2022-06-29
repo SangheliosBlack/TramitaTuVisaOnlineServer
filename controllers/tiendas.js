@@ -241,6 +241,7 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
                     ventas:'$ventas',
                     direccion:'$direccion',
                     online:'$online',
+                    punto_venta:'$punto_venta',
                     imagen_perfil:'$imagen_perfil',
                     listaProductos:{
                         $arrayElemAt:['$listaProductos',0]
@@ -265,6 +266,7 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
                     online:'$online',
                     equipo:'$equipo',
                     ventas:'$ventas',
+                    punto_venta:'$punto_venta',
                     imagen_perfil:'$imagen_perfil',
                     listaProductos:'$listaProductos.productos'
             },
@@ -317,6 +319,7 @@ const busqueda = async(req,res)=>{
                     equipo:'$equipo',
                     direccion:'$direccion',
                     ventas:'$ventas',
+                    punto_venta:'$punto_venta',
                     imagen_perfil:'$imagen_perfil',
                     listaProductos:{
                         $arrayElemAt:['$listaProductos',0]
@@ -340,6 +343,7 @@ const busqueda = async(req,res)=>{
                     fotografias:'$fotografias',
                     inventario:'$inventario',
                     equipo:'$equipo',
+                    punto_venta:'$punto_venta',
                     imagen_perfil:'$imagen_perfil',
                     ventas:'$ventas',
                     listaProductos:'$listaProductos.productos'
@@ -359,15 +363,17 @@ const busqueda = async(req,res)=>{
             },{
                 $project:{
                     _id:'$productos._id',
-                    categorias:'$productos.categoria',
-                    nombre:'$productos.nombre',
                     precio:'$productos.precio',
-                    descripcion:'$productos.descripcion',
+                    nombre:'$productos.nombre',
                     descuentoP:'$productos.descuentoP',
                     descuentoC:'$productos.descuentoC',
+                    descripcion:'$productos.descripcion',
                     disponible:'$productos.disponible',
+                    categorias:'$productos.categoria',
+                    imagen:'$productos.imagen',
                     comentarios:'$productos.comentarios',
                     opciones:'$productos.opciones',
+                    tienda:'$productos.tienda',
 
                 }
             }
@@ -508,7 +514,6 @@ const obtenerProductosTienda = async (req,res)=>{
         ]
     );
 
-    console.log( tienda[0].productos);
 
 
     const categorias = await ListaProductos.aggregate(
@@ -529,7 +534,6 @@ const obtenerProductosTienda = async (req,res)=>{
     );
 
 
-    console.log(categorias);
 
     var definitivo =  [];
 
@@ -546,7 +550,6 @@ if(categorias.length > 0){
 
       tienda[0].productos.forEach(function(currentValue2, index2){
 
-          console.log(currentValue2);
           
           if(currentValue1 == currentValue2.subCategoria){
               definitivo[index1].productos.push(currentValue2);
@@ -642,10 +645,12 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
                     descuentoC:'$productos.descuentoC',
                     disponible:'$productos.disponible',
                     comentarios:'$productos.comentarios',
-                    tienda:'$tienda',
+                    tienda:'$productos.tienda',
                     opciones:'$productos.opciones',
                     subCategoria:'$productos.subCategoria'
                 }
+            },{
+              $limit:15  
             }
         ]
     );
@@ -689,30 +694,48 @@ const  obtenerTienda = async (req,res = response)=>{
 
     const usuario = await Usuario.findById(req.uid);
 
-    if(req.body.tienda){
+    if(req.body.token){
 
-        const tienda = await Tienda.findById(req.body.tienda);
+        const tienda = await Tienda.findOne({punto_venta:req.body.token});
 
-        const productos = await ListaProductos.findById(tienda.productos);
+        if(tienda){
+            const productos = await ListaProductos.findById(tienda.productos);
 
         tienda.listaProductos = productos.productos;
 
-        res.json(   
+        return res.json(   
             tienda
         );
+        }else{
+            if(req.body.tienda){
 
-    }else{
+                const tienda = await Tienda.findById(req.body.tienda);
         
-        const tienda = await Tienda.findById(usuario.negocios[0]);
+                const productos = await ListaProductos.findById(tienda.productos);
+        
+                tienda.listaProductos = productos.productos;
+        
+                return res.json(   
+                    tienda
+                );
+        
+            }else{
+                
+                const tienda = await Tienda.findById(usuario.negocios[0]);
+        
+                const productos = await ListaProductos.findById(tienda.productos);
+        
+                tienda.listaProductos = productos.productos;
+        
+                return res.json(   
+                    tienda
+                );
+            }
+        }
 
-        const productos = await ListaProductos.findById(tienda.productos);
-
-        tienda.listaProductos = productos.productos;
-
-        res.json(   
-            tienda
-        );
     }
+
+    
 
 
     

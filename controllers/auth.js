@@ -1,6 +1,7 @@
 const { response } = require("express");
 const bcrypt = require("bcryptjs");
 const Usuario = require("../models/usuario");
+const Tienda = require("../models/tiendas");
 const { generarJWT } = require("../helpers/jwt");
 const mongoose = require('mongoose');
 const { generarNombre } = require("../helpers/generar_nombre");
@@ -47,6 +48,7 @@ const crearUsuario = async (req, res = response) => {
     usuario.online = false;
     usuario.envio_promo = false;
     usuario.customer_id = customer.id;
+    usuario.tokenFB = req.body.tokenFB;
     usuario.cesta ={
       productos:[],
       total:0,
@@ -72,10 +74,20 @@ const crearUsuario = async (req, res = response) => {
 
     const token = await generarJWT(usuario.id);
 
+    var checkToken = await Tienda.findOne({punto_venta:req.body.tokenFB});
+
+
+  if(checkToken){
+    checkToken = true;
+  }else{
+    checkToken = false;
+  }
+
     res.status(200).json({
       ok: true,
       usuario,
       token,
+      checkToken
     });
 
   } catch (error) {
@@ -150,6 +162,10 @@ const renovarToken = async (req, res = response) => {
 
   const usuario = await Usuario.findById(uid);
 
+  usuario.tokenFB = req.header('x-token-firebase');
+
+  await usuario.save();
+
   const usuario2 = await Usuario.aggregate(
     [
       {$match:{_id:mongoose.Types.ObjectId(uid)}},
@@ -186,58 +202,38 @@ const renovarToken = async (req, res = response) => {
 
 
   usuario.negocios = listado;
-  console.log(usuario);
     
+  const token2 = req.header('x-token-firebase');
+
+
+  var checkToken = await Tienda.findOne({punto_venta:token2});
+
+
+  if(checkToken){
+    checkToken = true;
+  }else{
+    checkToken = false;
+  }
+
 
   res.json({
     ok: true,
     usuario: usuario,
     token,
+    checkToken
   });
   
 };
 
 const iniciarUsuarioTelefono = async(req,res= response) =>{
 
-  console.log(req.body);
 
-  const {numero} = req.body;
+
+  const {numero,tokenFB} = req.body;
 
 
   const usuarioDB = await Usuario.findOne({numero_celular:numero});
 
-  const usuario2 = await Usuario.aggregate(
-    [
-      {$match:{_id:mongoose.Types.ObjectId(usuarioDB._id)}},
-      {$unwind:'$negocios'},
-      {
-        $lookup:{
-            from: 'tiendas',
-            localField: 'negocios',
-            foreignField: '_id',
-            as:'negocioPro'
-        },
-      },
-    ]
-  )
-
-  var listado = [];
-
-  for (let index = 0; index < usuario2.length; index++) {
-    var actual = usuario2[index];
-    
-    var element = {};
-
-    element.nombre = actual.negocioPro[0].nombre;
-    element.imagen = actual.negocioPro[0].imagen_perfil;
-    element.uid = actual.negocioPro[0]._id;
-
-
-    listado.push(element);
-    
-  }
-
-  usuarioDB.negocios = listado;
 
   if(!usuarioDB){
 
@@ -245,12 +241,59 @@ const iniciarUsuarioTelefono = async(req,res= response) =>{
     
   }else{
     
+    usuarioDB.tokenFB = tokenFB;
+
+    await usuarioDB.save();
+  
+    const usuario2 = await Usuario.aggregate(
+      [
+        {$match:{_id:mongoose.Types.ObjectId(usuarioDB._id)}},
+        {$unwind:'$negocios'},
+        {
+          $lookup:{
+              from: 'tiendas',
+              localField: 'negocios',
+              foreignField: '_id',
+              as:'negocioPro'
+          },
+        },
+      ]
+    )
+  
+    var listado = [];
+  
+    for (let index = 0; index < usuario2.length; index++) {
+      var actual = usuario2[index];
+      
+      var element = {};
+  
+      element.nombre = actual.negocioPro[0].nombre;
+      element.imagen = actual.negocioPro[0].imagen_perfil;
+      element.uid = actual.negocioPro[0]._id;
+  
+  
+      listado.push(element);
+      
+    }
+  
+    usuarioDB.negocios = listado;
+
     const token = await generarJWT(usuarioDB.id);
+
+    var checkToken = await Tienda.findOne({punto_venta:req.body.tokenFB});
+
+
+  if(checkToken){
+    checkToken = true;
+  }else{
+    checkToken = false;
+  }
 
     res.status(200).json({
       ok: true,
       usuario: usuarioDB,
       token,
+      checkToken
     });
 
   }
