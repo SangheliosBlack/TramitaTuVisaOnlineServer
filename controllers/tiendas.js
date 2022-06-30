@@ -223,7 +223,7 @@ const crearPedido = async (req,res)=>{
             };
     
             Notificacion.sendPushToOneUser(data);
-
+        }
         
             return res.status(200).json(venta);
     
