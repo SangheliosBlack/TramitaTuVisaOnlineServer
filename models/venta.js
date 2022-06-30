@@ -33,6 +33,10 @@ const VentaSchema = Schema({
         type:Number,
         require:true,
     },
+    direccion:{
+        type:Object,
+        require:true
+    }
     
 },{
     timestamps:true
