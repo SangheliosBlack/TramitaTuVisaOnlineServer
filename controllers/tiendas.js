@@ -19,7 +19,7 @@ const crearPedido = async (req,res)=>{
 
     
     
-    var {total,tarjeta,productos,efectivo,codigo} = JSON.parse(req.body.cesta);
+    var {total,tarjeta,productos,efectivo,codigo,direccion} = JSON.parse(req.body.cesta);
 
     var {envio,usuario,servicio,customer} = req.body;
 
@@ -46,6 +46,7 @@ const crearPedido = async (req,res)=>{
     venta.usuario = usuario;
     venta.servicio = servicio;
     venta.envioPromo = codigo ? envio :0;
+    venta.direccion = direccion;
 
     if(efectivo){
 
@@ -72,6 +73,7 @@ const crearPedido = async (req,res)=>{
                 subElement.repartidor = 'Pendiente';
                 subElement.imagen = datos_tienda.imagen_perfil;
                 subElement.ubicacion = datos_tienda.coordenadas;
+                subElement.direccion = datos_tienda.direccion;
     
     
                 pedidos.push(subElement);
@@ -107,7 +109,7 @@ const crearPedido = async (req,res)=>{
         await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
 
         const data = {
-            tokenId:'dQxN2WlUR_uGZytPuCVDQ9:APA91bHKyK0mPb1Xwi_ebSj1mL_DT99TakDp601kkYukud1Ns0VsXP2DbkI2wy8AIUaR-4Yl3wypf5FzIkeXXbl4iV2Y1-q_Welb59pAnqyrCiBDIq8rDrCMTKy_s_vYfMotYcnxlakk',
+            tokenId:'cbuRKMi9Ru2k4oGgH16WT2:APA91bFiEbQ9ZWpfPK2RxYOnALOpqKXQ2_RJtAszm2-IdyjCkkn3OpEap8dUwLEESDpSe9MfEUKp5gUG3im8cpyvHHv4V787WeRA9eRlw0EWaooPgm_DaDo_nlM2c29g7WZ4bQNRr8Ci',
             titulo:'Enviado desde NodeJS',
             mensaje:'Si puede perros 7u7',
         };

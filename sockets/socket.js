@@ -1,6 +1,6 @@
 const { io } = require('../app');
 const { comprobarJWT } = require('../helpers/jwt');
-const {usuarioConectado, usuarioDesconectado,conectarNegocio, desconectarNegocio} = require('../controllers/socket');
+const {usuarioConectado, usuarioDesconectado,conectarNegocio, desconectarNegocio, revisarPuntoVenta} = require('../controllers/socket');
 
 // Mensajes de Sockets
 io.on('connection', client => {
@@ -18,9 +18,21 @@ io.on('connection', client => {
 
     console.log('Cliente autorizado');
 
-    usuarioConectado(uid);
+    const isVenta =  revisarPuntoVenta;
 
-    client.join(uid);
+    if(isVenta){
+
+        client.join(isVenta.punto_venta);
+
+    }else{
+
+        usuarioConectado(uid);
+
+        client.join(uid);
+
+    }
+
+    
 
     client.on('disconnect', () => {
         usuarioDesconectado(uid);
@@ -49,6 +61,12 @@ io.on('connection', client => {
         client.broadcast.emit('estado-negocio', {'token':client.handshake.headers['token'],'estado':true});
 
         // broadcast cuando es para todos menos quien lo envia
+
+    });
+
+    client.on('enviar-pedido',(payload)=>{
+
+        console.log('pedido recibido');
 
     });
 

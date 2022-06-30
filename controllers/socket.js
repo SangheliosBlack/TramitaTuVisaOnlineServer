@@ -33,6 +33,14 @@ const usuarioDesconectado = async (uid = "") => {
   return usuario;
 };
 
+const revisarPuntoVenta = async(token = "") =>{
+
+  const tienda = await Tienda.findOne({punto_venta:token});
+
+  return tienda;
+
+}
+
 const grabarMensaje = async (payload) => {
   try {
     const mensaje = new Mensaje(payload);
@@ -83,5 +91,6 @@ module.exports = {
   agregarUsuario,
   findUser,
   desconectarNegocio,
-  conectarNegocio
+  conectarNegocio,
+  revisarPuntoVenta
 };
