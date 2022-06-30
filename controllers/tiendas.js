@@ -119,6 +119,8 @@ const crearPedido = async (req,res)=>{
         Notificacion.sendPushToOneUser(data);
 
         console.log('logrado');
+
+        console.log(venta);
     
         return res.status(200).json(venta);
 
