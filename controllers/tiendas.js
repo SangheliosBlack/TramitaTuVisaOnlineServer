@@ -118,7 +118,7 @@ const crearPedido = async (req,res)=>{
                 tokenId:pedidosSchema[element].punto_venta,
                 titulo:`${pedidosSchema[element].tienda}  Nuevo pedido`,
                 mensaje:'Presionar para mas detalles',
-                evento:1,
+                evento:'1',
                 pedido:pedidosSchema[element].tienda
             };
 
@@ -221,7 +221,7 @@ const crearPedido = async (req,res)=>{
                     tokenId:pedidosSchema[element].punto_venta,
                     titulo:`${pedidosSchema[element].tienda}  Nuevo pedido`,
                     mensaje:'Presionar para mas detalles',
-                    evento:1,
+                    evento:'1',
                     pedido:pedidosSchema[element].tienda
                 };
 
