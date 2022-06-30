@@ -215,7 +215,9 @@ const crearPedido = async (req,res)=>{
             
             for(const element in  pedidosSchema){
 
-            const data = {
+                console.log(element);
+
+                const data = {
                 tokenId:element.punto_venta,
                 titulo:`${element.tienda}  Nuevo pedido`,
                 mensaje:'Presionar para mas detalles',
