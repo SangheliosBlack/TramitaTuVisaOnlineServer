@@ -56,7 +56,7 @@ const crearPedido = async (req,res)=>{
             amount: 10,
             currency: 'mxn',
             destination: 'acct_1JOjHVPOnuOXNxOm',
-            transfer_group: venta.id
+            transfer_group: venta._id
         });
         
         var pedidos = [];

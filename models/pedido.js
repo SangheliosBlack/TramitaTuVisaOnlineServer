@@ -44,7 +44,16 @@ const PedidoSchema = Schema({
     ubicacion:{
         type:Object,
         require:true
-    }
+    },
+    ubicacion:{
+        type:Object,
+        require:true
+    },
+    direccion:{
+        type:String,
+        require:true
+    },
+    
 
     
 },{
