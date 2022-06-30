@@ -115,11 +115,11 @@ const crearPedido = async (req,res)=>{
         for(const element in  pedidosSchema){
 
             const data = {
-                tokenId:element.punto_venta,
-                titulo:`${element.tienda}  Nuevo pedido`,
+                tokenId:pedidosSchema[element].punto_venta,
+                titulo:`${pedidosSchema[element].tienda}  Nuevo pedido`,
                 mensaje:'Presionar para mas detalles',
                 evento:1,
-                pedido:element
+                pedido:pedidosSchema[element]
             };
 
             console.log(data);
@@ -218,11 +218,12 @@ const crearPedido = async (req,res)=>{
                 console.log(element);
 
                 const data = {
-                tokenId:element.punto_venta,
-                titulo:`${element.tienda}  Nuevo pedido`,
-                mensaje:'Presionar para mas detalles',
-                evento:1,
-                pedido:element
+                    tokenId:pedidosSchema[element].punto_venta,
+                    titulo:`${pedidosSchema[element].tienda}  Nuevo pedido`,
+                    mensaje:'Presionar para mas detalles',
+                    evento:1,
+                    pedido:pedidosSchema[element]
+                };
             };
 
             console.log(data);
