@@ -224,7 +224,6 @@ const crearPedido = async (req,res)=>{
                     evento:1,
                     pedido:pedidosSchema[element]
                 };
-            };
 
             console.log(data);
     
