@@ -77,7 +77,7 @@ const crearPedido = async (req,res)=>{
                 subElement.repartidor = 'Pendiente';
                 subElement.imagen = datos_tienda.imagen_perfil;
                 subElement.ubicacion = datos_tienda.coordenadas;
-                subElement.direccion = datos_tienda.direccion;
+                subElement.direccion =   datos_tienda.direccion;
                 subElement.punto_venta = datos_tienda.punto_venta;
     
     
@@ -96,7 +96,6 @@ const crearPedido = async (req,res)=>{
         for(const element in pedidos){
             
             var pedidosModel = new Pedido(pedidos[element]);
-    
     
             pedidosModel.pagado = true;
             pedidosModel.preparado = false;
@@ -122,6 +121,8 @@ const crearPedido = async (req,res)=>{
                 evento:1,
                 pedido:element
             };
+
+            console.log(data);
     
             Notificacion.sendPushToOneUser(data);
 
@@ -221,6 +222,8 @@ const crearPedido = async (req,res)=>{
                 evento:1,
                 pedido:element
             };
+
+            console.log(data);
     
             Notificacion.sendPushToOneUser(data);
         }
