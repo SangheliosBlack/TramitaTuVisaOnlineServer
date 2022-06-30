@@ -78,6 +78,7 @@ const crearPedido = async (req,res)=>{
                 subElement.imagen = datos_tienda.imagen_perfil;
                 subElement.ubicacion = datos_tienda.coordenadas;
                 subElement.direccion = datos_tienda.direccion;
+                subElement.punto_venta = datos_tienda.punto_venta;
     
     
                 pedidos.push(subElement);
@@ -112,13 +113,19 @@ const crearPedido = async (req,res)=>{
 
         await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
 
-        const data = {
-            tokenId:'cbuRKMi9Ru2k4oGgH16WT2:APA91bFiEbQ9ZWpfPK2RxYOnALOpqKXQ2_RJtAszm2-IdyjCkkn3OpEap8dUwLEESDpSe9MfEUKp5gUG3im8cpyvHHv4V787WeRA9eRlw0EWaooPgm_DaDo_nlM2c29g7WZ4bQNRr8Ci',
-            titulo:'Enviado desde NodeJS',
-            mensaje:'Si puede perros 7u7',
-        };
+        for(const element in  pedidosSchema){
 
-        Notificacion.sendPushToOneUser(data);
+            const data = {
+                tokenId:element.punto_venta,
+                titulo:`${element.tienda}  Nuevo pedido`,
+                mensaje:'Presionar para mas detalles',
+                evento:1,
+                pedido:element
+            };
+    
+            Notificacion.sendPushToOneUser(data);
+
+        }
 
         console.log('logrado');
 
@@ -169,6 +176,7 @@ const crearPedido = async (req,res)=>{
                     subElement.imagen = datos_tienda.imagen_perfil;
                     subElement.ubicacion = datos_tienda.coordenadas;
                     subElement.direccion = datos_tienda.direccion;
+                    subElement.punto_venta = datos_tienda.punto_venta;
         
         
                     pedidos.push(subElement);
@@ -202,6 +210,20 @@ const crearPedido = async (req,res)=>{
             await venta.save();
     
             await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
+
+            
+            for(const element in  pedidosSchema){
+
+            const data = {
+                tokenId:element.punto_venta,
+                titulo:`${element.tienda}  Nuevo pedido`,
+                mensaje:'Presionar para mas detalles',
+                evento:1,
+                pedido:element
+            };
+    
+            Notificacion.sendPushToOneUser(data);
+
         
             return res.status(200).json(venta);
     

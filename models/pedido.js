@@ -53,6 +53,10 @@ const PedidoSchema = Schema({
         type:String,
         require:true
     },
+    punto_venta:{
+        type:String,
+        require:true
+    }
     
 
     

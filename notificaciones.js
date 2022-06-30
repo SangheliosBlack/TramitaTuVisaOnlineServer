@@ -15,13 +15,13 @@ function sendPushToOneUser(mensaje){
 
     const message = {
         token:mensaje.tokenId,
-        data:{
+        notification:{
             title:mensaje.titulo,
             body:mensaje.mensaje
         },
-        notification:{
-            title:'Notification APP',
-            body:'{Message from node js app}'
+        data:{
+            evento:mensaje.evento,
+            pedido:mensaje.pedido
         },
         android:{
             ttl: 2419200,
