@@ -168,6 +168,7 @@ const crearPedido = async (req,res)=>{
                     subElement.repartidor = 'Pendiente';
                     subElement.imagen = datos_tienda.imagen_perfil;
                     subElement.ubicacion = datos_tienda.coordenadas;
+                    subElement.direccion = datos_tienda.direccion;
         
         
                     pedidos.push(subElement);
