@@ -56,8 +56,10 @@ const crearPedido = async (req,res)=>{
             amount: 10,
             currency: 'mxn',
             destination: 'acct_1JOjHVPOnuOXNxOm',
-            transfer_group: venta._id
+            transfer_group: venta.id
         });
+
+
         
         var pedidos = [];
     
@@ -131,7 +133,7 @@ const crearPedido = async (req,res)=>{
             currency: 'mxn',
             customer:customer,
             payment_method_types: ['card'],
-            transfer_group: venta.id
+            transfer_group: ve  nta.id
         });
     
         const paymentIntentConfirm = await stripe.paymentIntents.confirm(
