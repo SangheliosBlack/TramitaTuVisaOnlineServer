@@ -23,6 +23,8 @@ const crearPedido = async (req,res)=>{
 
     var {envio,usuario,servicio,customer} = req.body;
 
+    console.log(direccion);
+
 
     var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
 
@@ -115,6 +117,8 @@ const crearPedido = async (req,res)=>{
         };
 
         Notificacion.sendPushToOneUser(data);
+
+        console.log('logrado');
     
         return res.status(200).json(venta);
 

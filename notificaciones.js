@@ -27,6 +27,7 @@ function sendPushToOneUser(mensaje){
             ttl: 2419200,
             priority: "high",
             notification:{
+                defaultSound: true,
                 channel_id: "general_id",
                 imageUrl:'https://i.blogs.es/fff4ca/pizzas/1366_2000.jpg',
             }
