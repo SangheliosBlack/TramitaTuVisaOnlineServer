@@ -75,6 +75,10 @@ const UsuarioSchema =  Schema({
     tokenFB:{
         type:String,
         require:false
+    },
+    impresora:{
+        type:Object,
+        require:false
     }
 },{
     timestamps:true
