@@ -68,6 +68,10 @@ const TiendasSchema = Schema({
     online:{
         type:Boolean,
         require:true
+    },
+    tiempo_espera:{
+        type:Number,
+        require:true
     }
 },{
     timestamps:true

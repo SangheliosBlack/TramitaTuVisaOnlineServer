@@ -11,6 +11,7 @@ var controller = {
             params:{
                 latlng:coordenadas,
                 key: process.env.GOOGLE_GEOCODE_API,
+                bounds:'21.3533019 -101.952672',
                 language:'es-419',
                 location_type:'ROOFTOP'
             }

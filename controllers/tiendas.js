@@ -124,7 +124,12 @@ const crearPedido = async (req,res)=>{
 
             console.log(data);
     
-            Notificacion.sendPushToOneUser(data);
+            try{
+                Notificacion.sendPushToOneUser(data);
+                return res.status(200).json(venta);
+            }catch(e){
+                return res.status(200).json(venta);
+            }
 
         }
 
@@ -227,7 +232,12 @@ const crearPedido = async (req,res)=>{
 
             console.log(data);
     
-            Notificacion.sendPushToOneUser(data);
+            try{
+                Notificacion.sendPushToOneUser(data);
+                return res.status(200).json(venta);
+            }catch(e){
+                return res.status(200).json(venta);
+            }
         }
         
             return res.status(200).json(venta);
