@@ -101,6 +101,7 @@ const crearPedido = async (req,res)=>{
             pedidosModel.preparado = false;
             pedidosModel.enviado = false;
             pedidosModel.entregado = false;
+            pedidosModel.confirmado = false;
             
             pedidosSchema.push(pedidosModel);
             
@@ -206,6 +207,7 @@ const crearPedido = async (req,res)=>{
                 pedidosModel.preparado = false;
                 pedidosModel.enviado = false;
                 pedidosModel.entregado = false;
+                pedidosModel.confirmado = false;
                 
                 pedidosSchema.push(pedidosModel);
                 

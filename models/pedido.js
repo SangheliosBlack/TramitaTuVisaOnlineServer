@@ -25,6 +25,10 @@ const PedidoSchema = Schema({
         type:String,
         require:true
     },
+    confirmado:{
+        type:Boolean,
+        require:true
+    },
     pagado:{
         type:Boolean,
         require:true
