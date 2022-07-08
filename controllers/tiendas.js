@@ -97,7 +97,7 @@ const crearPedido = async (req,res)=>{
             
             var pedidosModel = new Pedido(pedidos[element]);
     
-            pedidosModel.pagado = true;
+            pedidosModel.pagado = false;
             pedidosModel.preparado = false;
             pedidosModel.enviado = false;
             pedidosModel.entregado = false;
