@@ -1,6 +1,6 @@
 const {Router} = require('express');
 const {validarJWT} = require('../middlewares/validar-jwt');
-const {obtenerProductosTienda,searchOne,obtenerTienda, verTodoTiendas, nuevaTienda, modificarHorarioTienda, modificarAniversario, modificarNombreTienda, modificarStatus, construirPantallaPrincipal, construirPantallaPrincipalCategorias, construirPantallaPrincipalTiendas, construirPantallaPrincipalProductos, obtenerProductosCategoria, verTodoProductos, busqueda, crearPedido } = require('../controllers/tiendas');
+const {obtenerProductosTienda,searchOne,obtenerTienda, verTodoTiendas, nuevaTienda, modificarHorarioTienda, modificarAniversario, modificarNombreTienda, modificarStatus, construirPantallaPrincipal, construirPantallaPrincipalCategorias, construirPantallaPrincipalTiendas, construirPantallaPrincipalProductos, obtenerProductosCategoria, verTodoProductos, busqueda, crearPedido, lista_pedidos, autoImpresion, macChangue, confirmarPedidoRepartidor, confirmarPedidoRestaurante } = require('../controllers/tiendas');
 
 const router = Router();
 
@@ -31,6 +31,17 @@ router.get('/verTodoProductos',validarJWT,verTodoProductos);
 router.post('/busqueda',validarJWT,busqueda);
 
 router.post('/crearPedido',validarJWT,crearPedido);
+
+router.post('/pedidos',lista_pedidos);
+
+router.post('/autoImpresion',validarJWT,autoImpresion);
+
+router.post('/macChangue',validarJWT,macChangue);
+
+router.post('/confirmarPedidoRepartidor',validarJWT,confirmarPedidoRepartidor);
+
+router.post('/confirmarPedidoRestaurante',validarJWT,confirmarPedidoRestaurante);
+
 
 
 module.exports = router;

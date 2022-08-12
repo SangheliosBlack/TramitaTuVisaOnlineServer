@@ -29,6 +29,14 @@ const PedidoSchema = Schema({
         type:Boolean,
         require:true
     },
+    proceso_iniciado:{
+        type:Boolean,
+        require:true
+    },
+    proceso_finalizado:{
+        type:Boolean,
+        require:true
+    },
     pagado:{
         type:Boolean,
         require:true
@@ -38,6 +46,10 @@ const PedidoSchema = Schema({
         require:true
     },
     enviado:{
+        type:Boolean,
+        require:true
+    },
+    entregado_repartidor:{
         type:Boolean,
         require:true
     },
@@ -60,9 +72,35 @@ const PedidoSchema = Schema({
     punto_venta:{
         type:String,
         require:true
+    },
+    usuario:{
+        type:Object,
+        require:true
+    },
+    efectivo:{
+        type:Boolean,
+        require:true
+    },
+    tiempo_espera:{
+        type:Number,
+        require:true
+    },
+    confirmacion_tiempo:{
+        type:Date,
+        require:false
+    },
+    entrega_repartidor_tiempo:{
+        type:Date,
+        require:false
+    },
+    codigo_repartidor:{
+        type:String,
+        require:true
+    },
+    id_venta:{
+        type:Schema.Types.ObjectId,
+        require:true
     }
-    
-
     
 },{
     timestamps:true

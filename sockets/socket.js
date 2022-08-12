@@ -66,7 +66,7 @@ io.on('connection', client => {
 
     client.on('enviar-pedido',(payload)=>{
 
-        console.log('pedido recibido');
+        client.broadcast.emit('repartidor-callback', {'token':true});
 
     });
 

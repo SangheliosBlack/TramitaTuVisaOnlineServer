@@ -12,18 +12,15 @@ const e = require('cors');
 
 const Pedido = require('../models/pedido');
 const Venta = require('../models/venta');
+const UsuarioVenta = require('../models/usuario_venta');
 
 const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
 
 const crearPedido = async (req,res)=>{
-
-    
     
     var {total,tarjeta,productos,efectivo,codigo,direccion} = JSON.parse(req.body.cesta);
 
     var {envio,usuario,servicio,customer} = req.body;
-
-    console.log(direccion);
 
 
     var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
@@ -70,16 +67,25 @@ const crearPedido = async (req,res)=>{
                 var subElement = {};
     
                 var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
+
+                var usuarioData = await Usuario.findById({_id:usuario});
+
+                var usuarioVenta = new UsuarioVenta();
+
+                usuarioVenta.imagen = 'https://www.blogdelfotografo.com/wp-content/uploads/2020/02/apoyado12-scaled.jpg';
+                usuarioVenta.nombre = usuarioData.nombre;
+                usuarioVenta._id = usuarioData._id;
     
                 subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
                 subElement.tienda = productos[element].tienda;
                 subElement.productos = [productos[element]];
-                subElement.repartidor = 'Pendiente';
                 subElement.imagen = datos_tienda.imagen_perfil;
                 subElement.ubicacion = datos_tienda.coordenadas;
                 subElement.direccion =   datos_tienda.direccion;
                 subElement.punto_venta = datos_tienda.punto_venta;
-    
+                subElement.efectivo = efectivo;
+                subElement.usuario = usuarioVenta;
+                subElement.tiempo_espera = datos_tienda.tiempo_espera;
     
                 pedidos.push(subElement);
             }else{
@@ -102,6 +108,14 @@ const crearPedido = async (req,res)=>{
             pedidosModel.enviado = false;
             pedidosModel.entregado = false;
             pedidosModel.confirmado = false;
+            pedidosModel.createdAt = new Date();
+            pedidosModel.updatedAt = new Date();
+
+            pedidosModel.entregado_repartidor =false;
+
+            pedidosModel.id_venta = venta._id;
+            pedidosModel.codigo_repartidor = Math.floor(1000 + Math.random() * 9000);
+            
             
             pedidosSchema.push(pedidosModel);
             
@@ -123,7 +137,6 @@ const crearPedido = async (req,res)=>{
                 pedido:JSON.stringify(pedidosSchema[element])
             };
 
-            console.log(data);
     
             try{
                 Notificacion.sendPushToOneUser(data);
@@ -134,10 +147,6 @@ const crearPedido = async (req,res)=>{
 
         }
 
-        console.log('logrado');
-
-        console.log(venta);
-    
         return res.status(200).json(venta);
 
     }else{
@@ -173,20 +182,30 @@ const crearPedido = async (req,res)=>{
                 if(!pedidos.some(elem=> elem.tienda == productos[element].tienda)){
     
                     var subElement = {};
-        
-                    var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
-        
-                    subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
-                    subElement.tienda = productos[element].tienda;
-                    subElement.productos = [productos[element]];
-                    subElement.repartidor = 'Pendiente';
-                    subElement.imagen = datos_tienda.imagen_perfil;
-                    subElement.ubicacion = datos_tienda.coordenadas;
-                    subElement.direccion = datos_tienda.direccion;
-                    subElement.punto_venta = datos_tienda.punto_venta;
-        
-        
-                    pedidos.push(subElement);
+    
+                var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
+
+                var usuarioData = await Usuario.findById({_id:usuario});
+
+                var usuarioVenta = new UsuarioVenta();
+
+                usuarioVenta.imagen = 'https://www.blogdelfotografo.com/wp-content/uploads/2020/02/apoyado12-scaled.jpg';
+                usuarioVenta.nombre = usuarioData.nombre;
+                usuarioVenta._id = usuarioData._id;
+    
+                subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
+                subElement.tienda = productos[element].tienda;
+                subElement.productos = [productos[element]];
+                subElement.imagen = datos_tienda.imagen_perfil;
+                subElement.ubicacion = datos_tienda.coordenadas;
+                subElement.direccion =   datos_tienda.direccion;
+                subElement.punto_venta = datos_tienda.punto_venta;
+                subElement.efectivo = efectivo;
+                subElement.usuario = usuarioVenta;
+                subElement.tiempo_espera = datos_tienda.tiempo_espera;
+                
+    
+                pedidos.push(subElement);
                 }else{
         
                     var objIndex = pedidos.findIndex((obj => obj.tienda == productos[element].tienda));
@@ -208,6 +227,13 @@ const crearPedido = async (req,res)=>{
                 pedidosModel.enviado = false;
                 pedidosModel.entregado = false;
                 pedidosModel.confirmado = false;
+                pedidosModel.createdAt = new Date();
+                pedidosModel.updatedAt = new Date();
+
+                pedidosModel.entregado_repartidor =false;
+
+                pedidosModel.id_venta = venta._id;
+                pedidosModel.codigo_repartidor = Math.floor(1000 + Math.random() * 9000);
                 
                 pedidosSchema.push(pedidosModel);
                 
@@ -220,31 +246,33 @@ const crearPedido = async (req,res)=>{
             await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
 
             
-            for(const element in  pedidosSchema){
+        //     for(const element in  pedidosSchema){
 
-                console.log(element);
 
-                const data = {
-                    tokenId:pedidosSchema[element].punto_venta,
-                    titulo:`${pedidosSchema[element].tienda}  Nuevo pedido`,
-                    mensaje:'Presionar para mas detalles',
-                    evento:'1',
-                    pedido:JSON.stringify(pedidosSchema[element])
-                };
+        //         const data = {
+        //             tokenId:pedidosSchema[element].punto_venta,
+        //             titulo:`${pedidosSchema[element].tienda}  Nuevo pedido`,
+        //             mensaje:'Presionar para mas detalles',
+        //             evento:'1',
+        //             pedido:JSON.stringify(pedidosSchema[element])
+        //         };
 
-            console.log(data);
     
-            try{
-                Notificacion.sendPushToOneUser(data);
-                return res.status(200).json(venta);
-            }catch(e){
-                return res.status(200).json(venta);
-            }
-        }
+        //     try{
+        //         Notificacion.sendPushToOneUser(data);
+        //         return res.status(200).json(venta);
+        //     }catch(e){
+        //         return res.status(200).json(venta);
+        //     }
+        // }
         
+
+        console.log(venta.pedidos[0]);
+
             return res.status(200).json(venta);
     
         }else{
+
     
             return res.status(400).json({ok:false,msg:paymentIntentConfirm.status});
     
@@ -275,6 +303,8 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
             },
             {
                 $project:{
+                    auto_impresion:'$auto_impresion',
+                    tiempo_espera:'$tiempo_espera',
                     nombre:'$nombre',
                     propietario:'$propietario',
                     disponible:'$disponible',
@@ -300,6 +330,8 @@ const construirPantallaPrincipalTiendas = async (req,res)=>{
             },
             {
                 $project:{
+                    auto_impresion:'$auto_impresion',
+                    tiempo_espera:'$tiempo_espera',
                     nombre:'$nombre',
                     propietario:'$propietario',
                     disponible:'$disponible',
@@ -729,9 +761,6 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
         contador ++;
     }while(index<productos.length);
 
-
-
-
     return res.json({
         ok:true,
         separados
@@ -786,9 +815,235 @@ const  obtenerTienda = async (req,res = response)=>{
     }
 
     
-
+    
 
     
+}
+
+const confirmarPedidoRestaurante = async (req,res)=>{
+
+
+    try{
+        const value = await Venta.findOneAndUpdate(
+            {
+                "_id":mongoose.Types.ObjectId(req.body.uidVenta)
+            },{
+                $set:{'pedidos.$[i].confirmado':true,'pedidos.$[i].confirmacion_tiempo':new Date()}
+            },{
+                arrayFilters:[
+                    {
+                        "i._id":mongoose.Types.ObjectId(req.body.uid)
+                    }
+                ]
+            }
+        )
+
+        if(value){
+
+            return res.status(200).json({ok:true});
+
+        }else{
+
+            return res.status(400).json({ok:false});
+
+        }
+    }catch(e){
+
+
+        return res.status(400).json({ok:false});
+
+    }
+
+}
+
+const confirmarPedidoRepartidor = async(req,res)=>{
+
+
+    try{
+        const value = await Venta.findOneAndUpdate(
+            {
+                "_id":mongoose.Types.ObjectId(req.body.uid)
+            },{
+                $set:{'pedidos.$[i].entregado_repartidor':true,'pedidos.$[i].entrega_repartidor_tiempo':new Date()}
+            },{
+                arrayFilters:[
+                    {
+                        "i._id":mongoose.Types.ObjectId(req.body.uidVenta)
+                    }
+                ]
+            }
+        )
+
+        if(value){
+
+            return res.status(200).json({ok:true});
+
+        }else{
+
+            return res.status(400).json({ok:false});
+
+        }
+    }catch(e){
+
+        return res.status(400).json({ok:false});
+
+    }
+
+}
+
+const lista_pedidos = async(req,res)=>{
+
+    const dateP= new Date();
+
+    const myDate = moment(dateP).format('L');
+
+    var gte = moment(myDate).subtract(10,'hours');
+    var lt = moment( myDate).add(13,'hours').add(59,'minutes').add(59,'seconds');
+
+    
+
+    if(req.body.filtro){
+
+        let text = req.body.filtro;
+
+        const myArray = text.split(" - ");
+
+        const horario = [];
+
+        myArray.forEach((element) =>{
+            const myArray2 = element.split('/');
+            horario.push(myArray2);
+        });
+
+        const gte2 = horario[0][2]+'/'+horario[0][1]+'/'+horario[0][0];
+        const lt2 =  horario[1][2]+'/'+horario[1][1]+'/'+horario[1][0];
+
+
+        var gteParse = new Date(gte2);
+        var gteMoment = moment(gteParse).format('L');
+        var gteSubs = moment(gteMoment).subtract(10,'hours');
+
+        var ltParse = new Date(lt2);
+        var ltMoment = moment(ltParse).format('L');
+        var ltSubs = moment(ltMoment).add(13,'hours').add(59,'minutes').add(59,'seconds');
+
+        
+        gte = gteSubs;
+        lt = ltSubs;
+
+    }
+
+    
+
+    const pedidos = await Venta.aggregate(
+        [
+        {$match:{}},
+        {$unwind:'$pedidos'},
+        {$project:{'pedido':'$pedidos'}},
+        {$project:{
+            "productos": "$pedido.productos",
+            "_id": "$pedido._id",
+            "total": "$pedido.total",
+            "tienda": "$pedido.tienda",
+            "repartidor": "$pedido.repartidor",
+            "imagen": "$pedido.imagen",
+            "ubicacion":"$pedido.ubicacion",
+            "direccion":"$pedido.direccion" ,
+            "punto_venta":"$pedido.punto_venta" ,
+            "efectivo":"$pedido.efectivo" ,
+            "usuario":"$pedido.usuario" ,
+            "pagado":"$pedido.pagado" ,
+            "preparado":"$pedido.preparado" ,
+            "enviado":"$pedido.enviado" ,
+            "entregado":"$pedido.entregado" ,
+            "confirmado":"$pedido.confirmado",
+            "createdAt":"$pedido.createdAt",
+            "updatedAt":"$pedido.updatedAt",
+            "tiempo_espera":"$pedido.tiempo_espera",
+            "entregado_repartidor":"$pedido.entregado_repartidor",
+            "confirmacion_tiempo":"$pedido.confirmacion_tiempo",
+            "entrega_repartidor_tiempo":"$pedido.entrega_repartidor_tiempo",
+            "codigo_repartidor":"$pedido.codigo_repartidor",
+            "id_venta":"$pedido.id_venta",
+
+        }},
+        {
+            $match:{
+            'tienda':'Capitan Naza',
+            'createdAt':{
+                $gte : new Date(gte), 
+                $lt :  new Date(lt), 
+            }
+        }},
+        {
+            $lookup:{
+                from:'usuarios',
+                localField:'repartidor',
+                foreignField:'_id',
+                as:'repartidor'
+            }
+        },
+        {$project:{
+            "productos": "$productos",
+            "_id": "$_id",
+            "total": "$total",
+            "tienda": "$tienda",
+            "repartidor": {$arrayElemAt:["$repartidor",0]},
+            "imagen": "$imagen",
+            "ubicacion":"$ubicacion",
+            "direccion":"$direccion" ,
+            "punto_venta":"$punto_venta" ,
+            "efectivo":"$efectivo" ,
+            "usuario":"$usuario" ,
+            "pagado":"$pagado" ,
+            "preparado":"$preparado" ,
+            "enviado":"$enviado" ,
+            "entregado":"$entregado" ,
+            "confirmado":"$confirmado",
+            "createdAt":"$createdAt",
+            "updatedAt":"$updatedAt",
+            "tiempo_espera":"$tiempo_espera",
+            "entregado_repartidor":"$entregado_repartidor",
+            "confirmacion_tiempo":"$confirmacion_tiempo",
+            "entrega_repartidor_tiempo":"$entrega_repartidor_tiempo",
+            "codigo_repartidor":"$codigo_repartidor",
+            "id_venta":"$id_venta",
+        }},
+        
+    ])
+
+    function calcularPedidosCompletos( pedidos ){
+
+        var completos = 0;
+
+        pedidos.forEach(element => element.confirmado && element.preparado && element.enviado ?  completos++ :completos );
+
+        
+
+        return completos;
+        
+    }
+
+    function calcularGananciaAprox( pedidos ){
+
+        var ganancia = 0;
+
+        pedidos.forEach(element => ganancia += element.total );
+
+
+        return ganancia;
+        
+    }
+
+    var pedidosPrev = {
+        ventas: pedidos,
+        size : pedidos.length,
+        completados:calcularPedidosCompletos(pedidos),
+        ganancia:calcularGananciaAprox(pedidos)
+    };
+
+    return res.json(pedidosPrev);
+
 }
 
 const modificarNombreTienda = async(req,res = response)=>{
@@ -849,6 +1104,22 @@ const searchOne = async (req,res = resposne) =>{
     );
 }
 
+const macChangue = async(req,res)=>{
+
+    await Tienda.findByIdAndUpdate({_id:req.body.id},{$set:{'mac':req.body.mac}});
+
+    return res.status(200).json({ok:true});
+
+}
+
+const autoImpresion = async(req,res)=>{
+
+    await Tienda.findByIdAndUpdate({_id:req.body.id},{$set:{'auto_impresion':req.body.status}});
+
+    return res.status(200).json({ok:true});
+
+}
+
 const nuevaTienda = async (req,res) =>{
 
     const newLista = await new ListaProductos();
@@ -884,4 +1155,10 @@ const nuevaTienda = async (req,res) =>{
 
 }
 
-module.exports = {crearPedido,busqueda,verTodoProductos,obtenerTienda,obtenerProductosCategoria,verTodoTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda};
+module.exports = {confirmarPedidoRestaurante,confirmarPedidoRepartidor,macChangue,autoImpresion,crearPedido,busqueda,verTodoProductos,obtenerTienda,obtenerProductosCategoria,verTodoTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda,lista_pedidos};
+
+
+
+
+
+

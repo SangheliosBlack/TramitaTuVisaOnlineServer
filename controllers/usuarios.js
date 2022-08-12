@@ -245,6 +245,7 @@ const Venta = require('../models/venta');
 
         const ordenes = await Venta.find({'usuario':mongoose.Types.ObjectId(req.uid)}).sort({'updatedAt':-1});
         
+
         return res.json(ordenes);
         
     },

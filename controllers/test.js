@@ -1,8 +1,12 @@
 const { response } = require("express");
 const Notificacion = require('../notificaciones');
 
+const Usuario = require('../models/usuario');
 const ListaProductos = require('../models/lista_productos');
 const Producto = require('../models/producto');
+const Ventas = require('../models/venta');
+
+const moment = require('moment')
 
 const test= async(req,res = response) =>{
     const data = {
@@ -26,6 +30,70 @@ const add = async(req,res)=>{
     
 }
 
+const repartidores = async(req,res) =>{
+
+    const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
+
+    if(repartidores.length >0){
+        res.json({ok:true, repartidores});
+    }else{
+        res.json({ok:false, repartidores});
+    }
+
+}
+ 
+const pedidosPendientes = async(req,res)=>{
+
+    const enviosSimConfirmar = await Ventas.aggregate(
+        [
+        {$match:{}},
+        {$unwind:'$pedidos'},
+        {$project:{'pedido':'$pedidos'}},
+        {$project:{
+            "productos": "$pedido.productos",
+            "_id": "$pedido._id",
+            "total": "$pedido.total",
+            "tienda": "$pedido.tienda",
+            "repartidor": "$pedido.repartidor",
+            "imagen": "$pedido.imagen",
+            "ubicacion":"$pedido.ubicacion",
+            "direccion":"$pedido.direccion" ,
+            "punto_venta":"$pedido.punto_venta" ,
+            "efectivo":"$pedido.efectivo" ,
+            "usuario":"$pedido.usuario" ,
+            "pagado":"$pedido.pagado" ,
+            "preparado":"$pedido.preparado" ,
+            "enviado":"$pedido.enviado" ,
+            "entregado":"$pedido.entregado" ,
+            "confirmado":"$pedido.confirmado",
+            "createdAt":"$pedido.createdAt"
+        }},
+        {
+            $match:{
+            'tienda':'Capitan Naza',
+            'confirmado':false,
+            'createdAt':{
+                $gte : new Date("2022-07-24T00:00:00+00:00"), 
+                $lt :  new Date("2022-07-24T23:59:59+00:00"), 
+            }
+        }},
+        
+    ])
+
+    const dateP= new Date();
+
+    const myDate = moment(dateP).format('L');
+
+    const gte = moment(myDate).subtract(10,'hours');
+    const lt = moment( myDate).add(13,'hours').add(59,'minutes').add(59,'seconds');
+
+    return res.json({
+        gte,
+        lt
+    });
+
+}
+
 module.exports = {
-    test,add
+    test,add,repartidores,pedidosPendientes
 }

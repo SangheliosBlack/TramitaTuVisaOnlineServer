@@ -72,6 +72,14 @@ const TiendasSchema = Schema({
     tiempo_espera:{
         type:Number,
         require:true
+    },
+    auto_impresion:{
+        type:Boolean,
+        require:true
+    },
+    mac:{
+        type:String,
+        require:true
     }
 },{
     timestamps:true

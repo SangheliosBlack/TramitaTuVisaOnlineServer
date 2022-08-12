@@ -79,7 +79,20 @@ const UsuarioSchema =  Schema({
     impresora:{
         type:Object,
         require:false
-    }
+    },
+    repartidor:{
+        type:Boolean,
+        require:true
+    },
+    ultima_tarea:{
+        type:Date,
+        require:true
+    },
+    transito:{
+        type:Boolean,
+        require:true
+    },
+    
 },{
     timestamps:true
 });
