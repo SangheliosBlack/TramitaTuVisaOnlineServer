@@ -68,6 +68,10 @@ const crearUsuario = async (req, res = response) => {
 
 
     usuario.negocios = [];
+    usuario.repartidor = false;
+    usuario.ultima_tarea = new Date();
+    usuario.online_repartidor = false;
+    usuario.transito = false;
 
     await usuario.save();
 
