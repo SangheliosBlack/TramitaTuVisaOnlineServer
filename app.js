@@ -27,7 +27,8 @@ class Server {
             stripe:'/api/stripe',
             twilio:'/api/twilio',
             google:'/api/google',
-            test:'/api/test'
+            test:'/api/test',
+            repartidor:'/api/repartidor'
         }
 
         this.conectarDB();
@@ -66,6 +67,7 @@ class Server {
         this.app.use(this.paths.twilio,require('./routes/twilio'));
         this.app.use(this.paths.google,require('./routes/google'));
         this.app.use(this.paths.test,require('./routes/test'));
+        this.app.use(this.paths.repartidor,require('./routes/repartidor'));
 
     }
 

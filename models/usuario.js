@@ -66,7 +66,8 @@ const UsuarioSchema =  Schema({
     },
     negocios:{
         type:Array,
-        required:false
+        required:false,
+        ref:'Tiendas'
     },
     cesta:{
         type:Object,

@@ -5,6 +5,7 @@ const s3 = require("../config/s3.config.js");
 const path = require('path');
 const Producto = require('../models/producto');
 const Venta = require('../models/venta');
+const { repartidores } = require('./test');
 
  var controller = {
     updateDireccionFavorita : async(req,res)=>{
@@ -243,10 +244,24 @@ const Venta = require('../models/venta');
     ordenes:async(req,res)=>{
 
 
-        const ordenes = await Venta.find({'usuario':mongoose.Types.ObjectId(req.uid)}).sort({'updatedAt':-1});
+        // const ordenes2 = await Venta.find({'usuario':mongoose.Types.ObjectId(req.uid)}).sort({'updatedAt':-1});
+
+        Venta.
+        find({usuario:mongoose.Types.ObjectId('6246598565e106410cf6bb4a')}).
+        sort({'updatedAt':-1}).
+        populate('pedidos.repartidor').
+        populate('pedidos.repartidor.negocios').
+        exec(function(err,data){
+            if(err) {
+                console.log(err);
+                return res.json({ok:false});
+            }
+            console.log(data);
+            return res.json(data);
+        });
+        
         
 
-        return res.json(ordenes);
         
     },
     buscarCodigo:async(req,res)=>{

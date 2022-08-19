@@ -18,13 +18,11 @@ const VentaSchema = Schema({
                         require:true
                     },
                     repartidor:{
-                        type:String,
-                        require:true
+                        type:Schema.Types.ObjectId,
+                        require:false,
+                        ref:'Usuario'
                     },
-                    entregado:{
-                        type:Boolean,
-                        require:true
-                    },
+                    
                     imagen:{
                         type:String,
                         require:true
@@ -41,23 +39,11 @@ const VentaSchema = Schema({
                         type:Boolean,
                         require:true
                     },
-                    pagado:{
-                        type:Boolean,
-                        require:true
-                    },
-                    preparado:{
-                        type:Boolean,
-                        require:true
-                    },
-                    enviado:{
-                        type:Boolean,
-                        require:true
-                    },
                     entregado_repartidor:{
                         type:Boolean,
                         require:true
                     },
-                    entregado:{
+                    entregado_cliente:{
                         type:Boolean,
                         require:true
                     },
@@ -97,12 +83,36 @@ const VentaSchema = Schema({
                         type:Date,
                         require:false
                     },
+                    entrega_cliente_tiempo:{
+                        type:Date,
+                        require:false
+                    },
                     codigo_repartidor:{
+                        type:String,
+                        require:true
+                    },
+                    codigo_cliente:{
                         type:String,
                         require:true
                     },
                     id_venta:{
                         type:Schema.Types.ObjectId,
+                        require:true
+                    },
+                    repartidor_domicilio:{
+                        type:Boolean,
+                        require:true
+                    },
+                    repartidor_domicilio_tiempo:{
+                        type:Date,
+                        require:true
+                    },
+                    repartidor_calificado:{
+                        type:Boolean,
+                        require:true
+                    },
+                    repartidor_calificado_tiempo:{
+                        type:Date,
                         require:true
                     }
                 },
@@ -124,7 +134,8 @@ const VentaSchema = Schema({
     },
     usuario:{
         type:Schema.Types.ObjectId,
-        require:true
+        require:true,
+        ref:'Usuario'
     },
     envio:{
         type:Number,

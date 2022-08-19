@@ -8,7 +8,6 @@ const Usuario = require('../models/usuario');
 const Horario = require('../models/horario');
 const ListaProductos = require('../models/lista_productos');
 const mongoose = require('mongoose');
-const e = require('cors');
 
 const Pedido = require('../models/pedido');
 const Venta = require('../models/venta');
@@ -103,18 +102,18 @@ const crearPedido = async (req,res)=>{
             
             var pedidosModel = new Pedido(pedidos[element]);
     
-            pedidosModel.pagado = false;
-            pedidosModel.preparado = false;
-            pedidosModel.enviado = false;
-            pedidosModel.entregado = false;
+            pedidosModel.entregado_cliente = false;
+            pedidosModel.entregado_repartidor = false;
             pedidosModel.confirmado = false;
             pedidosModel.createdAt = new Date();
             pedidosModel.updatedAt = new Date();
 
-            pedidosModel.entregado_repartidor =false;
+            pedidosModel.repartidor_domicilio = false;
+            pedidosModel.repartidor_calificado = false;
 
             pedidosModel.id_venta = venta._id;
             pedidosModel.codigo_repartidor = Math.floor(1000 + Math.random() * 9000);
+            pedidosModel.codigo_cliente = Math.floor(1000 + Math.random() * 9000);
             
             
             pedidosSchema.push(pedidosModel);
@@ -222,18 +221,18 @@ const crearPedido = async (req,res)=>{
                 var pedidosModel = new Pedido(pedidos[element]);
         
         
-                pedidosModel.pagado = true;
-                pedidosModel.preparado = false;
-                pedidosModel.enviado = false;
-                pedidosModel.entregado = false;
+                pedidosModel.entregado_cliente = false;
+                pedidosModel.entregado_repartidor = false;
                 pedidosModel.confirmado = false;
                 pedidosModel.createdAt = new Date();
                 pedidosModel.updatedAt = new Date();
 
-                pedidosModel.entregado_repartidor =false;
+                pedidosModel.repartidor_domicilio = false;
+                pedidosModel.repartidor_calificado = false;
 
                 pedidosModel.id_venta = venta._id;
                 pedidosModel.codigo_repartidor = Math.floor(1000 + Math.random() * 9000);
+                pedidosModel.codigo_cliente = Math.floor(1000 + Math.random() * 9000);
                 
                 pedidosSchema.push(pedidosModel);
                 
@@ -245,29 +244,29 @@ const crearPedido = async (req,res)=>{
     
             await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
 
+            console.log(venta.pedidos[0].productos[0]);
             
-        //     for(const element in  pedidosSchema){
+            for(const element in  pedidosSchema){
 
 
-        //         const data = {
-        //             tokenId:pedidosSchema[element].punto_venta,
-        //             titulo:`${pedidosSchema[element].tienda}  Nuevo pedido`,
-        //             mensaje:'Presionar para mas detalles',
-        //             evento:'1',
-        //             pedido:JSON.stringify(pedidosSchema[element])
-        //         };
+                const data = {
+                    tokenId:pedidosSchema[element].punto_venta,
+                    titulo:`${pedidosSchema[element].tienda}  Nuevo pedido`,
+                    mensaje:'Presionar para mas detalles',
+                    evento:'1',
+                    pedido:JSON.stringify(pedidosSchema[element])
+                };
 
     
-        //     try{
-        //         Notificacion.sendPushToOneUser(data);
-        //         return res.status(200).json(venta);
-        //     }catch(e){
-        //         return res.status(200).json(venta);
-        //     }
-        // }
+            try{
+                Notificacion.sendPushToOneUser(data);
+                return res.status(200).json(venta);
+            }catch(e){
+                return res.status(200).json(venta);
+            }
+        }
         
 
-        console.log(venta.pedidos[0]);
 
             return res.status(200).json(venta);
     
@@ -385,6 +384,8 @@ const busqueda = async(req,res)=>{
             },
             {
                 $project:{
+                    auto_impresion:'$auto_impresion',
+                    tiempo_espera:'$tiempo_espera',
                     nombre:'$nombre',
                     propietario:'$propietario',
                     disponible:'$disponible',
@@ -394,13 +395,13 @@ const busqueda = async(req,res)=>{
                     updatedAt:'$updatedAt',
                     uid:'$uid',
                     horario:'$horario',
-                    online:'$online',
                     coordenadas:'$coordenadas',
                     fotografias:'$fotografias',
                     inventario:'$inventario',
                     equipo:'$equipo',
-                    direccion:'$direccion',
                     ventas:'$ventas',
+                    direccion:'$direccion',
+                    online:'$online',
                     punto_venta:'$punto_venta',
                     imagen_perfil:'$imagen_perfil',
                     listaProductos:{
@@ -410,6 +411,8 @@ const busqueda = async(req,res)=>{
             },
             {
                 $project:{
+                    auto_impresion:'$auto_impresion',
+                    tiempo_espera:'$tiempo_espera',
                     nombre:'$nombre',
                     propietario:'$propietario',
                     disponible:'$disponible',
@@ -418,16 +421,16 @@ const busqueda = async(req,res)=>{
                     createdAt:'$createdAt',
                     updatedAt:'$updatedAt',
                     uid:'$uid',
-                    online:'$online',
-                    direccion:'$direccion',
                     horario:'$horario',
                     coordenadas:'$coordenadas',
+                    direccion:'$direccion',
                     fotografias:'$fotografias',
                     inventario:'$inventario',
+                    online:'$online',
                     equipo:'$equipo',
+                    ventas:'$ventas',
                     punto_venta:'$punto_venta',
                     imagen_perfil:'$imagen_perfil',
-                    ventas:'$ventas',
                     listaProductos:'$listaProductos.productos'
             },
 
@@ -897,12 +900,13 @@ const lista_pedidos = async(req,res)=>{
 
     const myDate = moment(dateP).format('L');
 
-    var gte = moment(myDate).subtract(10,'hours');
-    var lt = moment( myDate).add(13,'hours').add(59,'minutes').add(59,'seconds');
+    var gte = moment(myDate).subtract(0,'hours');
+    var lt = moment( myDate).add(1,'days');
 
-    
 
     if(req.body.filtro){
+
+        console.log('filtro');
 
         let text = req.body.filtro;
 
@@ -920,12 +924,10 @@ const lista_pedidos = async(req,res)=>{
 
 
         var gteParse = new Date(gte2);
-        var gteMoment = moment(gteParse).format('L');
-        var gteSubs = moment(gteMoment).subtract(10,'hours');
+        var gteSubs = moment(gteParse).subtract(0,'hours');
 
         var ltParse = new Date(lt2);
-        var ltMoment = moment(ltParse).format('L');
-        var ltSubs = moment(ltMoment).add(13,'hours').add(59,'minutes').add(59,'seconds');
+        var ltSubs = moment(ltSubs).add(1,'days');
 
         
         gte = gteSubs;
@@ -952,19 +954,22 @@ const lista_pedidos = async(req,res)=>{
             "punto_venta":"$pedido.punto_venta" ,
             "efectivo":"$pedido.efectivo" ,
             "usuario":"$pedido.usuario" ,
-            "pagado":"$pedido.pagado" ,
-            "preparado":"$pedido.preparado" ,
-            "enviado":"$pedido.enviado" ,
-            "entregado":"$pedido.entregado" ,
             "confirmado":"$pedido.confirmado",
             "createdAt":"$pedido.createdAt",
             "updatedAt":"$pedido.updatedAt",
             "tiempo_espera":"$pedido.tiempo_espera",
+            "entregado_cliente":"$pedido.entregado_cliente" ,
             "entregado_repartidor":"$pedido.entregado_repartidor",
             "confirmacion_tiempo":"$pedido.confirmacion_tiempo",
             "entrega_repartidor_tiempo":"$pedido.entrega_repartidor_tiempo",
+            "entrega_cliente_tiempo":"$pedido.entrega_cliente_tiempo",
             "codigo_repartidor":"$pedido.codigo_repartidor",
+            "codigo_cliente":"$pedido.codigo_cliente",
             "id_venta":"$pedido.id_venta",
+            "repartidor_domicilio":"$pedido.repartidor_domicilio",
+            "repartidor_domicilio_tiempo":"$pedido.repartidor_domicilio_tiempo",
+            "repartidor_calificado":"$pedido.repartidor_calificado",
+            "repartidor_calificado_tiempo":"$pedido.repartidor_calificado_tiempo",
 
         }},
         {
@@ -995,20 +1000,27 @@ const lista_pedidos = async(req,res)=>{
             "punto_venta":"$punto_venta" ,
             "efectivo":"$efectivo" ,
             "usuario":"$usuario" ,
-            "pagado":"$pagado" ,
-            "preparado":"$preparado" ,
-            "enviado":"$enviado" ,
-            "entregado":"$entregado" ,
             "confirmado":"$confirmado",
             "createdAt":"$createdAt",
             "updatedAt":"$updatedAt",
             "tiempo_espera":"$tiempo_espera",
+            "entregado_cliente":"$entregado_cliente" ,
             "entregado_repartidor":"$entregado_repartidor",
             "confirmacion_tiempo":"$confirmacion_tiempo",
             "entrega_repartidor_tiempo":"$entrega_repartidor_tiempo",
+            "entrega_cliente_tiempo":"$entrega_cliente_tiempo",
             "codigo_repartidor":"$codigo_repartidor",
+            "codigo_cliente":"$codigo_cliente",
             "id_venta":"$id_venta",
-        }},
+            "repartidor_domicilio":"$repartidor_domicilio",
+            "repartidor_domicilio_tiempo":"$repartidor_domicilio_tiempo",
+            "repartidor_calificado":"$repartidor_calificado",
+            "repartidor_calificado_tiempo":"$repartidor_calificado_tiempo",
+        }},{
+            $sort:{
+                "createdAt":-1
+            }
+        }
         
     ])
 
@@ -1016,7 +1028,7 @@ const lista_pedidos = async(req,res)=>{
 
         var completos = 0;
 
-        pedidos.forEach(element => element.confirmado && element.preparado && element.enviado ?  completos++ :completos );
+        pedidos.forEach(element => element.entregado_repartidor ?  completos++ :completos );
 
         
 
