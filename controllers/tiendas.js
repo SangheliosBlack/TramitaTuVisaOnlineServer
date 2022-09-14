@@ -12,10 +12,18 @@ const mongoose = require('mongoose');
 const Pedido = require('../models/pedido');
 const Venta = require('../models/venta');
 const UsuarioVenta = require('../models/usuario_venta');
+const Direccion = require('../models/direccion');
+const Ruta = require('../models/rutas');
+
+const Axios = require('axios');
+
+const haversine = require('haversine-distance')
+
 
 const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
 
 const crearPedido = async (req,res)=>{
+
     
     var {total,tarjeta,productos,efectivo,codigo,direccion} = JSON.parse(req.body.cesta);
 
@@ -40,10 +48,10 @@ const crearPedido = async (req,res)=>{
 
     venta.total = total;
     venta.efectivo = efectivo;
-    venta.envio = envio;
+    venta.envio = envio.toFixed(2);
     venta.usuario = usuario;
     venta.servicio = servicio;
-    venta.envioPromo = codigo ? envio :0;
+    venta.envioPromo = codigo ? envio.toFixed(2) :0;
     venta.direccion = direccion;
 
     if(efectivo){
@@ -71,22 +79,63 @@ const crearPedido = async (req,res)=>{
 
                 var usuarioVenta = new UsuarioVenta();
 
-                usuarioVenta.imagen = 'https://www.blogdelfotografo.com/wp-content/uploads/2020/02/apoyado12-scaled.jpg';
-                usuarioVenta.nombre = usuarioData.nombre;
-                usuarioVenta._id = usuarioData._id;
+
+                var direccion_negocio = new Direccion();
+
+
+                
+                direccion_negocio.coordenadas = datos_tienda.coordenadas;
+                direccion_negocio.titulo = datos_tienda.direccion;
+                direccion_negocio.predeterminado = false;
+                
+                const a = { latitude: direccion_negocio.coordenadas.latitud, longitude: direccion_negocio.coordenadas.longitud }
+                    const b = { latitude: direccion.coordenadas.lat, longitude: direccion.coordenadas.lng}
+
+                    var p = 0.017453292519943295;
+                    var c = Math.cos;
+                    var a2 = 0.5 - c((b.latitude - a.latitude) * p) / 2 + c(a.latitude * p) * c(b.latitude * p) * (1 - c((b.longitude - a.longitude) * p)) / 2;
+                    var envioCast = 12745*Math.asin(Math.sqrt(a2));
+                    var envioMultiplicado = (envioCast<= 3 ? 19.8 :((envioCast-3)*7.2)+19.8)-0.01;
+
+                    usuarioVenta.imagen = 'https://www.blogdelfotografo.com/wp-content/uploads/2020/02/apoyado12-scaled.jpg';
+                    usuarioVenta.nombre = usuarioData.nombre;
+                    usuarioVenta._id = usuarioData._id;
+                    
+                    subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
+                    subElement.tienda = productos[element].tienda;
+                    subElement.productos = [productos[element]];
+                    subElement.imagen = datos_tienda.imagen_perfil;
+                    subElement.punto_venta = datos_tienda.punto_venta;
+                    subElement.efectivo = efectivo;
+                    subElement.usuario = usuarioVenta;
+                    subElement.tiempo_espera = datos_tienda.tiempo_espera;
+                    subElement.envio = (envioMultiplicado+8.2).toFixed(2);
+                    subElement.direccion_negocio = direccion_negocio;
+                    subElement.direccion_cliente = direccion;
+                
+                var rutaR = await Axios.get('https://maps.googleapis.com/maps/api/directions/json',{
+                        params:{
+                        key:process.env.GOOGLE_DIRECTIONS_API,
+                        origin:`${direccion_negocio.coordenadas.latitud},${direccion_negocio.coordenadas.longitud}`,
+                        destination:`${direccion.coordenadas.lat},${direccion.coordenadas.lng}`,
+                        language:'es-419',
+                        region:'mx',
+                        mode:'driving'
+                        }
+                    });
+
+                    var ruta = new Ruta();
+
+                    ruta.bounds =   rutaR.data.routes[0].bounds;
+                    ruta.overview_polyline =   rutaR.data.routes[0].overview_polyline;
+                    ruta.distance = rutaR.data.routes[0].legs[0].distance;
+                    ruta.duration = rutaR.data.routes[0].legs[0].duration;
+
+                    subElement.ruta = ruta;
+
+
+                    pedidos.push(subElement);
     
-                subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
-                subElement.tienda = productos[element].tienda;
-                subElement.productos = [productos[element]];
-                subElement.imagen = datos_tienda.imagen_perfil;
-                subElement.ubicacion = datos_tienda.coordenadas;
-                subElement.direccion =   datos_tienda.direccion;
-                subElement.punto_venta = datos_tienda.punto_venta;
-                subElement.efectivo = efectivo;
-                subElement.usuario = usuarioVenta;
-                subElement.tiempo_espera = datos_tienda.tiempo_espera;
-    
-                pedidos.push(subElement);
             }else{
     
                 var objIndex = pedidos.findIndex((obj => obj.tienda == productos[element].tienda));
@@ -108,6 +157,8 @@ const crearPedido = async (req,res)=>{
             pedidosModel.createdAt = new Date();
             pedidosModel.updatedAt = new Date();
 
+            
+
             pedidosModel.repartidor_domicilio = false;
             pedidosModel.repartidor_calificado = false;
 
@@ -116,7 +167,11 @@ const crearPedido = async (req,res)=>{
             pedidosModel.codigo_cliente = Math.floor(1000 + Math.random() * 9000);
             
             
+
+
             pedidosSchema.push(pedidosModel);
+
+
             
         }
         
@@ -151,7 +206,7 @@ const crearPedido = async (req,res)=>{
     }else{
 
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: decimalCount(total) == 0 || decimalCount(total) == 1  ? total*100: total.replace('.',''),
+            amount: total.toFixed(2)*100,
             currency: 'mxn',
             customer:customer,
             payment_method_types: ['card'],
@@ -175,6 +230,8 @@ const crearPedido = async (req,res)=>{
             });
             
             var pedidos = [];
+
+            
         
             for(const element in productos){
         
@@ -182,29 +239,69 @@ const crearPedido = async (req,res)=>{
     
                     var subElement = {};
     
-                var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
+                    var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
+                    
+                    var usuarioData = await Usuario.findById({_id:usuario});
+                    
+                    var usuarioVenta = new UsuarioVenta();
+                    
+                    
+                    var direccion_negocio = new Direccion();
 
-                var usuarioData = await Usuario.findById({_id:usuario});
+                    
+                    direccion_negocio.coordenadas = datos_tienda.coordenadas;
+                    direccion_negocio.titulo = datos_tienda.direccion;
+                    direccion_negocio.predeterminado = false;
+                    
+                    const a = { latitude: direccion_negocio.coordenadas.latitud, longitude: direccion_negocio.coordenadas.longitud }
+                    const b = { latitude: direccion.coordenadas.lat, longitude: direccion.coordenadas.lng}
 
-                var usuarioVenta = new UsuarioVenta();
+                    var p = 0.017453292519943295;
+                    var c = Math.cos;
+                    var a2 = 0.5 - c((b.latitude - a.latitude) * p) / 2 + c(a.latitude * p) * c(b.latitude * p) * (1 - c((b.longitude - a.longitude) * p)) / 2;
+                    var envioCast = 12745*Math.asin(Math.sqrt(a2));
+                    var envioMultiplicado = (envioCast<= 3 ? 19.8 :((envioCast-3)*7.2)+19.8)-0.01;
 
-                usuarioVenta.imagen = 'https://www.blogdelfotografo.com/wp-content/uploads/2020/02/apoyado12-scaled.jpg';
-                usuarioVenta.nombre = usuarioData.nombre;
-                usuarioVenta._id = usuarioData._id;
-    
-                subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
-                subElement.tienda = productos[element].tienda;
-                subElement.productos = [productos[element]];
-                subElement.imagen = datos_tienda.imagen_perfil;
-                subElement.ubicacion = datos_tienda.coordenadas;
-                subElement.direccion =   datos_tienda.direccion;
-                subElement.punto_venta = datos_tienda.punto_venta;
-                subElement.efectivo = efectivo;
-                subElement.usuario = usuarioVenta;
-                subElement.tiempo_espera = datos_tienda.tiempo_espera;
-                
-    
-                pedidos.push(subElement);
+                    usuarioVenta.imagen = 'https://www.blogdelfotografo.com/wp-content/uploads/2020/02/apoyado12-scaled.jpg';
+                    usuarioVenta.nombre = usuarioData.nombre;
+                    usuarioVenta._id = usuarioData._id;
+                    
+                    subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
+                    subElement.tienda = productos[element].tienda;
+                    subElement.productos = [productos[element]];
+                    subElement.imagen = datos_tienda.imagen_perfil;
+                    subElement.punto_venta = datos_tienda.punto_venta;
+                    subElement.efectivo = efectivo;
+                    subElement.usuario = usuarioVenta;
+                    subElement.tiempo_espera = datos_tienda.tiempo_espera;
+                    subElement.envio = (envioMultiplicado+8.2);
+                    subElement.direccion_negocio = direccion_negocio;
+                    subElement.direccion_cliente = direccion;
+                    
+                    
+                    var rutaR = await Axios.get('https://maps.googleapis.com/maps/api/directions/json',{
+                        params:{
+                        key:process.env.GOOGLE_DIRECTIONS_API,
+                        origin:`${direccion_negocio.coordenadas.latitud},${direccion_negocio.coordenadas.longitud}`,
+                        destination:`${direccion.coordenadas.lat},${direccion.coordenadas.lng}`,
+                        language:'es-419',
+                        region:'mx',
+                        mode:'driving'
+                        }
+                    });
+
+
+                    var ruta = new Ruta();
+
+                    ruta.bounds =   rutaR.data.routes[0].bounds;
+                    ruta.overview_polyline =   rutaR.data.routes[0].overview_polyline;
+                    ruta.distance = rutaR.data.routes[0].legs[0].distance;
+                    ruta.duration = rutaR.data.routes[0].legs[0].duration;
+
+                    subElement.ruta = ruta;
+
+
+                    pedidos.push(subElement);
                 }else{
         
                     var objIndex = pedidos.findIndex((obj => obj.tienda == productos[element].tienda));
@@ -244,7 +341,6 @@ const crearPedido = async (req,res)=>{
     
             await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
 
-            console.log(venta.pedidos[0].productos[0]);
             
             for(const element in  pedidosSchema){
 
@@ -906,7 +1002,6 @@ const lista_pedidos = async(req,res)=>{
 
     if(req.body.filtro){
 
-        console.log('filtro');
 
         let text = req.body.filtro;
 
@@ -927,7 +1022,7 @@ const lista_pedidos = async(req,res)=>{
         var gteSubs = moment(gteParse).subtract(0,'hours');
 
         var ltParse = new Date(lt2);
-        var ltSubs = moment(ltSubs).add(1,'days');
+        var ltSubs = moment(ltParse).add(1,'days');
 
         
         gte = gteSubs;
@@ -970,6 +1065,9 @@ const lista_pedidos = async(req,res)=>{
             "repartidor_domicilio_tiempo":"$pedido.repartidor_domicilio_tiempo",
             "repartidor_calificado":"$pedido.repartidor_calificado",
             "repartidor_calificado_tiempo":"$pedido.repartidor_calificado_tiempo",
+            "direccion_cliente":'$pedido.direccion_cliente',
+            "direccion_negocio":'$pedido.direccion_negocio',
+            "envio":'$pedido.envio'
 
         }},
         {
@@ -1016,11 +1114,16 @@ const lista_pedidos = async(req,res)=>{
             "repartidor_domicilio_tiempo":"$repartidor_domicilio_tiempo",
             "repartidor_calificado":"$repartidor_calificado",
             "repartidor_calificado_tiempo":"$repartidor_calificado_tiempo",
+            "direccion_cliente":'$direccion_cliente',
+            "direccion_negocio":'$direccion_negocio',
+            "envio":'$envio'
         }},{
             $sort:{
                 "createdAt":-1
             }
         }
+
+        
         
     ])
 

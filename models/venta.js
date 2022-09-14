@@ -47,16 +47,12 @@ const VentaSchema = Schema({
                         type:Boolean,
                         require:true
                     },
-                    ubicacion:{
+                    direccion_cliente:{
                         type:Object,
                         require:true
                     },
-                    ubicacion:{
+                    direccion_negocio:{
                         type:Object,
-                        require:true
-                    },
-                    direccion:{
-                        type:String,
                         require:true
                     },
                     punto_venta:{
@@ -113,6 +109,14 @@ const VentaSchema = Schema({
                     },
                     repartidor_calificado_tiempo:{
                         type:Date,
+                        require:true
+                    },
+                    envio:{
+                        type:Number,
+                        require:true
+                    },
+                    ruta:{
+                        type:Object,
                         require:true
                     }
                 },

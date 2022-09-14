@@ -42,6 +42,28 @@ var controller = {
 
     },
 
+    ruta:async function(req,res){
+
+        Axios.get('https://maps.googleapis.com/maps/api/directions/json',{
+            params:{
+                key:process.env.GOOGLE_DIRECTIONS_API,
+                origin:'21.3724592,-101.9247371',
+                destination:'21.3545099,-101.9325919',
+                language:'es-419',
+                region:'mx',
+                mode:'driving'
+            }
+        }).then(function(response){
+            return res.json(response.data);
+        }).catch(function(e){
+            console.log(e);
+            return res.json({
+                ok:false
+            })
+        });
+
+    },
+
     busqueda: async function(req,res){
 
         const query = req.body.query;
