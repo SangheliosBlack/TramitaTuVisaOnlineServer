@@ -250,13 +250,16 @@ const { repartidores } = require('./test');
         find({usuario:mongoose.Types.ObjectId('6246598565e106410cf6bb4a')}).
         sort({'updatedAt':-1}).
         populate('pedidos.repartidor').
-        populate('pedidos.repartidor.negocios').
+        populate({
+            path:'pedidos.repartidor',
+            populate:{path:'negocios'},
+        }).
         exec(function(err,data){
             if(err) {
-                console.log(err);
                 return res.json({ok:false});
             }
-            console.log(data);
+            console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+            console.log(data[0].pedidos[0]);
             return res.json(data);
         });
         

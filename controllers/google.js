@@ -56,7 +56,6 @@ var controller = {
         }).then(function(response){
             return res.json(response.data);
         }).catch(function(e){
-            console.log(e);
             return res.json({
                 ok:false
             })

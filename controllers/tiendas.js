@@ -872,50 +872,32 @@ const  obtenerTienda = async (req,res = response)=>{
 
     const usuario = await Usuario.findById(req.uid);
 
-    if(req.body.token){
 
-        const tienda = await Tienda.findOne({punto_venta:req.body.token});
+    if(req.body.tienda){
 
-        if(tienda){
-            const productos = await ListaProductos.findById(tienda.productos);
+        const tienda = await Tienda.findById(req.body.tienda);
+
+        const productos = await ListaProductos.findById(tienda.productos);
 
         tienda.listaProductos = productos.productos;
 
         return res.json(   
             tienda
         );
-        }else{
-            if(req.body.tienda){
 
-                const tienda = await Tienda.findById(req.body.tienda);
+    }else{
         
-                const productos = await ListaProductos.findById(tienda.productos);
-        
-                tienda.listaProductos = productos.productos;
-        
-                return res.json(   
-                    tienda
-                );
-        
-            }else{
-                
-                const tienda = await Tienda.findById(usuario.negocios[0]);
-        
-                const productos = await ListaProductos.findById(tienda.productos);
-        
-                tienda.listaProductos = productos.productos;
-        
-                return res.json(   
-                    tienda
-                );
-            }
-        }
+        const tienda = await Tienda.findById(usuario.negocios[0]);
 
+        const productos = await ListaProductos.findById(tienda.productos);
+
+        tienda.listaProductos = productos.productos;
+
+        return res.json(   
+            tienda
+        );
     }
-
     
-    
-
     
 }
 
@@ -1030,7 +1012,6 @@ const lista_pedidos = async(req,res)=>{
 
     }
 
-    
 
     const pedidos = await Venta.aggregate(
         [
@@ -1067,8 +1048,8 @@ const lista_pedidos = async(req,res)=>{
             "repartidor_calificado_tiempo":"$pedido.repartidor_calificado_tiempo",
             "direccion_cliente":'$pedido.direccion_cliente',
             "direccion_negocio":'$pedido.direccion_negocio',
-            "envio":'$pedido.envio'
-
+            "envio":'$pedido.envio',
+            "ruta":"$pedido.ruta"
         }},
         {
             $match:{
@@ -1086,6 +1067,7 @@ const lista_pedidos = async(req,res)=>{
                 as:'repartidor'
             }
         },
+        
         {$project:{
             "productos": "$productos",
             "_id": "$_id",
@@ -1116,7 +1098,9 @@ const lista_pedidos = async(req,res)=>{
             "repartidor_calificado_tiempo":"$repartidor_calificado_tiempo",
             "direccion_cliente":'$direccion_cliente',
             "direccion_negocio":'$direccion_negocio',
-            "envio":'$envio'
+            "envio":'$envio',
+            "ruta":"$ruta",
+            "fix":true
         }},{
             $sort:{
                 "createdAt":-1
@@ -1124,8 +1108,9 @@ const lista_pedidos = async(req,res)=>{
         }
 
         
-        
     ])
+
+
 
     function calcularPedidosCompletos( pedidos ){
 

@@ -112,7 +112,6 @@ var controller = {
             
         ])
         
-        console.log(pedidos);
 
         return res.json(pedidos);
 
@@ -311,7 +310,6 @@ var controller = {
             
         ])
         
-        console.log(pedidos);
 
         return res.json(pedidos);
 
@@ -328,7 +326,6 @@ var controller = {
 
         if(req.body.filtro){
 
-            console.log('filtro');
     
             let text = req.body.filtro;
     
@@ -395,6 +392,7 @@ var controller = {
                 "direccion_cliente":'$pedido.direccion_cliente',
                 "direccion_negocio":'$pedido.direccion_negocio',
                 "envio":"$pedido.envio",
+                "ruta":"$pedido.ruta",
                 
             }},
             {
@@ -436,6 +434,7 @@ var controller = {
                 "direccion_cliente":'$direccion_cliente',
                 "direccion_negocio":'$direccion_negocio',
                 "envio":"$envio",
+                "ruta":"$ruta"
             }},{
                 $sort:{
                     "createdAt":-1
@@ -461,7 +460,6 @@ var controller = {
             ganancia:calcularGananciaAprox(pedidos)
         }
         
-        console.log(global);
 
         return res.json(global);
     }

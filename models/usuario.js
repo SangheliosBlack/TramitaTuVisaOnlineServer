@@ -64,11 +64,10 @@ const UsuarioSchema =  Schema({
         unique:true,
         required:false
     },
-    negocios:{
-        type:Array,
-        required:false,
+    negocios:[{
+        type:Schema.Types.ObjectId,
         ref:'Tiendas'
-    },
+    }],
     cesta:{
         type:Object,
         require :true

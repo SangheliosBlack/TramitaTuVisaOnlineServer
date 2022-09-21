@@ -170,63 +170,32 @@ const renovarToken = async (req, res = response) => {
 
   await usuario.save();
 
-  const usuario2 = await Usuario.aggregate(
-    [
-      {$match:{_id:mongoose.Types.ObjectId(uid)}},
-      {$unwind:'$negocios'},
-      {
-        $lookup:{
-            from: 'tiendas',
-            localField: 'negocios',
-            foreignField: '_id',
-            as:'negocioPro'
-        },
-      },
-    ]
-  )
+  Usuario.find({_id:mongoose.Types.ObjectId(uid)}).
+    populate('negocios').exec(async function(err,data)  {
 
-  usuario.negocios = listado;
+    const token2 = req.header('x-token-firebase');
 
 
-  var listado = [];
-
-  for (let index = 0; index < usuario2.length; index++) {
-    var actual = usuario2[index];
-    
-    var element = {};
-
-    element.nombre = actual.negocioPro[0].nombre;
-    element.imagen = actual.negocioPro[0].imagen_perfil;
-    element.uid = actual.negocioPro[0]._id;
+    var checkToken = await Tienda.findOne({punto_venta:token2});
 
 
-    listado.push(element);
-    
-  }
+    if(checkToken){
+      checkToken = true;
+    }else{
+      checkToken = false;
+    }
 
+    console.log(data);
 
-  usuario.negocios = listado;
-    
-  const token2 = req.header('x-token-firebase');
+    res.json({
+      ok: true,
+      usuario: data[0],
+      token:token,
+      checkToken
+    });
 
-
-  var checkToken = await Tienda.findOne({punto_venta:token2});
-
-
-  if(checkToken){
-    checkToken = true;
-  }else{
-    checkToken = false;
-  }
-
-
-  res.json({
-    ok: true,
-    usuario: usuario,
-    token,
-    checkToken
   });
-  
+
 };
 
 const iniciarUsuarioTelefono = async(req,res= response) =>{
