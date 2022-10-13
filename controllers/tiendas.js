@@ -869,34 +869,68 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
 
 const  obtenerTienda = async (req,res = response)=>{
 
+    const usuario = await Usuario.findOne({_id:'6246598565e106410cf6bb4a'});
 
-    const usuario = await Usuario.findById(req.uid);
 
+    if(req.body.token){
 
-    if(req.body.tienda){
+        var tienda = await Tienda.findOne({punto_venta:req.body.token});
 
-        const tienda = await Tienda.findById(req.body.tienda);
+        if(tienda){
 
-        const productos = await ListaProductos.findById(tienda.productos);
+            const productos = await ListaProductos.findById(tienda.productos);
+        
+                tienda.listaProductos = productos.productos;
+        
+                return res.json(   
+                    tienda
+                );
+        }else
+        {
 
-        tienda.listaProductos = productos.productos;
-
-        return res.json(   
-            tienda
-        );
+            
+            const tienda = await Tienda.findById(usuario.negocios[0]);
+    
+            const productos = await ListaProductos.findById(tienda.productos);
+    
+            tienda.listaProductos = productos.productos;
+    
+            return res.json(   
+                tienda
+            );
+        }
 
     }else{
-        
-        const tienda = await Tienda.findById(usuario.negocios[0]);
 
-        const productos = await ListaProductos.findById(tienda.productos);
+        if(req.body.tienda){
 
-        tienda.listaProductos = productos.productos;
+            const tienda = await Tienda.findById(req.body.tienda);
+    
+            const productos = await ListaProductos.findById(tienda.productos);
+    
+            tienda.listaProductos = productos.productos;
+    
+            return res.json(   
+                tienda
+            );
+    
+        }else{
 
-        return res.json(   
-            tienda
-        );
+            
+            const tienda = await Tienda.findById(usuario.negocios[0]);
+    
+            const productos = await ListaProductos.findById(tienda.productos);
+    
+            tienda.listaProductos = productos.productos;
+    
+            return res.json(   
+                tienda
+            );
+
+        }
     }
+
+
     
     
 }
@@ -972,7 +1006,45 @@ const confirmarPedidoRepartidor = async(req,res)=>{
 
 }
 
+const confirmarPedidoCliente = async(req,res)=>{
+
+
+    try{
+        const value = await Venta.findOneAndUpdate(
+            {
+                "_id":mongoose.Types.ObjectId(req.body.uid)
+            },{
+                $set:{'pedidos.$[i].entregado_cliente':true,'pedidos.$[i].entrega_cliente_tiempo':new Date()}
+            },{
+                arrayFilters:[
+                    {
+                        "i._id":mongoose.Types.ObjectId(req.body.uidVenta)
+                    }
+                ]
+            }
+        )
+
+        if(value){
+
+            await Usuario.findByIdAndUpdate(req.uid,{$set:{transito:false,ultima_tarea:new Date()}});
+
+            return res.status(200).json({ok:true});
+
+        }else{
+
+            return res.status(400).json({ok:false});
+
+        }
+    }catch(e){
+
+        return res.status(400).json({ok:false});
+
+    }
+
+}
+
 const lista_pedidos = async(req,res)=>{
+
 
     const dateP= new Date();
 
@@ -980,6 +1052,28 @@ const lista_pedidos = async(req,res)=>{
 
     var gte = moment(myDate).subtract(0,'hours');
     var lt = moment( myDate).add(1,'days');
+
+    var tienda_nombre = await Tienda.findOne({punto_venta:req.body.token});
+
+    if(!tienda_nombre){
+
+        const usuario = await Usuario.findById({_id:req.uid});
+
+        const tienda = await Tienda.findById(usuario.negocios[0]);
+    
+        tienda_nombre = {};
+
+        tienda_nombre.nombre = tienda.nombre;
+
+    }
+
+    if(req.body.tienda){
+        const tienda = await Tienda.findById(req.body.tienda);
+    
+        tienda_nombre = {};
+
+        tienda_nombre.nombre = tienda.nombre;
+    }
 
 
     if(req.body.filtro){
@@ -1053,7 +1147,7 @@ const lista_pedidos = async(req,res)=>{
         }},
         {
             $match:{
-            'tienda':'Capitan Naza',
+            'tienda': tienda_nombre.nombre,
             'createdAt':{
                 $gte : new Date(gte), 
                 $lt :  new Date(lt), 
@@ -1128,7 +1222,7 @@ const lista_pedidos = async(req,res)=>{
 
         var ganancia = 0;
 
-        pedidos.forEach(element => ganancia += element.total );
+        pedidos.forEach(element => ganancia += element.entregado_repartidor ? element.total :0 );
 
 
         return ganancia;
@@ -1141,6 +1235,13 @@ const lista_pedidos = async(req,res)=>{
         completados:calcularPedidosCompletos(pedidos),
         ganancia:calcularGananciaAprox(pedidos)
     };
+
+
+    pedidos.forEach(function(element,index){
+        if(element.repartidor){
+            pedidos[index].repartidor.negocios = [];
+        }
+    });
 
     return res.json(pedidosPrev);
 
@@ -1192,9 +1293,9 @@ const modificarHorarioTienda = async(req,res = response) =>{
     })
 }
 
-const searchOne = async (req,res = resposne) =>{
+const searchOne = async (req,res) =>{
     
-    const tienda = await Tienda.findById(req.body.uid);
+    const tienda = await Tienda.findOne(req.body.uid);
 
 
     res.json(
@@ -1255,7 +1356,7 @@ const nuevaTienda = async (req,res) =>{
 
 }
 
-module.exports = {confirmarPedidoRestaurante,confirmarPedidoRepartidor,macChangue,autoImpresion,crearPedido,busqueda,verTodoProductos,obtenerTienda,obtenerProductosCategoria,verTodoTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda,lista_pedidos};
+module.exports = {confirmarPedidoCliente,confirmarPedidoRestaurante,confirmarPedidoRepartidor,macChangue,autoImpresion,crearPedido,busqueda,verTodoProductos,obtenerTienda,obtenerProductosCategoria,verTodoTiendas,nuevaTienda,searchOne,modificarHorarioTienda,modificarAniversario,modificarNombreTienda,modificarStatus,construirPantallaPrincipalCategorias,construirPantallaPrincipalTiendas,construirPantallaPrincipalProductos,obtenerProductosTienda,lista_pedidos};
 
 
 

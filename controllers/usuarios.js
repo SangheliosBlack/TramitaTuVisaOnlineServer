@@ -258,8 +258,6 @@ const { repartidores } = require('./test');
             if(err) {
                 return res.json({ok:false});
             }
-            console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
-            console.log(data[0].pedidos[0]);
             return res.json(data);
         });
         

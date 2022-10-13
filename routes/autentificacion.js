@@ -8,7 +8,15 @@ const router = Router();
 const upload = require("../multer");
 
 router.post('/nuevoUsuario',[
-    check('nombre','El nombre es obligatorio').trim().not().isEmpty(),
+    check('nombre','El nombre es obligatorio').trim().not().isEmpty().custom(async(nombre,{req})=>{
+        
+        const myArray = nombre.split(' ');
+
+        if(myArray.length <= 2 ){
+            throw new Error('Formato nombre completo incorrecto')
+        }
+
+    }),
     check('contrasena').trim().isLength({min:6,max:16}).withMessage('Contraseña minimo 6 caracteres').custom(async(contrasena,{req})=>{
         const confirmar_contrasena = req.body.confirmar_contrasena;
         if(contrasena !== confirmar_contrasena ){

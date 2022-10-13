@@ -13,6 +13,7 @@ router.post('/desconectar',controller.desconectar);
 router.post('/envioPendiente',controller.buscarEnvioPendiente);
 
 router.post('/transitoUsuario',controller.transitoUsuario);
+router.post('/transitoUsuarioOff',controller.transitoUsuarioOff);
 
 router.post('/confirmarPedidoEntregado',controller.confirmarPedidoEntregado);
 

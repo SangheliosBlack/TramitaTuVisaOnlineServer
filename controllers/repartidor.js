@@ -28,6 +28,15 @@ var controller = {
             
         }
     },
+    transitoUsuarioOff: async function(req,res){
+        try {
+            await Usuario.findByIdAndUpdate({_id:req.body.id},{$set:{'transito':false}});
+            return res.status(200).json({ok:true});
+        } catch (error) {
+            return res.status(400).json({ok:false});
+            
+        }
+    },
     
     buscarEnvioPendiente: async function(req,res){
 
@@ -201,11 +210,11 @@ var controller = {
         
         if(pedidos.length == 0 ){
 
-            return res.status(400).json({ok:true});
+            return res.status(200).json({ok:true});
 
         }else{
             
-            return res.status(200).json({ok:false});
+            return res.status(400).json({ok:false});
             
         }
 
@@ -446,7 +455,7 @@ var controller = {
 
             var ganancia = 0;
     
-            pedidos.forEach(element => ganancia += element.envio );
+            pedidos.forEach(element => ganancia += element.entregado_cliente ? element.envio :0 );
     
     
             return ganancia;
