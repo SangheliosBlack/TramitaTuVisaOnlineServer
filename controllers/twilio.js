@@ -26,7 +26,7 @@ var controller ={
             }).then((data)=>{
                 res.json(data);
             }).catch((e)=>{
-                
+                console.log(e);
                 return res.status(400).json(e);
             });
         }else{
@@ -40,7 +40,7 @@ var controller ={
             }).then((data)=>{
                 res.json(data);
             }).catch((e)=>{
-                
+                console.log(e);
                 return res.status(400).json(e);
             });
         }
@@ -54,6 +54,7 @@ var controller ={
         .then((data)=>{
             res.json(data);
         }).catch((e)=>{
+            console.log(e);
             return res.status(400).json(e);
         });
     }
