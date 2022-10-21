@@ -900,6 +900,10 @@ const  obtenerTienda = async (req,res = response)=>{
                     tienda
                 );
 
+            }else{
+
+                return res.status(400).json({ok:false});
+
             }
 
         }
@@ -932,6 +936,10 @@ const  obtenerTienda = async (req,res = response)=>{
                 return res.json(   
                     tienda
                 );
+
+            }else{
+
+                return res.status(400).json({ok:false});
 
             }
 
