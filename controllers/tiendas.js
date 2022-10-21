@@ -869,7 +869,7 @@ const construirPantallaPrincipalProductos = async (req,res)=>{
 
 const  obtenerTienda = async (req,res = response)=>{
 
-    const usuario = await Usuario.findOne({_id:'6246598565e106410cf6bb4a'});
+    const usuario = await Usuario.findOne({_id:req.uid});
 
 
     if(req.body.token){
@@ -888,16 +888,20 @@ const  obtenerTienda = async (req,res = response)=>{
         }else
         {
 
-            
-            const tienda = await Tienda.findById(usuario.negocios[0]);
-    
-            const productos = await ListaProductos.findById(tienda.productos);
-    
-            tienda.listaProductos = productos.productos;
-    
-            return res.json(   
-                tienda
-            );
+            if(usuario.negocios.length > 0){
+                
+                const tienda = await Tienda.findById(usuario.negocios[0]);
+        
+                const productos = await ListaProductos.findById(tienda.productos);
+        
+                tienda.listaProductos = productos.productos;
+        
+                return res.json(   
+                    tienda
+                );
+
+            }
+
         }
 
     }else{

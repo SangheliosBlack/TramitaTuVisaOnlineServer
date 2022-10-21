@@ -31,6 +31,10 @@ const UsuarioSchema =  Schema({
         type:Boolean,
         default:false
     },
+    online_repartidor:{
+        type:Boolean,
+        default:false
+    },
     correo:{
         type:String,
         require:true,

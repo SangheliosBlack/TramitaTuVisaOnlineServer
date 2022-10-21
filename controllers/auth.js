@@ -19,6 +19,8 @@ const crearUsuario = async (req, res = response) => {
     const existeEmail = await Usuario.findOne({correo: correo.toLowerCase()});
 
     if (existeEmail) {
+      console.log('correo repetido');
+
       res.status(400).json({
         ok: false,
         errores: {
@@ -43,12 +45,24 @@ const crearUsuario = async (req, res = response) => {
 
     const salt = bcrypt.genSaltSync();
 
+    const str = req.body.nombre.toLowerCase();
+
+    const arr = str.split(" ");
+
+    for (var i = 0; i < arr.length; i++) {
+      arr[i] = arr[i].charAt(0).toUpperCase() + arr[i].slice(1);
+  
+    }
+
+    const str2 = arr.join(" ");
+
+    usuario.nombre = str2;
+
     usuario.contrasena = bcrypt.hashSync(contrasena, salt);
     usuario.correo = req.body.correo.toLowerCase();
     usuario.nombre_usuario = generarNombre(usuario.nombre);
     usuario.socio = false;
     usuario.online = false;
-    usuario.online_repartidor = false;
     usuario.envio_promo = false;
     usuario.customer_id = customer.id;
     usuario.tokenFB = req.body.tokenFB;
@@ -90,6 +104,8 @@ const crearUsuario = async (req, res = response) => {
     checkToken = false;
   }
 
+  console.log('todo cool');
+
     res.status(200).json({
       ok: true,
       usuario,
@@ -98,6 +114,7 @@ const crearUsuario = async (req, res = response) => {
     });
 
   } catch (error) {
+    console.log('valio verga'+error);
     res.status(500).json({
       ok: false,
       error,
@@ -200,8 +217,11 @@ const renovarToken = async (req, res = response) => {
 };
 
 const iniciarUsuarioTelefono = async(req,res= response) =>{
+  
+  console.log(req.body);
 
   const {numero,tokenFB} = req.body;
+
 
   numero.replaceAll(' ', '')
 
@@ -210,20 +230,27 @@ const iniciarUsuarioTelefono = async(req,res= response) =>{
     populate('negocios').exec(async function(err,data)  {
 
 
-      if(!data){
+      console.log(data);
+
+      if(!data || data.length == 0){
 
         return res.status(404).json({ok:false});
         
       }else{
 
         const usuario = await Usuario.findOne({numero_celular:numero});
+
+        if(usuario){
         
-        usuario.tokenFB = tokenFB;
+        usuario['tokenFB'] = tokenFB;
     
         await usuario.save();
       
-        const token = await generarJWT(usuario._id);
-    
+      }
+      
+      
+      const token = await generarJWT(data[0]._id);
+
         var checkToken = await Tienda.findOne({punto_venta:req.body.tokenFB});
     
     
