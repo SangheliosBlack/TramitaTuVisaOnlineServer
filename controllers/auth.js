@@ -35,12 +35,14 @@ const crearUsuario = async (req, res = response) => {
 
     
     const usuario = new Usuario(req.body);
+
+    const numero = req.body.numero_celular.replace(/ /g,'');
     
     const customer = await stripe.customers.create({
       description: `Cliente creado con el ID : ${usuario._id}`,
       email:correo,
       name:req.body.nombre,
-      phone:req.body.numero_celular
+      phone:numero
     });
 
     const salt = bcrypt.genSaltSync();
@@ -220,10 +222,9 @@ const iniciarUsuarioTelefono = async(req,res= response) =>{
   
   console.log(req.body);
 
-  const {numero,tokenFB} = req.body;
+  const {tokenFB} = req.body;
 
-
-  numero.replaceAll(' ', '')
+  const numero = req.body.to.replace(/ /g,'');
 
 
   Usuario.find({numero_celular:numero}).

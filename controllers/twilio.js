@@ -14,8 +14,7 @@ var controller ={
 
         var body = req.body;
 
-        console.log(req.body);
-        console.log(process.env.ACCOUNT_SID+process.env.AUTH_TOKEN);
+        const numero = req.body.to.replace(/ /g,'');
 
         if(body.hash){
             client
@@ -23,7 +22,7 @@ var controller ={
             .services(process.env.SERVICE_ID)
             .verifications
             .create({
-                to:body.codigo+body.to,
+                to:body.codigo+numero,
                 channel:'sms',
                 appHash:body.hash
             }).then((data)=>{
@@ -38,7 +37,7 @@ var controller ={
             .services(process.env.SERVICE_ID)
             .verifications
             .create({
-                to:body.codigo+body.to,
+                to:body.codigo+numero,
                 channel:'sms',
             }).then((data)=>{
                 res.json(data);
@@ -51,9 +50,12 @@ var controller ={
     },
     verificarSms:function(req,res){
         var body = req.body;
+
+        const numero = req.body.to.replace(/ /g,'');
+
         client.verify.services(process.env.SERVICE_ID)
         .verificationChecks
-        .create({to: body.codigo+body.to, code: body.code})
+        .create({to: body.codigo+numero, code: body.code})
         .then((data)=>{
             res.json(data);
         }).catch((e)=>{
