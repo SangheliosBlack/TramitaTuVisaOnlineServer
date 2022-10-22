@@ -14,6 +14,9 @@ var controller ={
 
         var body = req.body;
 
+        console.log(req.body);
+        console.log(process.env.ACCOUNT_SID+process.env.AUTH_TOKEN);
+
         if(body.hash){
             client
             .verify
