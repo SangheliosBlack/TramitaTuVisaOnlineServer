@@ -247,7 +247,7 @@ const { repartidores } = require('./test');
         // const ordenes2 = await Venta.find({'usuario':mongoose.Types.ObjectId(req.uid)}).sort({'updatedAt':-1});
 
         Venta.
-        find({usuario:mongoose.Types.ObjectId('6246598565e106410cf6bb4a')}).
+        find({usuario:mongoose.Types.ObjectId(req.uid)}).
         sort({'updatedAt':-1}).
         populate('pedidos.repartidor').
         populate({

@@ -23,7 +23,7 @@ router.post('/eliminarProductoCesta',validarJWT,controller.eliminarProductoCesta
 router.post('/modificarCantidadProductoCesta',validarJWT,controller.modificarCantidadProductoCesta);
 router.post('/buscarCodigo',validarJWT,controller.buscarCodigo);
 
-router.get('/ordenes',controller.ordenes);
+router.get('/ordenes',validarJWT,controller.ordenes);
 
 
 module.exports = router;
