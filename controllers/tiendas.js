@@ -790,9 +790,17 @@ const obtenerProductosCategoria = async(req,res)=>{
                                as:'item',
                                cond:{$eq:['$$item.categoria',req.body.filtro]}
                            }
-                   }
+                   },
+                   tienda:'$tienda'
                 }
-            },
+            },{
+                $lookup:{
+                    from:'tiendas',
+                    localField:'tienda',
+                    foreignField:'_id',
+                    as:'tiendas'
+                }
+            }
         ]
     );
 
@@ -803,7 +811,8 @@ const obtenerProductosCategoria = async(req,res)=>{
 
     return res.json({
         ok:true,
-        productos:productosFilter[0].productos
+        productos:productosFilter[0].productos,
+        tiendas:productosFilter[0].tiendas
     })
 }
 
