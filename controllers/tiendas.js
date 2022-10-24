@@ -797,7 +797,7 @@ const obtenerProductosCategoria = async(req,res)=>{
                 $lookup:{
                     from:'tiendas',
                     localField:'tienda',
-                    foreignField:'_id',
+                    foreignField:'nombre',
                     as:'tiendas'
                 }
             }
@@ -808,6 +808,8 @@ const obtenerProductosCategoria = async(req,res)=>{
     var productosFilter = productos.filter(function(obj){
         return obj.productos.length > 0;
     });
+
+    console.log(productosFilter[0])
 
     return res.json({
         ok:true,
