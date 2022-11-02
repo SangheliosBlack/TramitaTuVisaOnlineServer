@@ -4,11 +4,11 @@ const { test,add, repartidores, pedidosPendientes } = require('../controllers/te
 
 const router = Router();
 
-router.post('/test',test);
-router.post('/add',add);
 router.get('/repartidores',repartidores);
 router.get('/repartidores',repartidores);
-router.get('/pedidos',pedidosPendientes);
+router.get('/pedidos',     pedidosPendientes);
+router.post('/test',       test);
+router.post('/add',        add);
 
 
 module.exports = router;

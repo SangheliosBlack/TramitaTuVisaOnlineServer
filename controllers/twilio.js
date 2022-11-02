@@ -1,8 +1,8 @@
 const client = require('twilio')(process.env.ACCOUNT_SID,process.env.AUTH_TOKEN);
 
-
 var controller ={
     twilioTest:function(req,res){
+
         client.messages.create({
             to:'+524741030509',
             from:'+19034763144',
@@ -17,6 +17,7 @@ var controller ={
         const numero = req.body.to.replace(/ /g,'');
 
         if(body.hash){
+
             client
             .verify
             .services(process.env.SERVICE_ID)
@@ -31,7 +32,9 @@ var controller ={
                 console.log(e);
                 return res.status(400).json(e);
             });
+
         }else{
+
             client
             .verify
             .services(process.env.SERVICE_ID)
@@ -45,10 +48,12 @@ var controller ={
                 console.log(e);
                 return res.status(400).json(e);
             });
+
         }
         
     },
     verificarSms:function(req,res){
+
         var body = req.body;
 
         const numero = req.body.to.replace(/ /g,'');
@@ -62,6 +67,7 @@ var controller ={
             console.log(e);
             return res.status(400).json(e);
         });
+        
     }
 };
 

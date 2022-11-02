@@ -1,9 +1,7 @@
 const Axios = require('axios');
 
 var controller = {
-
     sugerencia: async function(req,res){
-
 
         const coordenadas = req.body.coordenadas;
 
@@ -23,8 +21,8 @@ var controller = {
             })
         });
     },
-
     busquedaID: async function(req,res) {
+        
         const id = req.body.id;
 
         Axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
@@ -41,7 +39,6 @@ var controller = {
         });
 
     },
-
     ruta:async function(req,res){
 
         Axios.get('https://maps.googleapis.com/maps/api/directions/json',{

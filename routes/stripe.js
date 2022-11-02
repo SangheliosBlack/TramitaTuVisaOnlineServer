@@ -1,14 +1,14 @@
-const {Router} = require('express');
+const controller = require('../controllers/stripe');
 const {validarJWT} = require('../middlewares/validar-jwt');
-const {getListCustomerPaymentsMethods, createNewCustomer, createPaymentMethod, obtenerCliente, updateCustomerPaymethDefault, deletePaymethMethod} = require('../controllers/stripe');
+const {Router} = require('express');
 
 const router = Router();
 
-router.post('/obtenerTarjetas',validarJWT,getListCustomerPaymentsMethods)
-router.post('/nuevoMetodo',validarJWT,createPaymentMethod);
-router.get('/obtenerCliente',validarJWT,obtenerCliente);
-router.post('/actualizarPagoPredeterminado',updateCustomerPaymethDefault);
-router.post('/eliminarMetodoPago',deletePaymethMethod);
+router.get('/obtenerCliente',               validarJWT,controller.obtenerCliente);
 
+router.post('/actualizarPagoPredeterminado',controller.updateCustomerPaymethDefault);
+router.post('/obtenerTarjetas',             validarJWT,controller.getListCustomerPaymentsMethods)
+router.post('/nuevoMetodo',                 validarJWT,controller.createPaymentMethod);
+router.post('/eliminarMetodoPago',          controller.deletePaymethMethod);
 
 module.exports = router;

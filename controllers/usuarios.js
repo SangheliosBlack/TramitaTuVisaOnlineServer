@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
-const Usuario = require('../models/usuario');
-const fs = require("fs");
-const s3 = require("../config/s3.config.js");
-const path = require('path');
 const Producto = require('../models/producto');
-const Venta = require('../models/venta');
+const s3 = require("../config/s3.config.js");
+const Usuario = require('../models/usuario');
 const { repartidores } = require('./test');
+const Venta = require('../models/venta');
+const mongoose = require('mongoose');
+const path = require('path');
+const fs = require("fs");
 
  var controller = {
     updateDireccionFavorita : async(req,res)=>{
@@ -16,7 +16,7 @@ const { repartidores } = require('./test');
           ok:true
         });
 
-      },
+    },
     modificarTiendaFavorita  : async( req,res) => {
     
         await Usuario.findOneAndUpdate({_id:req.uid},{$set:{tiendaFavorita:req.body.tienda}});
@@ -24,29 +24,31 @@ const { repartidores } = require('./test');
         res.json({
             ok:true
         });
+
     },
-    
-     guardarFotoPerfil : async(req,res)=>{
-        
+    guardarFotoPerfil : async(req,res)=>{
+
         const usuario = await Usuario.findById(req.uid);
-    
         const ext = path.extname(req.file.path);
-        
         const s3Client = s3.s3Client;
         var paramsDelete= {  Bucket:process.env.Bucket , Key: usuario.profilePhotoKey};
         const params = s3.uploadParams;
         
         fs.readFile(req.file.path,async function( err, data)  {
             
-            params.Bucket      =process.env.Bucket,
+            params.Bucket      = process.env.Bucket,
             params.Key         = `storage/${usuario._id}/`+`profile_image_${Date.now()}`+ext,
             params.Body        = data,
-            params.ContentType =req.file.mimetype
+            params.ContentType = req.file.mimetype
     
             const complete = new Promise((resolve)=>{
-                  s3Client.upload(params,(err,data)=>{
+
+                s3Client.upload(params,(err,data)=>{
+
                      resolve(data);
-                 });
+                
+                });
+            
             });
         
             complete.then( async (newData)=>{
@@ -54,9 +56,11 @@ const { repartidores } = require('./test');
                 if(usuario.profilePhotoKey){
     
                     const deleteComplete = new Promise((resolve)=>{
+
                         s3Client.deleteObject(paramsDelete,(err,data)=>{
                             resolve(data);
                         });
+
                     });
     
                     deleteComplete.then(async(deleteObject)=>{
@@ -75,16 +79,12 @@ const { repartidores } = require('./test');
                     
                 }
     
-                
             });
     
         });
     
     } ,
     getUsuarios :async (req,res)=>{
-    
-        //const desde = Number(req.query.desde) || 0;
-    
     
         const data = await Usuario.aggregate([
             {
@@ -110,7 +110,6 @@ const { repartidores } = require('./test');
         ]);
     
         const users = data[0].usuarios;
-    
         
         //const usuarios = await Usuario.find({_id:{$ne:req.uid}}).sort('-online').skip(desde).limit(20);
     
@@ -120,7 +119,6 @@ const { repartidores } = require('./test');
         });
     
     },
-    
     modificarNombre : async(req, res)=>{
         
         await Usuario.findOneAndUpdate({_id:req.uid},{$set:{nombre:req.body.nombre}});
@@ -130,7 +128,6 @@ const { repartidores } = require('./test');
         });
     
     },
-    
     modificarNombreUsuario : async(req, res)=>{
         
         await Usuario.findOneAndUpdate({_id:req.uid},{$set:{nombre_usuario:req.body.nombre_usuario}});
@@ -154,20 +151,18 @@ const { repartidores } = require('./test');
 
         }
 
-    },agregarProductoCesta:async(req,res)=>{
-
+    },
+    agregarProductoCesta:async(req,res)=>{
 
         try {
             
             const producto = new Producto(req.body.producto);
-
             
             await Usuario.findByIdAndUpdate({_id:req.uid},{$push:{'cesta.productos':producto}});
 
             return res.status(200).json({ok:true});
 
         } catch (error) {
-
 
             return res.status(400).json({ok:false});
 
@@ -183,6 +178,7 @@ const { repartidores } = require('./test');
             return res.status(200).json({ok:true});
 
         } catch (error) {
+
             return res.status(400).json({ok:false});
 
         }
@@ -203,12 +199,13 @@ const { repartidores } = require('./test');
             return res.status(200).json({ok:true});
 
         } catch (error) {
+
             return res.status(200).json({ok:false});
+
         }
 
     },
     modificarCantidadProductoCesta:async(req,res)=>{
-
 
         await Usuario.updateMany(
             
@@ -235,16 +232,11 @@ const { repartidores } = require('./test');
 
         } catch (error) {
 
-            print(error);
-
             return res.status(200).json({ok:false});
 
         }
     },
     ordenes:async(req,res)=>{
-
-
-        // const ordenes2 = await Venta.find({'usuario':mongoose.Types.ObjectId(req.uid)}).sort({'updatedAt':-1});
 
         Venta.
         find({usuario:mongoose.Types.ObjectId(req.uid)}).
@@ -255,26 +247,25 @@ const { repartidores } = require('./test');
             populate:{path:'negocios'},
         }).
         exec(function(err,data){
-            if(err) {
-                return res.json({ok:false});
-            }
-            return res.json(data);
-        });
-        
-        
 
+            if(err) {
+
+                return res.json({ok:false});
+
+            }
+
+            return res.json(data);
+
+        });
         
     },
     buscarCodigo:async(req,res)=>{
 
-        
-        
         try {
             
             var codigo = await Usuario.findOne({codigo:req.body.codigo});
 
             var checkUsuario = await Usuario.findById({_id:req.uid});
-
     
             if(codigo){
 
@@ -317,8 +308,7 @@ const { repartidores } = require('./test');
         }
 
     }
- }
 
-
+}
 
 module.exports = controller 

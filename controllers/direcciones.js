@@ -1,57 +1,57 @@
-const {response} = require('express');
-const mongoose = require('mongoose');
-const Direccion = require('../models/direccion');
 const Coordendas = require('../models/coodernadas');
+const Direccion = require('../models/direccion');
 const Usuario = require('../models/usuario');
+const mongoose = require('mongoose');
 const Axios = require('axios');
 
+var controller = {
 
-const getDirecciones = async (req,res = response)=>{
+    getDirecciones:async(req,res)=>{
 
-    var direcciones = await Usuario.findById({_id:req.uid});
+        var direcciones = await Usuario.findById({_id:req.uid});
 
+        res.json({
+            ok:true,
+            direcciones:direcciones.direcciones
+        });    
 
-    res.json({
-        ok:true,
-        direcciones:direcciones.direcciones
-    });
-}
+    },
+    searchOne:async(req,res)=>{
 
-const searchOne = async (req,res = response)=>{
-
-
-    var direccion = await Usuario.aggregate([
-        {$match:{_id:mongoose.Types.ObjectId(req.uid)}},
-        {$project:{
-            list:{$filter:{
-                input:'$direcciones',
-                as:'direccion',
-                cond:{$eq:['$$direccion._id', mongoose.Types.ObjectId(req.body.uid)]}
+        var direccion = await Usuario.aggregate([
+            {$match:{_id:mongoose.Types.ObjectId(req.uid)}},
+            {$project:{
+                list:{$filter:{
+                    input:'$direcciones',
+                    as:'direccion',
+                    cond:{$eq:['$$direccion._id', mongoose.Types.ObjectId(req.body.uid)]}
+                }}
             }}
-        }}
-    ])
-
-    res.json(
-        direccion[0].list[0]
-    );
-}
-
-const eliminarDireccion = async (req,res)=>{
+        ]);
     
-    const id = req.body.id;
+        res.json(
+            direccion[0].list[0]
+        );
 
-    try {
-        await Usuario.findByIdAndUpdate(req.uid,{$pull:{direcciones:{_id:mongoose.Types.ObjectId(id)}}});
-        return res.json({ok:true});
-    } catch (error) {
-        return res.json({ok:true});
-    }
+    },
+    eliminarDireccion:async (req,res)=>{
 
+        const id = req.body.id;
 
-}
+        try {
+         
+            await Usuario.findByIdAndUpdate(req.uid,{$pull:{direcciones:{_id:mongoose.Types.ObjectId(id)}}});
 
-const direccionPredeterminada = async(req,res)=>{
+            return res.json({ok:true});
 
+        } catch (error) {
+
+            return res.json({ok:true});
+
+        }
+
+    },
+    direccionPredeterminada:async (req,res)=>{
 
         if(req.body.actual != 'NA'){
 
@@ -80,17 +80,14 @@ const direccionPredeterminada = async(req,res)=>{
         );
 
         return res.status(200);
+    },
+    nuevaDireccion:async(req,res)=>{
 
-}
+        const id = req.body.id;
 
-const nuevaDireccion = async (req,res = response)=>{
+        if(req.body.sugerencia){
 
-    const id = req.body.id;
-
-
-    if(req.body.sugerencia){
-
-        const coodernadas = new Coordendas(req.body);
+            const coodernadas = new Coordendas(req.body);
     
             req.body.coordenadas = coodernadas;
 
@@ -107,41 +104,41 @@ const nuevaDireccion = async (req,res = response)=>{
                 direcciones:[direccion],
             });
 
-    }else{
-        Axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
-            params:{
-                place_id:id,
-                key: process.env.GOOGLE_GEOCODE_API,
-            }
-        }).then( async function(response){
+        }else{
+            Axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+                params:{
+                    place_id:id,
+                    key: process.env.GOOGLE_GEOCODE_API,
+                }
+            }).then( async function(response){
             
-            const coodernadas = new Coordendas(response.data.results[0].geometry.location);
-    
-            req.body.coordenadas = coodernadas;
+                const coodernadas = new Coordendas(response.data.results[0].geometry.location);
+                
+                req.body.coordenadas = coodernadas;
 
-            req.body.predeterminado = false;
-    
-            const direccion = new Direccion(req.body);
-    
-            direccion.titulo =response.data.results[0].formatted_address;
-    
-            await Usuario.findByIdAndUpdate({_id:req.uid},{$push:{direcciones:direccion}});
-    
-            res.json({
-                ok:true,
-                direcciones:[direccion],
-            });
+                req.body.predeterminado = false;
+                
+                const direccion = new Direccion(req.body);
+                
+                direccion.titulo =response.data.results[0].formatted_address;
+                
+                await Usuario.findByIdAndUpdate({_id:req.uid},{$push:{direcciones:direccion}});
+                
+                res.json({
+                    ok:true,
+                    direcciones:[direccion],
+                });
             
-        }).catch(function(e){
-            return res.status(400).json({
-                ok:false
-            })
-        });
+            }).catch(function(e){
+            
+                return res.status(400).json({
+                    ok:false
+                });
+
+            });
+        }
+
     }
-
-
 }
 
-
-
-module.exports = { getDirecciones,nuevaDireccion,searchOne,eliminarDireccion,direccionPredeterminada};
+module.exports = controller;

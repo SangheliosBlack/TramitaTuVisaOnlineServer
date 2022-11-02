@@ -2,7 +2,6 @@ const { io } = require('../app');
 const { comprobarJWT } = require('../helpers/jwt');
 const {usuarioConectado, usuarioDesconectado,conectarNegocio, desconectarNegocio, revisarPuntoVenta} = require('../controllers/socket');
 
-// Mensajes de Sockets
 io.on('connection', client => {
 
     console.log('Cliente conectado');
@@ -35,9 +34,13 @@ io.on('connection', client => {
     
 
     client.on('disconnect', () => {
+
         usuarioDesconectado(uid);
+        
         desconectarNegocio(client.handshake.headers['token']);
+        
         console.log('Cliente desconectado');
+
     });
 
     client.on('desconectar-negocio', ( payload ) => {

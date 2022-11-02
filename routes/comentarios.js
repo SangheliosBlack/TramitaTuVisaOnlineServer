@@ -1,14 +1,14 @@
-const { Router } = require("express");
-const { nuevoComentario, modificarComentario, reacionComentario, destacarComentario, noDestacarComentario, eliminarComentario } = require("../controllers/comentarios");
 const {validarJWT} = require('../middlewares/validar-jwt');
+const controller = require("../controllers/comentarios");
+const { Router } = require("express");
 const router = Router();
 
-router.post('/destacarComentario',validarJWT,destacarComentario);
+router.post('/destacarComentario',  validarJWT,controller.destacarComentario);
 
-router.post('/nuevoComentario',validarJWT,nuevoComentario);
-router.post('/modificarComentario',validarJWT,modificarComentario);
-router.post('/reaccionComentario',validarJWT,reacionComentario);
-router.post('/noDestacarComentario',validarJWT,noDestacarComentario);
-router.post('/eliminarComentario',validarJWT,eliminarComentario);
+router.post('/noDestacarComentario',validarJWT,controller.noDestacarComentario);
+router.post('/modificarComentario', validarJWT,controller.modificarComentario);
+router.post('/eliminarComentario',  validarJWT,controller.eliminarComentario);
+router.post('/reaccionComentario',  validarJWT,controller.reacionComentario);
+router.post('/nuevoComentario',     validarJWT,controller.nuevoComentario);
 
 module.exports = router;

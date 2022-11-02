@@ -1,14 +1,14 @@
-const {Router} = require('express');
+const controller = require('../controllers/direcciones');
 const {validarJWT} = require('../middlewares/validar-jwt');
-const {getDirecciones, nuevaDireccion, searchOne, eliminarDireccion, direccionPredeterminada} = require('../controllers/direcciones');
+const {Router} = require('express');
 
 const router = Router();
 
-router.get('/',validarJWT,getDirecciones);
-router.post('/nuevaDireccion',validarJWT,nuevaDireccion);
-router.post('/search',validarJWT,searchOne);
-router.post('/eliminar',validarJWT,eliminarDireccion);
+router.get('/',               validarJWT,controller.getDirecciones);
 
-router.post('/predeterminada',validarJWT,direccionPredeterminada);
+router.post('/predeterminada',validarJWT,controller.direccionPredeterminada);
+router.post('/nuevaDireccion',validarJWT,controller.nuevaDireccion);
+router.post('/eliminar',      validarJWT,controller.eliminarDireccion);
+router.post('/search',        validarJWT,controller.searchOne);
 
 module.exports = router;

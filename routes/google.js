@@ -5,9 +5,9 @@ const controller = require('../controllers/google');
 
 const router = Router();
 
-router.post('/busqueda',validarJWT,controller.busqueda);
 router.post('/sugerencia',validarJWT,controller.sugerencia);
 router.post('/busquedaID',validarJWT,controller.busquedaID);
-router.post('/ruta',validarJWT,controller.ruta);
+router.post('/busqueda',  validarJWT,controller.busqueda);
+router.post('/ruta',      validarJWT,controller.ruta);
 
 module.exports = router;
