@@ -92,6 +92,10 @@ const ProductosSchema = Schema({
         type:String,
         require:true
     },
+    sugerencia:{
+        type:Boolean,
+        require:false
+    },
     imagen:{
         type:String,
         require:true

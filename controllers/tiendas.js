@@ -392,6 +392,7 @@ var controller = {
                         online:'$online',
                         punto_venta:'$punto_venta',
                         imagen_perfil:'$imagen_perfil',
+                        sugerencia:"$sugerencia",
                         listaProductos:{
                             $arrayElemAt:['$listaProductos',0]
                         }
@@ -417,6 +418,7 @@ var controller = {
                         online:'$online',
                         equipo:'$equipo',
                         ventas:'$ventas',
+                        sugerencia:"$sugerencia",
                         punto_venta:'$punto_venta',
                         imagen_perfil:'$imagen_perfil',
                         listaProductos:'$listaProductos.productos'
@@ -469,6 +471,7 @@ var controller = {
                         direccion:'$direccion',
                         online:'$online',
                         punto_venta:'$punto_venta',
+                        sugerencia:"$sugerencia",
                         imagen_perfil:'$imagen_perfil',
                         listaProductos:{
                             $arrayElemAt:['$listaProductos',0]
@@ -495,6 +498,7 @@ var controller = {
                         online:'$online',
                         equipo:'$equipo',
                         ventas:'$ventas',
+                        sugerencia:"$sugerencia",
                         punto_venta:'$punto_venta',
                         imagen_perfil:'$imagen_perfil',
                         listaProductos:'$listaProductos.productos'
@@ -588,6 +592,7 @@ var controller = {
                         descripcion:'$productos.descripcion',
                         descuentoP:'$productos.descuentoP',
                         descuentoC:'$productos.descuentoC',
+                        sugerencia:"$productos.sugerencias",
                         disponible:'$productos.disponible',
                         comentarios:'$productos.comentarios',
                         tienda:'$productos.tienda',
@@ -786,6 +791,7 @@ var controller = {
                         nombre:'$productos.nombre',
                         precio:'$productos.precio',
                         descripcion:'$productos.descripcion',
+                        sugerencia:'$productos.sugerencia',
                         descuentoP:'$productos.descuentoP',
                         descuentoC:'$productos.descuentoC',
                         disponible:'$productos.disponible',
@@ -1305,8 +1311,19 @@ var controller = {
             nuevaTienda,
         });
     
-    }
+    },
+    obtenerTiendaMasVendido : async (req,res) =>{
 
+    },
+    obtenerProductosMasVendido : async(req,res)=>{
+    
+    },
+    obtenerTiendaPopulares : async (req,res) =>{
+
+    },
+    obtenerProductosPopulares : async(req,res)=>{
+
+    }
 }
 
 module.exports = controller;

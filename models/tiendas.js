@@ -80,6 +80,10 @@ const TiendasSchema = Schema({
     mac:{
         type:String,
         require:true
+    },
+    sugerencia:{
+        type:Boolean,
+        require:false
     }
 },{
     timestamps:true

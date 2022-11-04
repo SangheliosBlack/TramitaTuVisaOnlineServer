@@ -28,4 +28,14 @@ router.post('/macChangue',                validarJWT,controller.macChangue);
 router.post('/getTienda',                 validarJWT,controller.searchOne);
 router.post('/busqueda',                  validarJWT,controller.busqueda);
 
+
+//pruebas
+
+router.post('obtenerProductosMasVendidos', validarJWT,controller.obtenerProductosMasVendido);
+router.post('obtenerTiendaMasVendido'),    validarJWT,controller.obtenerTiendaMasVendido;
+router.post('obtenerProductosPopular', validarJWT,controller.obtenerProductosPopulares);
+router.post('obtenerTiendaPopular'),    validarJWT,controller.obtenerTiendaPopulares;
+
+
+
 module.exports = router;
