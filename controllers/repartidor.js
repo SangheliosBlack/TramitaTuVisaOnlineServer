@@ -37,7 +37,6 @@ var controller = {
             
         }
     },
-    
     buscarEnvioPendiente: async function(req,res){
 
         const pedidos = await Venta.aggregate(

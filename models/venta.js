@@ -156,6 +156,10 @@ const VentaSchema = Schema({
     direccion:{
         type:Object,
         require:true
+    },
+    codigo_promo:{
+        type:String,
+        require:false
     }
     
 },{

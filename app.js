@@ -10,9 +10,9 @@ class Server {
 
     constructor(){
         
+        this.app = express();
         this.server = require('http').createServer(this.app);
         this.port = process.env.PORT;
-        this.app = express();
 
         module.exports.io = require('socket.io')(this.server);
         require('./sockets/socket');

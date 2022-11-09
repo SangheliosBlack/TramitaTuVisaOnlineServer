@@ -160,9 +160,13 @@ const fs = require("fs");
             
             await Usuario.findByIdAndUpdate({_id:req.uid},{$push:{'cesta.productos':producto}});
 
+            console.log('que paso');
+
             return res.status(200).json({ok:true});
 
         } catch (error) {
+
+            console.log(error);
 
             return res.status(400).json({ok:false});
 

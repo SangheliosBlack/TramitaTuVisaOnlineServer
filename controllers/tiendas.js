@@ -45,6 +45,7 @@ var controller = {
         venta.servicio = servicio;
         venta.envioPromo = codigo ? envio.toFixed(2) :0;
         venta.direccion = direccion;
+        venta.codigo_promo = codigo ? codigo : '';
     
         if(efectivo){
     
@@ -169,14 +170,13 @@ var controller = {
     
                 const data = {
                     tokenId:pedidosSchema[element].punto_venta,
-                    titulo:`${pedidosSchema[element].tienda}  Nuevo pedido`,
+                    titulo:`${pedidosSchema[element].tienda}, tienes un nuevo pedido`,
                     mensaje:'Presionar para mas detalles',
                     evento:'1',
                     pedido:JSON.stringify(pedidosSchema[element])
                 };
         
                 try{
-
                     Notificacion.sendPushToOneUser(data);
                     return res.status(200).json(venta);
 
@@ -326,7 +326,7 @@ var controller = {
     
                     const data = {
                         tokenId:pedidosSchema[element].punto_venta,
-                        titulo:`${pedidosSchema[element].tienda}  Nuevo pedido`,
+                        titulo:`${pedidosSchema[element].tienda}, tienes un nuevo pedido`,
                         mensaje:'Presionar para mas detalles',
                         evento:'1',
                         pedido:JSON.stringify(pedidosSchema[element])
@@ -800,8 +800,6 @@ var controller = {
                         opciones:'$productos.opciones',
                         subCategoria:'$productos.subCategoria'
                     }
-                },{
-                  $limit:15  
                 }
             ]
         );
@@ -810,6 +808,13 @@ var controller = {
         var separados = [];
         var contador = 1;
         var limite = 0;
+
+        var shuffledArray = productos.sort(function(){
+            return Math.random() - 0.5;
+        });
+
+        shuffledArray.splice(15,shuffledArray.length-14);
+
     
         do{
 
@@ -831,16 +836,19 @@ var controller = {
             
             }
 
-            separados[limite].productos.push(productos[index])
+            separados[limite].productos.push(shuffledArray[index])
             index++;
             contador ++;
             
-        }while(index<productos.length);
+        }while(index<shuffledArray.length);
     
+
             return res.json({
                 ok:true,
                 separados
             });
+
+        
     
     },
     obtenerTienda : async (req,res)=>{

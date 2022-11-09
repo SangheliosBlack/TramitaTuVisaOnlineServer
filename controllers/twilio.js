@@ -15,6 +15,8 @@ var controller ={
         var body = req.body;
 
         const numero = req.body.to.replace(/ /g,'');
+        
+        console.log(body.codigo+numero);
 
         if(body.hash){
             
@@ -27,6 +29,7 @@ var controller ={
                 channel:'sms',
                 appHash:body.hash
             }).then((data)=>{
+                console.log(data);
                 res.json(data);
             }).catch((e)=>{
                 console.log(e);

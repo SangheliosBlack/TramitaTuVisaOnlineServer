@@ -67,7 +67,7 @@ var controller = {
         productos:[],
         total:0,
         tarjeta:'',
-        efectivo:false,
+        efectivo:true,
         direccion:{
           titulo:'',
           coordenadas:{
@@ -228,7 +228,7 @@ var controller = {
 
   const {tokenFB} = req.body;
 
-  const numero = req.body.to.replace(/ /g,'');
+  const numero = req.body.numero.replace(/ /g,'');
 
   Usuario.find({numero_celular:numero}).
     populate('negocios').exec(async function(err,data)  {
