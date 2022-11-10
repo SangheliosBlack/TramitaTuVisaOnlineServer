@@ -178,6 +178,32 @@ var controller = {
         
                 try{
                     Notificacion.sendPushToOneUser(data);
+
+                    const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
+
+                console.log(repartidores);
+
+                if(repartidores.length >0){
+                    
+                    const data = {
+                        tokenId:repartidores[0].tokenFB,
+                        titulo:`Tienes un nuevo pedido!`,
+                        mensaje:'Presionar para mas detalles',
+                        evento:'1',
+                        pedido:JSON.stringify(pedidosSchema[element])
+                    };
+
+                    try{
+
+                        Notificacion.sendPushToOneUser(data);
+    
+                    }catch(e){
+    
+                    
+                    }
+
+                }
+
                     return res.status(200).json(venta);
 
                 }catch(e){
@@ -185,6 +211,8 @@ var controller = {
                     return res.status(200).json(venta);
                 
                 }
+
+                
     
             }
     
@@ -335,13 +363,40 @@ var controller = {
                 try{
 
                     Notificacion.sendPushToOneUser(data);
+
+                    const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
+
+                console.log(repartidores);
+
+                if(repartidores.length >0){
+                    
+                    const data = {
+                        tokenId:repartidores[0].tokenFB,
+                        titulo:`Tienes un nuevo pedido!`,
+                        mensaje:'Presionar para mas detalles',
+                        evento:'1',
+                        pedido:JSON.stringify(pedidosSchema[element])
+                    };
+
+
+                        Notificacion.sendPushToOneUser(data);
+    
+
+                }
+
                     return res.status(200).json(venta);
 
                 }catch(e){
-
+                    
                     return res.status(200).json(venta);
                 
                 }
+
+                    return res.status(200).json(venta);
+
+                
+                
+
             }
     
                 return res.status(200).json(venta);
