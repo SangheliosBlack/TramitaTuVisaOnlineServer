@@ -11,7 +11,8 @@ var controller = {
                 key: process.env.GOOGLE_GEOCODE_API,
                 bounds:'21.3533019 -101.952672',
                 language:'es-419',
-                location_type:'ROOFTOP'
+                location_type:'ROOFTOP',
+                components:'MEX|47400|Lagos de Moreno'
             }
         }).then(function(response){
             return res.json(response.data);
