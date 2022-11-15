@@ -184,7 +184,26 @@ var controller = {
                 console.log(repartidores);
 
                 if(repartidores.length >0){
-                    
+
+                    try{
+
+                        await Venta.findOneAndUpdate(
+                            {
+                                "_id":mongoose.Types.ObjectId(venta._id)
+                            },
+                            {
+                                $set:{'pedidos.$[i].repartidor':repartidores[0]._id}
+                            },
+                            {
+                                arrayFilters:[
+                                    {
+                                        "i._id":mongoose.Types.ObjectId(repartidores[0]._id)
+                                    }
+                                ]
+                            }
+                        );
+
+                                            
                     const data = {
                         tokenId:repartidores[0].tokenFB,
                         titulo:`Tienes un nuevo pedido!`,
@@ -201,6 +220,17 @@ var controller = {
     
                     
                     }
+                
+                        return res.json({ok:true});
+                
+                    }catch(e){
+                
+                        return res.json({
+                            e
+                        });
+                
+                    }
+
 
                 }
 
@@ -369,7 +399,25 @@ var controller = {
                 console.log(repartidores);
 
                 if(repartidores.length >0){
-                    
+                    try{
+
+                        await Venta.findOneAndUpdate(
+                            {
+                                "_id":mongoose.Types.ObjectId(venta._id)
+                            },
+                            {
+                                $set:{'pedidos.$[i].repartidor':repartidores[0]._id}
+                            },
+                            {
+                                arrayFilters:[
+                                    {
+                                        "i._id":mongoose.Types.ObjectId(repartidores[0]._id)
+                                    }
+                                ]
+                            }
+                        );
+
+                                            
                     const data = {
                         tokenId:repartidores[0].tokenFB,
                         titulo:`Tienes un nuevo pedido!`,
@@ -378,8 +426,24 @@ var controller = {
                         pedido:JSON.stringify(pedidosSchema[element])
                     };
 
+                    try{
 
                         Notificacion.sendPushToOneUser(data);
+    
+                    }catch(e){
+    
+                    
+                    }
+                
+                        return res.json({ok:true});
+                
+                    }catch(e){
+                
+                        return res.json({
+                            e
+                        });
+                
+                    }
     
 
                 }
@@ -392,7 +456,6 @@ var controller = {
                 
                 }
 
-                    return res.status(200).json(venta);
 
                 
                 

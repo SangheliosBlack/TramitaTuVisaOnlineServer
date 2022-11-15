@@ -4,7 +4,8 @@ const Producto = require('../models/producto');
 const Usuario = require('../models/usuario');
 const Ventas = require('../models/venta');
 const { response } = require("express");
-const moment = require('moment')
+const mongoose = require('mongoose');
+const moment = require('moment');
 
 const test= async(req,res = response) =>{
     const data = {
@@ -36,6 +37,38 @@ const repartidores = async(req,res) =>{
         res.json({ok:true, repartidores});
     }else{
         res.json({ok:false, repartidores});
+    }
+
+}
+
+const actulizarVentaRepartidor = async(req,res)=>{
+
+    try{
+
+        await Ventas.findOneAndUpdate(
+            {
+                "_id":mongoose.Types.ObjectId('636c4955f05a370be45189a7')
+            },
+            {
+                $set:{'pedidos.$[i].repartidor':'6352dde2642e410016f994fc'}
+            },
+            {
+                arrayFilters:[
+                    {
+                        "i._id":mongoose.Types.ObjectId("636c4957f05a370be45189ad")
+                    }
+                ]
+            }
+        );
+
+        return res.json({ok:true});
+
+    }catch(e){
+
+        return res.json({
+            e
+        });
+
     }
 
 }
@@ -93,5 +126,5 @@ const pedidosPendientes = async(req,res)=>{
 }
 
 module.exports = {
-    test,add,repartidores,pedidosPendientes
+    test,add,repartidores,pedidosPendientes,actulizarVentaRepartidor
 }
