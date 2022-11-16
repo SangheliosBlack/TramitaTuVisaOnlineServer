@@ -11,7 +11,7 @@ function initFirebase(){
 
 initFirebase();
 
-function sendPushToOneUser(mensaje){
+async function sendPushToOneUser(mensaje){
 
     // const message = {
     //     token:mensaje.tokenId,

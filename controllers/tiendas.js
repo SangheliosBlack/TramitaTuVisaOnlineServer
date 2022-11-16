@@ -55,6 +55,8 @@ var controller = {
                 destination: 'acct_1JOjHVPOnuOXNxOm',
                 transfer_group: venta.id
             });
+
+            console.log('efectivo');
     
             var pedidos = [];
         
@@ -66,7 +68,7 @@ var controller = {
         
                     var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
     
-                    if(datos_tienda.onlin== false){
+                    if(datos_tienda.online== false){
 
                         return res.status(400).json({ok:false});
 
@@ -177,13 +179,16 @@ var controller = {
                 };
         
                 try{
+                    
+                    console.log('entre');
+
                     Notificacion.sendPushToOneUser(data);
 
                     const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
 
-                console.log(repartidores);
+                    console.log(repartidores);
 
-                if(repartidores.length >0){
+                    if(repartidores.length >0){
 
                     try{
 
@@ -234,11 +239,9 @@ var controller = {
 
                 }
 
-                    return res.status(200).json(venta);
 
                 }catch(e){
                     
-                    return res.status(200).json(venta);
                 
                 }
 
@@ -390,63 +393,63 @@ var controller = {
                         pedido:JSON.stringify(pedidosSchema[element])
                     };
         
-                try{
+                    try{
 
                     Notificacion.sendPushToOneUser(data);
 
                     const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
 
-                console.log(repartidores);
+                    console.log(repartidores);
 
-                if(repartidores.length >0){
-                    try{
+                    if(repartidores.length >0){
+                        
+                        try{
 
-                        await Venta.findOneAndUpdate(
-                            {
-                                "_id":mongoose.Types.ObjectId(venta._id)
-                            },
-                            {
-                                $set:{'pedidos.$[i].repartidor':repartidores[0]._id}
-                            },
-                            {
-                                arrayFilters:[
-                                    {
-                                        "i._id":mongoose.Types.ObjectId(repartidores[0]._id)
-                                    }
-                                ]
-                            }
-                        );
+                            await Venta.findOneAndUpdate(
+                                {
+                                    "_id":mongoose.Types.ObjectId(venta._id)
+                                },
+                                {
+                                    $set:{'pedidos.$[i].repartidor':repartidores[0]._id}
+                                },
+                                {
+                                    arrayFilters:[
+                                        {
+                                            "i._id":mongoose.Types.ObjectId(repartidores[0]._id)
+                                        }
+                                    ]
+                                }
+                            );
 
                                             
-                    const data = {
-                        tokenId:repartidores[0].tokenFB,
-                        titulo:`Tienes un nuevo pedido!`,
-                        mensaje:'Presionar para mas detalles',
-                        evento:'1',
-                        pedido:JSON.stringify(pedidosSchema[element])
-                    };
+                            const data = {
+                                tokenId:repartidores[0].tokenFB,
+                                titulo:`Tienes un nuevo pedido!`,
+                                mensaje:'Presionar para mas detalles',
+                                evento:'1',
+                                pedido:JSON.stringify(pedidosSchema[element])
+                            };
 
-                    try{
+                            try{
 
-                        Notificacion.sendPushToOneUser(data);
+                                Notificacion.sendPushToOneUser(data);
     
-                    }catch(e){
+                            }catch(e){
     
                     
-                    }
+                            }
                 
                         return res.json({ok:true});
                 
-                    }catch(e){
+                        }catch(e){
                 
-                        return res.json({
+                            return res.json({
                             e
-                        });
+                            });
                 
-                    }
-    
+                        }
 
-                }
+                    }
 
                     return res.status(200).json(venta);
 
@@ -456,11 +459,7 @@ var controller = {
                 
                 }
 
-
-                
-                
-
-            }
+                }
     
                 return res.status(200).json(venta);
         
