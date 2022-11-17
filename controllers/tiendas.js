@@ -182,15 +182,18 @@ var controller = {
                     
                     console.log('entre');
 
-                    Notificacion.sendPushToOneUser(data);
 
                     const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
 
                     console.log(repartidores);
 
-                    if(repartidores.length >0){
+                    console.log(repartidores.length);
 
-                    try{
+                    if(repartidores.length > 0){
+
+                        console.log('entre asdasdasd');
+
+                        try{
 
                         await Venta.findOneAndUpdate(
                             {
@@ -202,11 +205,13 @@ var controller = {
                             {
                                 arrayFilters:[
                                     {
-                                        "i._id":mongoose.Types.ObjectId(repartidores[0]._id)
+                                        "i._id":mongoose.Types.ObjectId(pedidosSchema[element]._id)
                                     }
                                 ]
                             }
                         );
+
+                        console.log('pos si se armo segun yo');
 
                                             
                     const data = {
@@ -222,17 +227,15 @@ var controller = {
                         Notificacion.sendPushToOneUser(data);
     
                     }catch(e){
-    
+                        console.log(e);
                     
                     }
                 
-                        return res.json({ok:true});
                 
                     }catch(e){
                 
-                        return res.json({
-                            e
-                        });
+                        console.log(e);
+
                 
                     }
 
@@ -415,7 +418,7 @@ var controller = {
                                 {
                                     arrayFilters:[
                                         {
-                                            "i._id":mongoose.Types.ObjectId(repartidores[0]._id)
+                                            "i._id":mongoose.Types.ObjectId(pedidosSchema[element]._id)
                                         }
                                     ]
                                 }
@@ -439,13 +442,9 @@ var controller = {
                     
                             }
                 
-                        return res.json({ok:true});
                 
                         }catch(e){
                 
-                            return res.json({
-                            e
-                            });
                 
                         }
 
