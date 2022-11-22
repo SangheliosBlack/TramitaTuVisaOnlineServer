@@ -469,6 +469,7 @@ var controller = {
             ventas:pedidos,
             size:0,
             completados:0,
+            
             ganancia:calcularGananciaAprox(pedidos)
         }
         
