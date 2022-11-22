@@ -414,7 +414,7 @@ var controller = {
                     $gte : new Date(gte), 
                     $lt :  new Date(lt), 
                 },
-                repartidor:mongoose.Types.ObjectId('6246598565e106410cf6bb4a'),
+                repartidor:mongoose.Types.ObjectId(req.uid),
             }},
             {$project:{
                 "productos": "$productos",
