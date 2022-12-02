@@ -107,6 +107,14 @@ const ProductosSchema = Schema({
     sku:{
         type:String,
         require:true
+    },
+    fecha_venta:{
+        type:Date,
+        require:false
+    },
+    apartado:{
+        type:Boolean,
+        require:false
     }
 });
 

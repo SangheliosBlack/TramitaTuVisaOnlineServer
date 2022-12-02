@@ -84,6 +84,10 @@ const TiendasSchema = Schema({
     sugerencia:{
         type:Boolean,
         require:false
+    },
+    tienda_ropa:{
+        type:Boolean,
+        require:true
     }
 },{
     timestamps:true

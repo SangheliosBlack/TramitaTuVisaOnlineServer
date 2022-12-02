@@ -5,7 +5,15 @@ const { response } = require('express');
 const mongoose = require('mongoose');
 
 var controller = {
+    buscarSku:async(req,res)=>{
 
+        var producto = await ListaProductos.find({'productos.sku':'8506622579'},{'_id':0,'productos.$':1});
+
+        var producto_parse =producto[0].productos[0]
+
+        return res.json(producto_parse);
+
+    },
     nuevoProducto:async(req,res)=>{
 
         req.body.descuentoP = 0.00;
@@ -13,6 +21,13 @@ var controller = {
         req.body.disponible = true;
 
         const producto = new Producto(req.body);
+
+        producto.sku = Math.floor(100000 + Math.random() * 10000000000);
+        producto.categoria = '';
+        producto.subCategoria = '';
+        producto.imagen = '';
+        producto.tienda = req.body.tienda;
+        producto.apartado = false;
 
         await ListaProductos.findOneAndUpdate({'_id':req.body.listaProductos},{$push:{productos:producto}});
     

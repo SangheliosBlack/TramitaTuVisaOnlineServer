@@ -56,7 +56,6 @@ var controller = {
                 transfer_group: venta.id
             });
 
-            console.log('efectivo');
     
             var pedidos = [];
         
@@ -180,18 +179,12 @@ var controller = {
         
                 try{
                     
-                    console.log('entre');
-
 
                     const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
 
-                    console.log(repartidores);
-
-                    console.log(repartidores.length);
 
                     if(repartidores.length > 0){
 
-                        console.log('entre asdasdasd');
 
                         try{
 
@@ -211,7 +204,6 @@ var controller = {
                             }
                         );
 
-                        console.log('pos si se armo segun yo');
 
                                             
                     const data = {
@@ -227,14 +219,12 @@ var controller = {
                         Notificacion.sendPushToOneUser(data);
     
                     }catch(e){
-                        console.log(e);
                     
                     }
                 
                 
                     }catch(e){
                 
-                        console.log(e);
 
                 
                     }
@@ -402,7 +392,6 @@ var controller = {
 
                     const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
 
-                    console.log(repartidores);
 
                     if(repartidores.length >0){
                         
@@ -970,15 +959,15 @@ var controller = {
     obtenerTienda : async (req,res)=>{
 
         const usuario = await Usuario.findOne({_id:req.uid});
-    
+
         if(req.body.token){
     
             var tienda = await Tienda.findOne({punto_venta:req.body.token});
-    
+
             if(tienda){
     
                 const productos = await ListaProductos.findById(tienda.productos);
-            
+
                     tienda.listaProductos = productos.productos;
             
                     return res.json(   
@@ -988,7 +977,7 @@ var controller = {
     
                 if(usuario.negocios.length > 0){
                     
-                    const tienda = await Tienda.findById(usuario.negocios[0]);
+                    var tienda = await Tienda.findById(usuario.negocios[0]);
             
                     const productos = await ListaProductos.findById(tienda.productos);
             
@@ -1007,7 +996,7 @@ var controller = {
             }
     
         }else{
-    
+
             if(req.body.tienda){
     
                 const tienda = await Tienda.findById(req.body.tienda);
