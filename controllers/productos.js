@@ -11,7 +11,7 @@ var controller = {
 
         var producto_parse =producto[0].productos[0]
 
-        return res.json(producto_parse);
+        return res.json(producto_parseI );
 
     },
     nuevoProducto:async(req,res)=>{

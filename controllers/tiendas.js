@@ -465,7 +465,9 @@ var controller = {
         const tiendas = await Tienda.aggregate(
             [
                 {
-                    $match:{}
+                    $match:{
+                        tienda_ropa:false
+                    }
                 
                 },{
                     $lookup:{
@@ -545,7 +547,9 @@ var controller = {
         const listaTiendas = await Tienda.aggregate(
             [
                 {
-                    $match:{}
+                        $match:{
+                            tienda_ropa:false
+                        }
                 
                 },{
                     $lookup:{
@@ -617,7 +621,13 @@ var controller = {
         const listaProductos = await ListaProductos.aggregate(
             [
                 {
-                    $match:{}
+                    $match:{
+                        'tienda':{
+                            $not:{
+                                $eq:'Black Shop'
+                            }
+                        }
+                    }
                 },{
                     $unwind:'$productos'
                 },{
@@ -639,7 +649,6 @@ var controller = {
                 }
             ]
         );
-    
     
         var busqueda = req.body.busqueda.toLowerCase();
     
@@ -672,6 +681,8 @@ var controller = {
         var productos = autocompleteMatchProductos(busqueda)
     
         var tiendas = autocompleteMatchTiendas(busqueda);
+
+        console.log(productos);
     
         return res.json({
             ok:true,
@@ -721,7 +732,9 @@ var controller = {
         const tiendas = await Tienda.aggregate(
             [
                 {
-                    $match:{}
+                    $match:{
+                        tienda_ropa:false
+                    }
                 
                 },
                 {
@@ -823,7 +836,13 @@ var controller = {
         const categorias = await ListaProductos.aggregate(
             [
                 {
-                    $match:{}
+                    $match:{
+                        'tienda':{
+                            $not:{
+                                $eq:'Black Shop'
+                            }
+                        }
+                    }
                 },{
                     $unwind:'$productos'
                 },{
@@ -886,7 +905,13 @@ var controller = {
         const productos = await ListaProductos.aggregate(
             [
                 {
-                    $match:{}
+                    $match:{
+                        'tienda':{
+                            $not:{
+                                $eq:'Black Shop'
+                            }
+                        }
+                    }
                 },{
                     $unwind:'$productos'
                 },{
@@ -960,21 +985,29 @@ var controller = {
 
         const usuario = await Usuario.findOne({_id:req.uid});
 
+        console.log(req.body);
+
         if(req.body.token){
     
             var tienda = await Tienda.findOne({punto_venta:req.body.token});
 
-            if(tienda){
-    
-                const productos = await ListaProductos.findById(tienda.productos);
+            console.log(tienda);
 
-                    tienda.listaProductos = productos.productos;
-            
-                    return res.json(   
-                        tienda
+            if(tienda){
+
+                console.log('hay tienda');
+                
+                const productos = await ListaProductos.findById(tienda.productos);
+                
+                tienda.listaProductos = productos.productos;
+                
+                return res.json(   
+                    tienda
                     );
             }else{
-    
+                
+                console.log('no hay tienda');
+
                 if(usuario.negocios.length > 0){
                     
                     var tienda = await Tienda.findById(usuario.negocios[0]);
