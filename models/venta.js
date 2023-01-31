@@ -118,6 +118,14 @@ const VentaSchema = Schema({
                     ruta:{
                         type:Object,
                         require:true
+                    },
+                    apartado:{
+                        type:Boolean,
+                        require:false
+                    },
+                    liquidado:{
+                        type:Boolean,
+                        require:false
                     }
                 },
                 { timestamps: true }
@@ -159,6 +167,14 @@ const VentaSchema = Schema({
     },
     codigo_promo:{
         type:String,
+        require:false
+    },
+    apartado:{
+        type:Boolean,
+        require:false
+    },
+    liquidado:{
+        type:Boolean,
         require:false
     }
     

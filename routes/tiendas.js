@@ -28,6 +28,12 @@ router.post('/macChangue',                validarJWT,controller.macChangue);
 router.post('/getTienda',                 validarJWT,controller.searchOne);
 router.post('/busqueda',                  validarJWT,controller.busqueda);
 
+//lineas_tienda_ropa    
+
+router.post('/busquedaPrendaSku',validarJWT,controller.busquedaPrendaSku);
+router.post('/busquedaQRVenta',validarJWT,controller.busquedaQRVenta);
+router.post('/busquedaPrenda',validarJWT,controller.busquedaPrenda);
+
 
 //pruebas
 

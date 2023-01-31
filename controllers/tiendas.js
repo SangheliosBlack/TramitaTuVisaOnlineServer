@@ -13,6 +13,7 @@ const Ruta = require('../models/rutas');
 const mongoose = require('mongoose');
 const moment = require('moment');
 const Axios = require('axios');
+const pedido = require('../models/pedido');
 
 var controller = {
 
@@ -20,7 +21,7 @@ var controller = {
 
         var {total,tarjeta,productos,efectivo,codigo,direccion} = JSON.parse(req.body.cesta);
 
-        var {envio,usuario,servicio,customer} = req.body;
+        var {envio,usuario,servicio,customer,tienda_ropa,liquidado,apartado} = req.body;
     
         var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
     
@@ -38,7 +39,7 @@ var controller = {
     
         var venta = new Venta();
     
-        venta.total = total;
+        venta.total = tienda_ropa ? total-10.2 : total;
         venta.efectivo = efectivo;
         venta.envio = envio.toFixed(2);
         venta.usuario = usuario;
@@ -46,16 +47,12 @@ var controller = {
         venta.envioPromo = codigo ? envio.toFixed(2) :0;
         venta.direccion = direccion;
         venta.codigo_promo = codigo ? codigo : '';
+        
     
-        if(efectivo){
-    
-            await stripe.transfers.create({
-                amount: 10,
-                currency: 'mxn',
-                destination: 'acct_1JOjHVPOnuOXNxOm',
-                transfer_group: venta.id
-            });
+        if(tienda_ropa){
 
+            venta.apartado = apartado;
+            venta.liquidado = liquidado;
     
             var pedidos = [];
         
@@ -67,12 +64,6 @@ var controller = {
         
                     var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
     
-                    if(datos_tienda.online== false){
-
-                        return res.status(400).json({ok:false});
-
-                    }
-    
                     var usuarioData = await Usuario.findById({_id:usuario});
                     var usuarioVenta = new UsuarioVenta();
                     var direccion_negocio = new Direccion();
@@ -81,14 +72,6 @@ var controller = {
                     direccion_negocio.titulo = datos_tienda.direccion;
                     direccion_negocio.predeterminado = false;
                     
-                    const a = { latitude: direccion_negocio.coordenadas.latitud, longitude: direccion_negocio.coordenadas.longitud }
-                    const b = { latitude: direccion.coordenadas.lat, longitude: direccion.coordenadas.lng}
-    
-                    var p = 0.017453292519943295;
-                    var c = Math.cos;
-                    var a2 = 0.5 - c((b.latitude - a.latitude) * p) / 2 + c(a.latitude * p) * c(b.latitude * p) * (1 - c((b.longitude - a.longitude) * p)) / 2;
-                    var envioCast = 12745*Math.asin(Math.sqrt(a2));
-                    var envioMultiplicado = (envioCast<= 3 ? 19.8 :((envioCast-3)*7.2)+19.8)-0.01;
     
                     usuarioVenta.imagen = 'https://www.blogdelfotografo.com/wp-content/uploads/2020/02/apoyado12-scaled.jpg';
                     usuarioVenta.nombre = usuarioData.nombre;
@@ -102,32 +85,10 @@ var controller = {
                     subElement.efectivo = efectivo;
                     subElement.usuario = usuarioVenta;
                     subElement.tiempo_espera = datos_tienda.tiempo_espera;
-                    subElement.envio = (envioMultiplicado+8.2).toFixed(2);
+                    subElement.envio = 0;
                     subElement.direccion_negocio = direccion_negocio;
                     subElement.direccion_cliente = direccion;
                     
-                    var rutaR = await Axios.get('https://maps.googleapis.com/maps/api/directions/json',{
-
-                        params:{
-                            key:process.env.GOOGLE_DIRECTIONS_API,
-                            origin:`${direccion_negocio.coordenadas.latitud},${direccion_negocio.coordenadas.longitud}`,
-                            destination:`${direccion.coordenadas.lat},${direccion.coordenadas.lng}`,
-                            language:'es-419',
-                            region:'mx',
-                            mode:'driving'
-                        }
-
-                    });
-    
-                    var ruta = new Ruta();
-    
-                    ruta.bounds =   rutaR.data.routes[0].bounds;
-                    ruta.overview_polyline =   rutaR.data.routes[0].overview_polyline;
-                    ruta.distance = rutaR.data.routes[0].legs[0].distance;
-                    ruta.duration = rutaR.data.routes[0].legs[0].duration;
-    
-                    subElement.ruta = ruta;
-    
                     pedidos.push(subElement);
         
                 }else{
@@ -162,149 +123,64 @@ var controller = {
             }
             
             venta.pedidos = pedidosSchema;
+
+            console.log(venta);
             
             await venta.save();
     
-            await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
-    
-            for(const element in  pedidosSchema){
-    
-                const data = {
-                    tokenId:pedidosSchema[element].punto_venta,
-                    titulo:`${pedidosSchema[element].tienda}, tienes un nuevo pedido`,
-                    mensaje:'Presionar para mas detalles',
-                    evento:'1',
-                    pedido:JSON.stringify(pedidosSchema[element])
-                };
-        
-                try{
-                    
-
-                    const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
-
-
-                    if(repartidores.length > 0){
-
-
-                        try{
-
-                        await Venta.findOneAndUpdate(
-                            {
-                                "_id":mongoose.Types.ObjectId(venta._id)
-                            },
-                            {
-                                $set:{'pedidos.$[i].repartidor':repartidores[0]._id}
-                            },
-                            {
-                                arrayFilters:[
-                                    {
-                                        "i._id":mongoose.Types.ObjectId(pedidosSchema[element]._id)
-                                    }
-                                ]
-                            }
-                        );
-
-
-                                            
-                    const data = {
-                        tokenId:repartidores[0].tokenFB,
-                        titulo:`Tienes un nuevo pedido!`,
-                        mensaje:'Presionar para mas detalles',
-                        evento:'1',
-                        pedido:JSON.stringify(pedidosSchema[element])
-                    };
-
-                    try{
-
-                        Notificacion.sendPushToOneUser(data);
-    
-                    }catch(e){
-                    
-                    }
-                
-                
-                    }catch(e){
-                
-
-                
-                    }
-
-
-                }
-
-
-                }catch(e){
-                    
-                
-                }
-
-                
-    
-            }
+            await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],apartado:false,'envio_promo':codigo ? true :false});
     
             return res.status(200).json(venta);
-    
+
         }else{
+
+            if(efectivo){
     
-            const paymentIntent = await stripe.paymentIntents.create({
-                amount: total.toFixed(2)*100,
-                currency: 'mxn',
-                customer:customer,
-                payment_method_types: ['card'],
-                transfer_group: venta.id
-            });
-        
-            const paymentIntentConfirm = await stripe.paymentIntents.confirm(
-                paymentIntent.id,
-                {payment_method: tarjeta}
-            );
-        
-            if(paymentIntentConfirm.status == 'succeeded'){
-        
-                venta.metodoPago = paymentIntentConfirm;
-            
                 await stripe.transfers.create({
                     amount: 10,
                     currency: 'mxn',
                     destination: 'acct_1JOjHVPOnuOXNxOm',
                     transfer_group: venta.id
                 });
-                
+    
+        
                 var pedidos = [];
             
                 for(const element in productos){
             
                     if(!pedidos.some(elem=> elem.tienda == productos[element].tienda)){
-        
+            
                         var subElement = {};
+            
+                        var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda})
         
-                        var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda});
+                        if(datos_tienda.online== false){
     
-                        if(datos_tienda.online == false){
                             return res.status(400).json({ok:false});
+    
                         }
-                        
+        
                         var usuarioData = await Usuario.findById({_id:usuario});
                         var usuarioVenta = new UsuarioVenta();
                         var direccion_negocio = new Direccion();
-                        
+        
                         direccion_negocio.coordenadas = datos_tienda.coordenadas;
                         direccion_negocio.titulo = datos_tienda.direccion;
                         direccion_negocio.predeterminado = false;
                         
                         const a = { latitude: direccion_negocio.coordenadas.latitud, longitude: direccion_negocio.coordenadas.longitud }
                         const b = { latitude: direccion.coordenadas.lat, longitude: direccion.coordenadas.lng}
-    
+        
                         var p = 0.017453292519943295;
                         var c = Math.cos;
                         var a2 = 0.5 - c((b.latitude - a.latitude) * p) / 2 + c(a.latitude * p) * c(b.latitude * p) * (1 - c((b.longitude - a.longitude) * p)) / 2;
                         var envioCast = 12745*Math.asin(Math.sqrt(a2));
                         var envioMultiplicado = (envioCast<= 3 ? 19.8 :((envioCast-3)*7.2)+19.8)-0.01;
-    
+        
                         usuarioVenta.imagen = 'https://www.blogdelfotografo.com/wp-content/uploads/2020/02/apoyado12-scaled.jpg';
                         usuarioVenta.nombre = usuarioData.nombre;
                         usuarioVenta._id = usuarioData._id;
-                        
+                            
                         subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
                         subElement.tienda = productos[element].tienda;
                         subElement.productos = [productos[element]];
@@ -313,33 +189,34 @@ var controller = {
                         subElement.efectivo = efectivo;
                         subElement.usuario = usuarioVenta;
                         subElement.tiempo_espera = datos_tienda.tiempo_espera;
-                        subElement.envio = (envioMultiplicado+8.2);
+                        subElement.envio = (envioMultiplicado+8.2).toFixed(2);
                         subElement.direccion_negocio = direccion_negocio;
                         subElement.direccion_cliente = direccion;
                         
-                        
                         var rutaR = await Axios.get('https://maps.googleapis.com/maps/api/directions/json',{
+    
                             params:{
-                            key:process.env.GOOGLE_DIRECTIONS_API,
-                            origin:`${direccion_negocio.coordenadas.latitud},${direccion_negocio.coordenadas.longitud}`,
-                            destination:`${direccion.coordenadas.lat},${direccion.coordenadas.lng}`,
-                            language:'es-419',
-                            region:'mx',
-                            mode:'driving'
+                                key:process.env.GOOGLE_DIRECTIONS_API,
+                                origin:`${direccion_negocio.coordenadas.latitud},${direccion_negocio.coordenadas.longitud}`,
+                                destination:`${direccion.coordenadas.lat},${direccion.coordenadas.lng}`,
+                                language:'es-419',
+                                region:'mx',
+                                mode:'driving'
                             }
+    
                         });
-    
+        
                         var ruta = new Ruta();
-    
+        
                         ruta.bounds =   rutaR.data.routes[0].bounds;
                         ruta.overview_polyline =   rutaR.data.routes[0].overview_polyline;
                         ruta.distance = rutaR.data.routes[0].legs[0].distance;
                         ruta.duration = rutaR.data.routes[0].legs[0].duration;
-    
+        
                         subElement.ruta = ruta;
-    
+        
                         pedidos.push(subElement);
-
+            
                     }else{
             
                         var objIndex = pedidos.findIndex((obj => obj.tienda == productos[element].tienda));
@@ -360,14 +237,15 @@ var controller = {
                     pedidosModel.confirmado = false;
                     pedidosModel.createdAt = new Date();
                     pedidosModel.updatedAt = new Date();
+    
                     pedidosModel.repartidor_domicilio = false;
                     pedidosModel.repartidor_calificado = false;
+        
                     pedidosModel.id_venta = venta._id;
                     pedidosModel.codigo_repartidor = Math.floor(1000 + Math.random() * 9000);
                     pedidosModel.codigo_cliente = Math.floor(1000 + Math.random() * 9000);
-                    
+        
                     pedidosSchema.push(pedidosModel);
-                    
                 }
                 
                 venta.pedidos = pedidosSchema;
@@ -375,9 +253,9 @@ var controller = {
                 await venta.save();
         
                 await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
-                
+        
                 for(const element in  pedidosSchema){
-    
+        
                     const data = {
                         tokenId:pedidosSchema[element].punto_venta,
                         titulo:`${pedidosSchema[element].tienda}, tienes un nuevo pedido`,
@@ -385,18 +263,18 @@ var controller = {
                         evento:'1',
                         pedido:JSON.stringify(pedidosSchema[element])
                     };
-        
+            
                     try{
-
-                    Notificacion.sendPushToOneUser(data);
-
-                    const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
-
-
-                    if(repartidores.length >0){
                         
-                        try{
-
+    
+                        const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
+    
+    
+                        if(repartidores.length > 0){
+    
+    
+                            try{
+    
                             await Venta.findOneAndUpdate(
                                 {
                                     "_id":mongoose.Types.ObjectId(venta._id)
@@ -412,52 +290,265 @@ var controller = {
                                     ]
                                 }
                             );
-
-                                            
-                            const data = {
-                                tokenId:repartidores[0].tokenFB,
-                                titulo:`Tienes un nuevo pedido!`,
-                                mensaje:'Presionar para mas detalles',
-                                evento:'1',
-                                pedido:JSON.stringify(pedidosSchema[element])
-                            };
-
-                            try{
-
-                                Notificacion.sendPushToOneUser(data);
     
-                            }catch(e){
     
-                    
-                            }
-                
-                
+                                                
+                        const data = {
+                            tokenId:repartidores[0].tokenFB,
+                            titulo:`Tienes un nuevo pedido!`,
+                            mensaje:'Presionar para mas detalles',
+                            evento:'1',
+                            pedido:JSON.stringify(pedidosSchema[element])
+                        };
+    
+                        try{
+    
+                            Notificacion.sendPushToOneUser(data);
+        
                         }catch(e){
-                
-                
+                        
                         }
-
-                    }
-
-                    return res.status(200).json(venta);
-
-                }catch(e){
                     
-                    return res.status(200).json(venta);
-                
-                }
-
-                }
+                    
+                        }catch(e){
+                    
     
+                    
+                        }
+    
+    
+                    }
+    
+    
+                    }catch(e){
+                        
+                    
+                    }
+    
+                    
+        
+                }
+        
                 return res.status(200).json(venta);
         
             }else{
         
-                return res.status(400).json({ok:false,msg:paymentIntentConfirm.status});
+                const paymentIntent = await stripe.paymentIntents.create({
+                    amount: total.toFixed(2)*100,
+                    currency: 'mxn',
+                    customer:customer,
+                    payment_method_types: ['card'],
+                    transfer_group: venta.id
+                });
+            
+                const paymentIntentConfirm = await stripe.paymentIntents.confirm(
+                    paymentIntent.id,
+                    {payment_method: tarjeta}
+                );
+            
+                if(paymentIntentConfirm.status == 'succeeded'){
+            
+                    venta.metodoPago = paymentIntentConfirm;
+                
+                    await stripe.transfers.create({
+                        amount: 10,
+                        currency: 'mxn',
+                        destination: 'acct_1JOjHVPOnuOXNxOm',
+                        transfer_group: venta.id
+                    });
+                    
+                    var pedidos = [];
+                
+                    for(const element in productos){
+                
+                        if(!pedidos.some(elem=> elem.tienda == productos[element].tienda)){
+            
+                            var subElement = {};
+            
+                            var datos_tienda = await Tienda.findOne({'nombre':productos[element].tienda});
+        
+                            if(datos_tienda.online == false){
+                                return res.status(400).json({ok:false});
+                            }
+                            
+                            var usuarioData = await Usuario.findById({_id:usuario});
+                            var usuarioVenta = new UsuarioVenta();
+                            var direccion_negocio = new Direccion();
+                            
+                            direccion_negocio.coordenadas = datos_tienda.coordenadas;
+                            direccion_negocio.titulo = datos_tienda.direccion;
+                            direccion_negocio.predeterminado = false;
+                            
+                            const a = { latitude: direccion_negocio.coordenadas.latitud, longitude: direccion_negocio.coordenadas.longitud }
+                            const b = { latitude: direccion.coordenadas.lat, longitude: direccion.coordenadas.lng}
+        
+                            var p = 0.017453292519943295;
+                            var c = Math.cos;
+                            var a2 = 0.5 - c((b.latitude - a.latitude) * p) / 2 + c(a.latitude * p) * c(b.latitude * p) * (1 - c((b.longitude - a.longitude) * p)) / 2;
+                            var envioCast = 12745*Math.asin(Math.sqrt(a2));
+                            var envioMultiplicado = (envioCast<= 3 ? 19.8 :((envioCast-3)*7.2)+19.8)-0.01;
+        
+                            usuarioVenta.imagen = 'https://www.blogdelfotografo.com/wp-content/uploads/2020/02/apoyado12-scaled.jpg';
+                            usuarioVenta.nombre = usuarioData.nombre;
+                            usuarioVenta._id = usuarioData._id;
+                            
+                            subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
+                            subElement.tienda = productos[element].tienda;
+                            subElement.productos = [productos[element]];
+                            subElement.imagen = datos_tienda.imagen_perfil;
+                            subElement.punto_venta = datos_tienda.punto_venta;
+                            subElement.efectivo = efectivo;
+                            subElement.usuario = usuarioVenta;
+                            subElement.tiempo_espera = datos_tienda.tiempo_espera;
+                            subElement.envio = (envioMultiplicado+8.2);
+                            subElement.direccion_negocio = direccion_negocio;
+                            subElement.direccion_cliente = direccion;
+                            
+                            
+                            var rutaR = await Axios.get('https://maps.googleapis.com/maps/api/directions/json',{
+                                params:{
+                                key:process.env.GOOGLE_DIRECTIONS_API,
+                                origin:`${direccion_negocio.coordenadas.latitud},${direccion_negocio.coordenadas.longitud}`,
+                                destination:`${direccion.coordenadas.lat},${direccion.coordenadas.lng}`,
+                                language:'es-419',
+                                region:'mx',
+                                mode:'driving'
+                                }
+                            });
+        
+                            var ruta = new Ruta();
+        
+                            ruta.bounds =   rutaR.data.routes[0].bounds;
+                            ruta.overview_polyline =   rutaR.data.routes[0].overview_polyline;
+                            ruta.distance = rutaR.data.routes[0].legs[0].distance;
+                            ruta.duration = rutaR.data.routes[0].legs[0].duration;
+        
+                            subElement.ruta = ruta;
+        
+                            pedidos.push(subElement);
+    
+                        }else{
+                
+                            var objIndex = pedidos.findIndex((obj => obj.tienda == productos[element].tienda));
+                            pedidos[objIndex].total = pedidos[objIndex].total + ((productos[element].precio + productos[element].extra) * productos[element].cantidad);
+                            pedidos[objIndex].productos.push(productos[element]);
+                            
+                        }
+                    }
+                
+                    var pedidosSchema = [];
+                    
+                    for(const element in pedidos){
+                        
+                        var pedidosModel = new Pedido(pedidos[element]);
+                
+                        pedidosModel.entregado_cliente = false;
+                        pedidosModel.entregado_repartidor = false;
+                        pedidosModel.confirmado = false;
+                        pedidosModel.createdAt = new Date();
+                        pedidosModel.updatedAt = new Date();
+                        pedidosModel.repartidor_domicilio = false;
+                        pedidosModel.repartidor_calificado = false;
+                        pedidosModel.id_venta = venta._id;
+                        pedidosModel.codigo_repartidor = Math.floor(1000 + Math.random() * 9000);
+                        pedidosModel.codigo_cliente = Math.floor(1000 + Math.random() * 9000);
+                        
+                        pedidosSchema.push(pedidosModel);
+                        
+                    }
+                    
+                    venta.pedidos = pedidosSchema;
+                    
+                    await venta.save();
+            
+                    await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
+                    
+                    for(const element in  pedidosSchema){
+        
+                        const data = {
+                            tokenId:pedidosSchema[element].punto_venta,
+                            titulo:`${pedidosSchema[element].tienda}, tienes un nuevo pedido`,
+                            mensaje:'Presionar para mas detalles',
+                            evento:'1',
+                            pedido:JSON.stringify(pedidosSchema[element])
+                        };
+            
+                        try{
+    
+                        Notificacion.sendPushToOneUser(data);
+    
+                        const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
+    
+    
+                        if(repartidores.length >0){
+                            
+                            try{
+    
+                                await Venta.findOneAndUpdate(
+                                    {
+                                        "_id":mongoose.Types.ObjectId(venta._id)
+                                    },
+                                    {
+                                        $set:{'pedidos.$[i].repartidor':repartidores[0]._id}
+                                    },
+                                    {
+                                        arrayFilters:[
+                                            {
+                                                "i._id":mongoose.Types.ObjectId(pedidosSchema[element]._id)
+                                            }
+                                        ]
+                                    }
+                                );
+    
+                                                
+                                const data = {
+                                    tokenId:repartidores[0].tokenFB,
+                                    titulo:`Tienes un nuevo pedido!`,
+                                    mensaje:'Presionar para mas detalles',
+                                    evento:'1',
+                                    pedido:JSON.stringify(pedidosSchema[element])
+                                };
+    
+                                try{
+    
+                                    Notificacion.sendPushToOneUser(data);
+        
+                                }catch(e){
+        
+                        
+                                }
+                    
+                    
+                            }catch(e){
+                    
+                    
+                            }
+    
+                        }
+    
+                        return res.status(200).json(venta);
+    
+                    }catch(e){
+                        
+                        return res.status(200).json(venta);
+                    
+                    }
+    
+                    }
+        
+                    return res.status(200).json(venta);
+            
+                }else{
+            
+                    return res.status(400).json({ok:false,msg:paymentIntentConfirm.status});
+            
+                }
         
             }
-    
+
         }
+
+        
 
     },
     construirPantallaPrincipalTiendas:async (req,res)=>{
@@ -659,7 +750,7 @@ var controller = {
             var reg = new RegExp(input)
             
             return listaProductos.filter(function(term) {
-                if (term.nombre.toLowerCase().match(reg)) {
+                if (term.categorias.toLowerCase().match(reg)) {
                   return term;
                 }
             });
@@ -689,6 +780,110 @@ var controller = {
             productos,
             tiendas
         })
+
+    },
+    busquedaPrendaSku: async(req,res)=> {
+
+        const listaProductos = await ListaProductos.aggregate(
+            [
+                {
+                    $match:{
+                        'tienda':{
+                                $eq:'Black Shop'
+                        }
+                    }
+                },{
+                    $unwind:'$productos'
+                },{
+                    $project:{
+                        _id:'$productos._id',
+                        precio:'$productos.precio',
+                        nombre:'$productos.nombre',
+                        descuentoP:'$productos.descuentoP',
+                        descuentoC:'$productos.descuentoC',
+                        descripcion:'$productos.descripcion',
+                        disponible:'$productos.disponible',
+                        categorias:'$productos.categoria',
+                        imagen:'$productos.imagen',
+                        comentarios:'$productos.comentarios',
+                        opciones:'$productos.opciones',
+                        tienda:'$productos.tienda',
+                        sku:'$productos.sku'
+                    }
+                }
+            ]
+        );
+
+         function autocompleteMatchProductos(input) {
+            if (input == '') {
+              return [];
+            }
+            var reg = new RegExp(input)
+            
+            return listaProductos.filter(function(term) {
+                if (term.sku.toLowerCase().match(reg)) {
+                  return term;
+                }
+            });
+        }
+
+        return res.status(200).json({
+            productos:autocompleteMatchProductos(listaProductos)
+        });
+
+    },
+    busquedaPrenda: async(req,res)=> {
+
+        const listaProductos = await ListaProductos.aggregate(
+            [
+                {
+                    $match:{
+                        'tienda':{
+                                $eq:'Black Shop'
+                        }
+                    }
+                },{
+                    $unwind:'$productos'
+                },{
+                    $project:{
+                        _id:'$productos._id',
+                        precio:'$productos.precio',
+                        nombre:'$productos.nombre',
+                        descuentoP:'$productos.descuentoP',
+                        descuentoC:'$productos.descuentoC',
+                        descripcion:'$productos.descripcion',
+                        disponible:'$productos.disponible',
+                        categorias:'$productos.categoria',
+                        imagen:'$productos.imagen',
+                        comentarios:'$productos.comentarios',
+                        opciones:'$productos.opciones',
+                        tienda:'$productos.tienda',
+                        sku:'$productos.sku'
+                    }
+                }
+            ]
+        );
+
+        var busqueda = req.body.busqueda.toLowerCase();
+
+         function autocompleteMatchProductos(input) {
+            if (input == '') {
+              return [];
+            }
+            var reg = new RegExp(input)
+            
+            return listaProductos.filter(function(term) {
+                if (term.nombre.toLowerCase().match(reg) || term.sku.match(reg)) {
+                  return term;
+                }
+            });
+        }
+
+        return res.status(200).json({
+            ok:true,
+            productos:autocompleteMatchProductos(busqueda),
+            tiendas:[]
+        });
 
     },
     verTodoProductos:async(req,res)=>{
@@ -1201,9 +1396,13 @@ var controller = {
             tienda_nombre.nombre = tienda.nombre;
         }
     
+        console.log(req.body);
+
+        var tienda_ropa =  req.body.tienda_ropa;
     
         if(req.body.filtro){
     
+
     
             let text = req.body.filtro;
     
@@ -1235,7 +1434,7 @@ var controller = {
             [
             {$match:{}},
             {$unwind:'$pedidos'},
-            {$project:{'pedido':'$pedidos'}},
+            {$project:{'pedido':'$pedidos','apartado':'$apartado','liquidado':'$liquidado'}},
             {$project:{
                 "productos": "$pedido.productos",
                 "_id": "$pedido._id",
@@ -1267,7 +1466,9 @@ var controller = {
                 "direccion_cliente":'$pedido.direccion_cliente',
                 "direccion_negocio":'$pedido.direccion_negocio',
                 "envio":'$pedido.envio',
-                "ruta":"$pedido.ruta"
+                "ruta":"$pedido.ruta",
+                "apartado":"$apartado",
+                "liquidado":"$liquidado",
             }},
             {
                 $match:{
@@ -1285,7 +1486,6 @@ var controller = {
                     as:'repartidor'
                 }
             },
-            
             {$project:{
                 "productos": "$productos",
                 "_id": "$_id",
@@ -1318,6 +1518,8 @@ var controller = {
                 "direccion_negocio":'$direccion_negocio',
                 "envio":'$envio',
                 "ruta":"$ruta",
+                "apartado":"$apartado",
+                "liquidado":"$liquidado",
                 "fix":true
             }},{
                 $sort:{
@@ -1341,7 +1543,15 @@ var controller = {
     
             var ganancia = 0;
     
-            pedidos.forEach(element => ganancia += element.entregado_repartidor ? element.total :0 );
+            if(tienda_ropa){
+
+                pedidos.forEach(element => ganancia +=  element.total );
+
+            }else{
+
+                pedidos.forEach(element => ganancia += element.entregado_repartidor ? element.total :0 );
+
+            }
     
             return ganancia;
             
@@ -1468,6 +1678,181 @@ var controller = {
 
     },
     obtenerProductosPopulares : async(req,res)=>{
+
+    },
+    busquedaQRVenta: async(req,res)=>{
+
+        console.log(req.body.qr);
+
+        try{
+
+            var pedidos = await Venta.aggregate(
+                [
+                {$match:{'_id': mongoose.Types.ObjectId(req.body.qr)}},
+                {$unwind:'$pedidos'},
+                
+                {$project:{'pedido':'$pedidos'}},
+                {$project:{
+                    "productos": "$pedido.productos",
+                    "_id": "$pedido._id",
+                    "total": "$pedido.total",
+                    "tienda": "$pedido.tienda",
+                    "imagen": "$pedido.imagen",
+                    "ubicacion":"$pedido.ubicacion",
+                    "direccion":"$pedido.direccion" ,
+                    "punto_venta":"$pedido.punto_venta" ,
+                    "efectivo":"$pedido.efectivo" ,
+                    "usuario":"$pedido.usuario" ,
+                    "confirmado":"$pedido.confirmado",
+                    "createdAt":"$pedido.createdAt",
+                    "updatedAt":"$pedido.updatedAt",
+                    "tiempo_espera":"$pedido.tiempo_espera",
+                    "entregado_cliente":"$pedido.entregado_cliente" ,
+                    "entregado_repartidor":"$pedido.entregado_repartidor",
+                    "confirmacion_tiempo":"$pedido.confirmacion_tiempo",
+                    "entrega_repartidor_tiempo":"$pedido.entrega_repartidor_tiempo",
+                    "entrega_cliente_tiempo":"$pedido.entrega_cliente_tiempo",
+                    "codigo_repartidor":"$pedido.codigo_repartidor",
+                    "codigo_cliente":"$pedido.codigo_cliente",
+                    "id_venta":"$pedido.id_venta",
+                    "repartidor_domicilio":"$pedido.repartidor_domicilio",
+                    "repartidor_domicilio_tiempo":"$pedido.repartidor_domicilio_tiempo",
+                    "repartidor_calificado":"$pedido.repartidor_calificado",
+                    "repartidor_calificado_tiempo":"$pedido.repartidor_calificado_tiempo",
+                    "direccion_cliente":'$pedido.direccion_cliente',
+                    "direccion_negocio":'$pedido.direccion_negocio',
+                    "envio":'$pedido.envio',
+                    "ruta":"$pedido.ruta"
+                }},
+                
+                
+            ]);
+
+
+    
+            if(pedidos.length > 0){
+
+                var venta_general = await Venta.findById(req.body.qr);
+
+                venta_general.pedidos = pedidos[0];
+
+                console.log(venta_general);
+    
+                return res.status(200).json(venta_general);
+    
+            }else{
+    
+                return res.status(400);
+    
+            }
+
+        }catch(e){
+
+            console.log('error');
+            console.log(e);
+
+            return res.status(400);
+
+        }
+
+
+    },
+    busquedaApartados: async(req,res)=>{
+
+        const pedidos = await Venta.aggregate(
+            [
+            {$match:{}},
+            {$unwind:'$pedidos'},
+            {$project:{'pedido':'$pedidos'}},
+            {$project:{
+                "productos": "$pedido.productos",
+                "_id": "$pedido._id",
+                "total": "$pedido.total",
+                "tienda": "$pedido.tienda",
+                "repartidor": "$pedido.repartidor",
+                "imagen": "$pedido.imagen",
+                "ubicacion":"$pedido.ubicacion",
+                "direccion":"$pedido.direccion" ,
+                "punto_venta":"$pedido.punto_venta" ,
+                "efectivo":"$pedido.efectivo" ,
+                "usuario":"$pedido.usuario" ,
+                "confirmado":"$pedido.confirmado",
+                "createdAt":"$pedido.createdAt",
+                "updatedAt":"$pedido.updatedAt",
+                "tiempo_espera":"$pedido.tiempo_espera",
+                "entregado_cliente":"$pedido.entregado_cliente" ,
+                "entregado_repartidor":"$pedido.entregado_repartidor",
+                "confirmacion_tiempo":"$pedido.confirmacion_tiempo",
+                "entrega_repartidor_tiempo":"$pedido.entrega_repartidor_tiempo",
+                "entrega_cliente_tiempo":"$pedido.entrega_cliente_tiempo",
+                "codigo_repartidor":"$pedido.codigo_repartidor",
+                "codigo_cliente":"$pedido.codigo_cliente",
+                "id_venta":"$pedido.id_venta",
+                "repartidor_domicilio":"$pedido.repartidor_domicilio",
+                "repartidor_domicilio_tiempo":"$pedido.repartidor_domicilio_tiempo",
+                "repartidor_calificado":"$pedido.repartidor_calificado",
+                "repartidor_calificado_tiempo":"$pedido.repartidor_calificado_tiempo",
+                "direccion_cliente":'$pedido.direccion_cliente',
+                "direccion_negocio":'$pedido.direccion_negocio',
+                "envio":'$pedido.envio',
+                "ruta":"$pedido.ruta"
+            }},
+            {
+                $match:{
+                'tienda': tienda_nombre.nombre,
+                'createdAt':{
+                    $gte : new Date(gte), 
+                    $lt :  new Date(lt), 
+                }
+            }},
+            {
+                $lookup:{
+                    from:'usuarios',
+                    localField:'repartidor',
+                    foreignField:'_id',
+                    as:'repartidor'
+                }
+            },
+            {$project:{
+                "productos": "$productos",
+                "_id": "$_id",
+                "total": "$total",
+                "tienda": "$tienda",
+                "repartidor": {$arrayElemAt:["$repartidor",0]},
+                "imagen": "$imagen",
+                "ubicacion":"$ubicacion",
+                "direccion":"$direccion" ,
+                "punto_venta":"$punto_venta" ,
+                "efectivo":"$efectivo" ,
+                "usuario":"$usuario" ,
+                "confirmado":"$confirmado",
+                "createdAt":"$createdAt",
+                "updatedAt":"$updatedAt",
+                "tiempo_espera":"$tiempo_espera",
+                "entregado_cliente":"$entregado_cliente" ,
+                "entregado_repartidor":"$entregado_repartidor",
+                "confirmacion_tiempo":"$confirmacion_tiempo",
+                "entrega_repartidor_tiempo":"$entrega_repartidor_tiempo",
+                "entrega_cliente_tiempo":"$entrega_cliente_tiempo",
+                "codigo_repartidor":"$codigo_repartidor",
+                "codigo_cliente":"$codigo_cliente",
+                "id_venta":"$id_venta",
+                "repartidor_domicilio":"$repartidor_domicilio",
+                "repartidor_domicilio_tiempo":"$repartidor_domicilio_tiempo",
+                "repartidor_calificado":"$repartidor_calificado",
+                "repartidor_calificado_tiempo":"$repartidor_calificado_tiempo",
+                "direccion_cliente":'$direccion_cliente',
+                "direccion_negocio":'$direccion_negocio',
+                "envio":'$envio',
+                "ruta":"$ruta",
+                "fix":true
+            }},{
+                $sort:{
+                    "createdAt":-1
+                }
+            }
+            
+        ])
 
     }
 }

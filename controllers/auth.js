@@ -65,6 +65,7 @@ var controller = {
       usuario.tokenFB = req.body.tokenFB;
       usuario.cesta ={
         productos:[],
+        apartado:false,
         total:0,
         tarjeta:'',
         efectivo:true,

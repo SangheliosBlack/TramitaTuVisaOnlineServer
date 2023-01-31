@@ -20,6 +20,9 @@ var controller = {
         req.body.descuentoC = 0.00;
         req.body.disponible = true;
 
+
+        console.log(req.body);
+
         const producto = new Producto(req.body);
 
         producto.sku = Math.floor(100000 + Math.random() * 10000000000);
