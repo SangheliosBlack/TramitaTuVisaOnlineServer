@@ -14,6 +14,27 @@ var controller = {
         return res.json(producto_parseI );
 
     },
+    eliminarProducto:async(req,res)=>{
+
+        var {lista_productos,id_producto} = req.body;
+
+        try {
+        
+            await ListaProductos.updateMany({ '_id':lista_productos},{ $pull: { "productos._id": id_producto}},)
+    
+            return res.json({
+                ok:true
+            });
+    
+        } catch (error) {
+            
+            return res.json({
+                true:false
+            });
+    
+        }
+
+    },
     nuevoProducto:async(req,res)=>{
 
         req.body.descuentoP = 0.00;
