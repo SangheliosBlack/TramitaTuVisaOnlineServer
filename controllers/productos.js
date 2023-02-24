@@ -20,7 +20,7 @@ var controller = {
 
         try {
         
-            await ListaProductos.updateMany({ '_id':lista_productos},{ $pull: { "productos._id": id_producto}},)
+            await ListaProductos.updateMany({ 'nombre':lista_productos},{ $pull: { "productos._id": id_producto}},)
     
             return res.json({
                 ok:true
@@ -62,33 +62,31 @@ var controller = {
     },
     modificarProducto: async(req,res)=>{
 
+        const {lista_uid,producto_uid,talla,nombre,precio,cantidad} = req.body;
+
         try{
 
             await ListaProductos.findOneAndUpdate(
                 {
-                    _id:req.body.uid,'productos._id':mongoose.Types.ObjectId(req.body.producto_uid)
+                    _id:lista_uid,'productos._id':mongoose.Types.ObjectId(producto_uid)
                 },
                 {
                     $set:{
-                        'productos.$.categoria':req.body.categoria,
-                        'productos.$.nombre':req.body.nombre,
-                        'productos.$.nombre':req.body.nombre,
-                        'productos.$.precio':req.body.precio,
-                        'productos.$.descripcion':req.body.descripcion,
-                        'productos.$.descuentoP':req.body.descuentoP,
-                        'productos.$.descuentoC':req.body.descuentoC,
-                        'productos.$.disponible':req.body.disponible,
+                        'productos.$.descripcion':talla,
+                        'productos.$.cantidad':cantidad,
+                        'productos.$.nombre':nombre,
+                        'productos.$.precio':precio,
                     }
                 }
             );
         
-            return res.json({
+            return res.status(200).json({
                 ok:true
             });
+
         }catch(e){
-            return res.json({
-    e
-            });
+
+            return res.status(400);
         }
         
     }

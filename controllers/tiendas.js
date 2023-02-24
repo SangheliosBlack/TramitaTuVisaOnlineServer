@@ -17,6 +17,7 @@ const pedido = require('../models/pedido');
 
 var controller = {
 
+    
     crearPedido:async (req,res)=>{
 
         var {total,tarjeta,productos,efectivo,codigo,direccion} = JSON.parse(req.body.cesta);
@@ -263,6 +264,14 @@ var controller = {
                         evento:'1',
                         pedido:JSON.stringify(pedidosSchema[element])
                     };
+
+                    try{
+    
+                        Notificacion.sendPushToOneUser(data);
+    
+                    }catch(e){
+                    
+                    }
             
                     try{
                         
