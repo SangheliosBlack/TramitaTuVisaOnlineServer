@@ -2178,7 +2178,7 @@ var controller = {
             nuevoAbono.titulo = 'Abono';
     
             await Venta.findByIdAndUpdate({'_id':req.body.ventaId},{$push:{abonos:nuevoAbono}});
-            await Venta.findByIdAndUpdate({'_id':req.body.ventaId},{$set:{liquidado:liquidado}});
+            await Venta.findByIdAndUpdate({'_id':req.body.ventaId},{$set:{liquidado:req.body.liquidado}});
     
             res.status(200).json({
                 ok:true
