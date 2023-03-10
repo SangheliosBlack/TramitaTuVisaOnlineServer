@@ -88,6 +88,10 @@ const TiendasSchema = Schema({
     tienda_ropa:{
         type:Boolean,
         require:true
+    },
+    promociones:{
+        type:Array,
+        require:false
     }
 },{
     timestamps:true

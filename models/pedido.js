@@ -116,6 +116,18 @@ const PedidoSchema = Schema({
     liquidado:{
         type:Boolean,
         require:false
+    },
+    abonos:{
+        type:Array,
+        require:false
+    },
+    total_safe:{
+        type:Number,
+        require:false
+    },
+    concepto_titulo:{
+        type:String,
+        require:false
     }
     
 },{

@@ -3,6 +3,7 @@ const Producto = require('../models/producto');
 const Tiendas = require('../models/tiendas');
 const { response } = require('express');
 const mongoose = require('mongoose');
+const { body } = require('express-validator');
 
 var controller = {
     buscarSku:async(req,res)=>{
@@ -11,7 +12,7 @@ var controller = {
 
         var producto_parse =producto[0].productos[0]
 
-        return res.json(producto_parseI );
+        return res.json(producto_parse );
 
     },
     eliminarProducto:async(req,res)=>{
@@ -64,6 +65,8 @@ var controller = {
 
         const {lista_uid,producto_uid,talla,nombre,precio,cantidad} = req.body;
 
+        console.log(req.body);
+
         try{
 
             await ListaProductos.findOneAndUpdate(
@@ -85,6 +88,8 @@ var controller = {
             });
 
         }catch(e){
+
+            console.log(e);
 
             return res.status(400);
         }

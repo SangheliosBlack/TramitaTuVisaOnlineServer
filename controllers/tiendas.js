@@ -14,15 +14,19 @@ const mongoose = require('mongoose');
 const moment = require('moment');
 const Axios = require('axios');
 const pedido = require('../models/pedido');
+const Abono = require('../models/abono');
+const { json } = require('express');
 
 var controller = {
 
     
     crearPedido:async (req,res)=>{
 
+        console.log(req.body);
+
         var {total,tarjeta,productos,efectivo,codigo,direccion} = JSON.parse(req.body.cesta);
 
-        var {envio,usuario,servicio,customer,tienda_ropa,liquidado,apartado} = req.body;
+        var {abonoReq,envio,usuario,servicio,customer,tienda_ropa,liquidado,apartado} = req.body;
     
         var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
     
@@ -49,15 +53,66 @@ var controller = {
         venta.direccion = direccion;
         venta.codigo_promo = codigo ? codigo : '';
         
+        
     
         if(tienda_ropa){
 
             venta.apartado = apartado;
             venta.liquidado = liquidado;
+            
+
+            if(venta.apartado){
+
+                var abonos = [];
+
+                var abono = new Abono();
+
+                abono.fecha = new Date();
+                abono.cantidad =  abonoReq;
+                abono.titulo = 'Apartado'
+
+                abonos.push(abono);
+
+                venta.abonos = abonos;
+
+            }else{
+
+                var abonos = [];
+
+                var abono = new Abono();
+
+                abono.fecha = new Date();
+                abono.cantidad =   total-10.2;
+                abono.titulo = 'Compra'
+
+                abonos.push(abono);
+
+                venta.abonos = abonos;
+
+            }
     
             var pedidos = [];
         
             for(const element in productos){
+
+                await ListaProductos.updateMany(
+                
+                    {
+                        "tienda":productos[element].tienda,
+                    },{
+                        $inc:{
+                            'productos.$[i].cantidad':-productos[element].cantidad,
+                        }
+                    },
+                    {
+                        arrayFilters:[
+                            {
+                                "i._id":mongoose.Types.ObjectId(productos[element]._id),
+                            }
+                        ]
+                    }
+                    
+                )
         
                 if(!pedidos.some(elem=> elem.tienda == productos[element].tienda)){
         
@@ -99,6 +154,9 @@ var controller = {
                     pedidos[objIndex].productos.push(productos[element]);
                     
                 }
+
+
+
             }
         
             var pedidosSchema = [];
@@ -124,8 +182,8 @@ var controller = {
             }
             
             venta.pedidos = pedidosSchema;
+            venta.negocio = pedidosSchema[0].tienda;
 
-            console.log(venta);
             
             await venta.save();
     
@@ -250,6 +308,7 @@ var controller = {
                 }
                 
                 venta.pedidos = pedidosSchema;
+                venta.abonos = [];
                 
                 await venta.save();
         
@@ -467,6 +526,7 @@ var controller = {
                     }
                     
                     venta.pedidos = pedidosSchema;
+                    venta.abonos = [];
                     
                     await venta.save();
             
@@ -782,7 +842,6 @@ var controller = {
     
         var tiendas = autocompleteMatchTiendas(busqueda);
 
-        console.log(productos);
     
         return res.json({
             ok:true,
@@ -1189,17 +1248,14 @@ var controller = {
 
         const usuario = await Usuario.findOne({_id:req.uid});
 
-        console.log(req.body);
 
         if(req.body.token){
     
             var tienda = await Tienda.findOne({punto_venta:req.body.token});
 
-            console.log(tienda);
 
             if(tienda){
 
-                console.log('hay tienda');
                 
                 const productos = await ListaProductos.findById(tienda.productos);
                 
@@ -1210,7 +1266,6 @@ var controller = {
                     );
             }else{
                 
-                console.log('no hay tienda');
 
                 if(usuario.negocios.length > 0){
                     
@@ -1405,7 +1460,6 @@ var controller = {
             tienda_nombre.nombre = tienda.nombre;
         }
     
-        console.log(req.body);
 
         var tienda_ropa =  req.body.tienda_ropa;
     
@@ -1443,7 +1497,7 @@ var controller = {
             [
             {$match:{}},
             {$unwind:'$pedidos'},
-            {$project:{'pedido':'$pedidos','apartado':'$apartado','liquidado':'$liquidado'}},
+            {$project:{'pedido':'$pedidos','apartado':'$apartado','liquidado':'$liquidado','abonos':'$abonos'}},
             {$project:{
                 "productos": "$pedido.productos",
                 "_id": "$pedido._id",
@@ -1478,6 +1532,7 @@ var controller = {
                 "ruta":"$pedido.ruta",
                 "apartado":"$apartado",
                 "liquidado":"$liquidado",
+                "abonos":"$abonos"
             }},
             {
                 $match:{
@@ -1529,7 +1584,8 @@ var controller = {
                 "ruta":"$ruta",
                 "apartado":"$apartado",
                 "liquidado":"$liquidado",
-                "fix":true
+                "fix":true,
+                "abonos":"$abonos"
             }},{
                 $sort:{
                     "createdAt":-1
@@ -1555,6 +1611,222 @@ var controller = {
             if(tienda_ropa){
 
                 pedidos.forEach(element => ganancia +=  element.total );
+
+            }else{
+
+                pedidos.forEach(element => ganancia += element.entregado_repartidor ? element.total :0 );
+
+            }
+    
+            return ganancia;
+            
+        }
+    
+        var pedidosPrev = {
+            ventas: pedidos,
+            size : pedidos.length,
+            completados:calcularPedidosCompletos(pedidos),
+            ganancia:calcularGananciaAprox(pedidos)
+        };
+    
+        pedidos.forEach(function(element,index){
+
+            if(element.repartidor){
+            
+                pedidos[index].repartidor.negocios = [];
+            
+            }
+
+        });
+    
+        return res.json(pedidosPrev);
+    
+    },
+    lista_pedidos_tienda : async(req,res)=>{
+
+        const dateP= new Date();
+    
+        const myDate = moment(dateP).format('L');
+    
+        var gte = moment(myDate).subtract(0,'hours');
+        var lt = moment( myDate).add(1,'days');
+    
+        var tienda_nombre = await Tienda.findOne({punto_venta:req.body.token});
+    
+        if(!tienda_nombre){
+    
+            const usuario = await Usuario.findById({_id:req.uid});
+            const tienda = await Tienda.findById(usuario.negocios[0]);
+        
+            tienda_nombre = {};
+            tienda_nombre.nombre = tienda.nombre;
+    
+        }
+    
+        if(req.body.tienda){
+            const tienda = await Tienda.findById(req.body.tienda);
+        
+            tienda_nombre = {};
+            tienda_nombre.nombre = tienda.nombre;
+        }
+    
+
+        var tienda_ropa =  req.body.tienda_ropa;
+    
+        if(req.body.filtro){
+    
+
+    
+            let text = req.body.filtro;
+    
+            const myArray = text.split(" - ");
+            const horario = [];
+    
+            myArray.forEach((element) =>{
+
+                const myArray2 = element.split('/');
+                horario.push(myArray2);
+
+            });
+    
+            const gte2 = horario[0][2]+'/'+horario[0][1]+'/'+horario[0][0];
+            const lt2 =  horario[1][2]+'/'+horario[1][1]+'/'+horario[1][0];
+    
+            var gteParse = new Date(gte2);
+            var gteSubs = moment(gteParse).subtract(0,'hours');
+    
+            var ltParse = new Date(lt2);
+            var ltSubs = moment(ltParse).add(1,'days');
+    
+            gte = gteSubs;
+            lt = ltSubs;
+    
+        }
+    
+        const pedidos = await Venta.aggregate(
+            [
+            {$match:{}},
+            {$unwind:'$pedidos'},
+            {$project:{'pedido':'$pedidos','apartado':'$apartado','liquidado':'$liquidado','abonos':'$abonos'}},
+            {$project:{
+                "productos": "$pedido.productos",
+                "_id": "$pedido._id",
+                "total": "$pedido.total",
+                "tienda": "$pedido.tienda",
+                "repartidor": "$pedido.repartidor",
+                "imagen": "$pedido.imagen",
+                "ubicacion":"$pedido.ubicacion",
+                "direccion":"$pedido.direccion" ,
+                "punto_venta":"$pedido.punto_venta" ,
+                "efectivo":"$pedido.efectivo" ,
+                "usuario":"$pedido.usuario" ,
+                "confirmado":"$pedido.confirmado",
+                "createdAt":"$pedido.createdAt",
+                "updatedAt":"$pedido.updatedAt",
+                "tiempo_espera":"$pedido.tiempo_espera",
+                "entregado_cliente":"$pedido.entregado_cliente" ,
+                "entregado_repartidor":"$pedido.entregado_repartidor",
+                "confirmacion_tiempo":"$pedido.confirmacion_tiempo",
+                "entrega_repartidor_tiempo":"$pedido.entrega_repartidor_tiempo",
+                "entrega_cliente_tiempo":"$pedido.entrega_cliente_tiempo",
+                "codigo_repartidor":"$pedido.codigo_repartidor",
+                "codigo_cliente":"$pedido.codigo_cliente",
+                "id_venta":"$pedido.id_venta",
+                "repartidor_domicilio":"$pedido.repartidor_domicilio",
+                "repartidor_domicilio_tiempo":"$pedido.repartidor_domicilio_tiempo",
+                "repartidor_calificado":"$pedido.repartidor_calificado",
+                "repartidor_calificado_tiempo":"$pedido.repartidor_calificado_tiempo",
+                "direccion_cliente":'$pedido.direccion_cliente',
+                "direccion_negocio":'$pedido.direccion_negocio',
+                "envio":'$pedido.envio',
+                "ruta":"$pedido.ruta",
+                "apartado":"$apartado",
+                "liquidado":"$liquidado",
+                "abonos":"$abonos",
+                "abonosSafe":"$abonos",
+            }},
+            {$unwind:'$abonos'},
+            {
+                $match:{
+                'tienda': tienda_nombre.nombre,
+                'abonos.fecha':{
+                    $gte : new Date(gte), 
+                    $lt :  new Date(lt), 
+                }
+            }},
+            {
+                $lookup:{
+                    from:'usuarios',
+                    localField:'repartidor',
+                    foreignField:'_id',
+                    as:'repartidor'
+                }
+            },
+            {$project:{
+                "productos": "$productos",
+                "_id": "$_id",
+                "total": "$total",
+                "tienda": "$tienda",
+                "repartidor": {$arrayElemAt:["$repartidor",0]},
+                "imagen": "$imagen",
+                "ubicacion":"$ubicacion",
+                "direccion":"$direccion" ,
+                "punto_venta":"$punto_venta" ,
+                "efectivo":"$efectivo" ,
+                "usuario":"$usuario" ,
+                "confirmado":"$confirmado",
+                "createdAt":"$createdAt",
+                "updatedAt":"$updatedAt",
+                "tiempo_espera":"$tiempo_espera",
+                "entregado_cliente":"$entregado_cliente" ,
+                "entregado_repartidor":"$entregado_repartidor",
+                "confirmacion_tiempo":"$confirmacion_tiempo",
+                "entrega_repartidor_tiempo":"$entrega_repartidor_tiempo",
+                "entrega_cliente_tiempo":"$entrega_cliente_tiempo",
+                "codigo_repartidor":"$codigo_repartidor",
+                "codigo_cliente":"$codigo_cliente",
+                "id_venta":"$id_venta",
+                "repartidor_domicilio":"$repartidor_domicilio",
+                "repartidor_domicilio_tiempo":"$repartidor_domicilio_tiempo",
+                "repartidor_calificado":"$repartidor_calificado",
+                "repartidor_calificado_tiempo":"$repartidor_calificado_tiempo",
+                "direccion_cliente":'$direccion_cliente',
+                "direccion_negocio":'$direccion_negocio',
+                "envio":'$envio',
+                "ruta":"$ruta",
+                "apartado":"$apartado",
+                "liquidado":"$liquidado",
+                "fix":true,
+                "concepto_titulo":"$abonos.titulo",
+                "total_safe":"$abonos.cantidad",
+                "abonos":"$abonosSafe",
+            }},{
+                $sort:{
+                    "createdAt":-1
+                }
+            }
+            
+        ])
+
+        console.log(pedidos);
+    
+        function calcularPedidosCompletos( pedidos ){
+    
+            var completos = 0;
+    
+            pedidos.forEach(element => element.entregado_repartidor ?  completos++ :completos );
+    
+            return completos;
+            
+        }
+    
+        function calcularGananciaAprox( pedidos ){
+    
+            var ganancia = 0;
+    
+            if(tienda_ropa){
+
+                pedidos.forEach(element => ganancia +=  element.total_safe );
 
             }else{
 
@@ -1691,16 +1963,16 @@ var controller = {
     },
     busquedaQRVenta: async(req,res)=>{
 
-        console.log(req.body.qr);
+        console.log(req.body);
 
         try{
 
             var pedidos = await Venta.aggregate(
                 [
-                {$match:{'_id': mongoose.Types.ObjectId(req.body.qr)}},
+                {$match:{'_id': mongoose.Types.ObjectId(req.body.qr),'negocio':'Black Shop'}},
                 {$unwind:'$pedidos'},
                 
-                {$project:{'pedido':'$pedidos'}},
+                {$project:{'pedido':'$pedidos','apartado':'$apartado','liquidado':'$liquidado','abonos':'$abonos'}},
                 {$project:{
                     "productos": "$pedido.productos",
                     "_id": "$pedido._id",
@@ -1731,22 +2003,30 @@ var controller = {
                     "direccion_cliente":'$pedido.direccion_cliente',
                     "direccion_negocio":'$pedido.direccion_negocio',
                     "envio":'$pedido.envio',
-                    "ruta":"$pedido.ruta"
+                    "ruta":"$pedido.ruta",
+                    "apartado":"$apartado",
+                    "liquidado":"$liquidado",
+                    "abonos":"$abonos",
+                    "concepto_titulo":"",
+                    "total_safe":"0",
                 }},
                 
                 
             ]);
 
-
+            console.log(pedidos);
     
             if(pedidos.length > 0){
 
                 var venta_general = await Venta.findById(req.body.qr);
 
                 venta_general.pedidos = pedidos[0];
+                venta_general.apartado = pedidos[0].apartado;
+                venta_general.liquidado = pedidos[0].liquidado;
+                venta_general.abonos = pedidos[0].abonos;
 
                 console.log(venta_general);
-    
+
                 return res.status(200).json(venta_general);
     
             }else{
@@ -1757,8 +2037,6 @@ var controller = {
 
         }catch(e){
 
-            console.log('error');
-            console.log(e);
 
             return res.status(400);
 
@@ -1770,9 +2048,13 @@ var controller = {
 
         const pedidos = await Venta.aggregate(
             [
-            {$match:{}},
+            {$match:{
+                'negocio':'Black Shop',
+                'apartado':true,
+                'liquidado':false
+            }},
             {$unwind:'$pedidos'},
-            {$project:{'pedido':'$pedidos'}},
+            {$project:{'pedido':'$pedidos','apartado':'$apartado','liquidado':'$liquidado','abonos':'$abonos'}},
             {$project:{
                 "productos": "$pedido.productos",
                 "_id": "$pedido._id",
@@ -1804,15 +2086,10 @@ var controller = {
                 "direccion_cliente":'$pedido.direccion_cliente',
                 "direccion_negocio":'$pedido.direccion_negocio',
                 "envio":'$pedido.envio',
-                "ruta":"$pedido.ruta"
-            }},
-            {
-                $match:{
-                'tienda': tienda_nombre.nombre,
-                'createdAt':{
-                    $gte : new Date(gte), 
-                    $lt :  new Date(lt), 
-                }
+                "ruta":"$pedido.ruta",
+                "apartado":"$apartado",
+                "liquidado":"$liquidado",
+                "abonos":"$abonos"
             }},
             {
                 $lookup:{
@@ -1854,19 +2131,77 @@ var controller = {
                 "direccion_negocio":'$direccion_negocio',
                 "envio":'$envio',
                 "ruta":"$ruta",
-                "fix":true
+                "fix":true,
+                "apartado":"$apartado",
+                "liquidado":"$liquidado",
+                "abonos":"$abonos"
             }},{
                 $sort:{
                     "createdAt":-1
                 }
             }
             
-        ])
+        ]);
+
+        var pedidosPrev = {
+            ventas: pedidos,
+            size : pedidos.length,
+            completados:0,
+            ganancia:0
+        };
+    -
+        pedidos.forEach(function(element,index){
+
+            if(element.repartidor){
+            
+                pedidos[index].repartidor.negocios = [];
+            
+            }
+
+        });
+
+        console.log(pedidosPrev);
+    
+        return res.json(pedidosPrev);
+
+    },
+    agregarNuevoAbono:async(req,res)=>{
+
+        try {
+
+            console.log(req.body);
+
+            const nuevoAbono = new Abono();
+    
+            nuevoAbono.cantidad = req.body.cantidad;
+            nuevoAbono.fecha = new Date();
+            nuevoAbono.titulo = 'Abono';
+    
+            await Venta.findByIdAndUpdate({'_id':req.body.ventaId},{$push:{abonos:nuevoAbono}});
+            await Venta.findByIdAndUpdate({'_id':req.body.ventaId},{$set:{liquidado:liquidado}});
+    
+            res.status(200).json({
+                ok:true
+    
+            });
+
+        } catch (error) {
+
+            console.log(error);
+
+            res.status(400).json({
+                ok:false
+    
+            });
+
+        }
 
     }
 }
 
 module.exports = controller;
+
+
 
 
 

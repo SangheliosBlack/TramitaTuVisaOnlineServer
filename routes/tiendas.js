@@ -30,17 +30,20 @@ router.post('/busqueda',                  validarJWT,controller.busqueda);
 
 //lineas_tienda_ropa    
 
+router.post('/agregarNuevoAbono',validarJWT,controller.agregarNuevoAbono);
 router.post('/busquedaPrendaSku',validarJWT,controller.busquedaPrendaSku);
-router.post('/busquedaQRVenta',validarJWT,controller.busquedaQRVenta);
-router.post('/busquedaPrenda',validarJWT,controller.busquedaPrenda);
+router.get('/obtenerApartados',  validarJWT,controller.busquedaApartados);
+router.post('/busquedaQRVenta',  validarJWT,controller.busquedaQRVenta);
+router.post('/busquedaPrenda',   validarJWT,controller.busquedaPrenda);
+router.post('/pedidosTienda',    validarJWT,controller.lista_pedidos_tienda);
 
 
 //pruebas
 
-router.post('obtenerProductosMasVendidos', validarJWT,controller.obtenerProductosMasVendido);
-router.post('obtenerTiendaMasVendido'),    validarJWT,controller.obtenerTiendaMasVendido;
-router.post('obtenerProductosPopular', validarJWT,controller.obtenerProductosPopulares);
-router.post('obtenerTiendaPopular'),    validarJWT,controller.obtenerTiendaPopulares;
+router.post('obtenerProductosMasVendidos',validarJWT,controller.obtenerProductosMasVendido);
+router.post('obtenerProductosPopular',    validarJWT,controller.obtenerProductosPopulares);
+router.post('obtenerTiendaMasVendido'),   validarJWT,controller.obtenerTiendaMasVendido;
+router.post('obtenerTiendaPopular'),      validarJWT,controller.obtenerTiendaPopulares;
 
 
 

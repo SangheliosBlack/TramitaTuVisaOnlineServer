@@ -126,6 +126,18 @@ const VentaSchema = Schema({
                     liquidado:{
                         type:Boolean,
                         require:false
+                    },
+                    abonos:{
+                        type:Array,
+                        require:false
+                    },
+                    totalSafe:{
+                        type:Number,
+                        require:false
+                    },
+                    concepto_titulo:{
+                        type:String,
+                        require:false
                     }
                 },
                 { timestamps: true }
@@ -175,6 +187,14 @@ const VentaSchema = Schema({
     },
     liquidado:{
         type:Boolean,
+        require:false
+    },
+    negocio:{
+        type:String,
+        require:false
+    },
+    abonos:{
+        type:Array,
         require:false
     }
     
