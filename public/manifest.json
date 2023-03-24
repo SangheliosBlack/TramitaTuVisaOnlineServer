@@ -1,6 +1,6 @@
 {
-    "name": "delivery",
-    "short_name": "delivery",
+    "name": "cashless",
+    "short_name": "cashless",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
