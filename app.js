@@ -23,6 +23,7 @@ class Server {
             comentarios:'/api/comentarios',
             repartidor:'/api/repartidor',
             auth:'/api/autentificacion',
+            lakesFell:'/api/lakesFeel',
             producto:'/api/productos',
             usuario:'/api/usuario',
             tienda:'/api/tiendas',
@@ -30,7 +31,6 @@ class Server {
             twilio:'/api/twilio',
             google:'/api/google',
             test:'/api/test'
-
         }
 
         this.middlewares();
@@ -67,6 +67,7 @@ class Server {
         this.app.use(this.paths.twilio,     require('./routes/twilio'));
         this.app.use(this.paths.google,     require('./routes/google'));
         this.app.use(this.paths.test,       require('./routes/test'));
+        this.app.use(this.paths.lakesFell,  require('./routes/lakes_feel'));
 
     }
 

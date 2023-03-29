@@ -96,6 +96,25 @@ const UsuarioSchema =  Schema({
         type:Boolean,
         require:true
     },
+    recargas:[
+        {
+            type:Schema(
+                {
+                    cantidad:{
+                        type:Number,
+                        require:true
+                    },
+                    usuario:{
+                        type:Schema.Types.ObjectId,
+                        require:true
+                    }
+                },
+                {
+                    timestamps: true
+                }
+            )
+        }
+    ]
     
 },{
     timestamps:true
