@@ -323,77 +323,49 @@ var controller = {
                         evento:'1',
                         pedido:JSON.stringify(pedidosSchema[element])
                     };
-
-                    try{
     
-                        Notificacion.sendPushToOneUser(data);
-    
-                    }catch(e){
                     
-                    }
-            
-                    try{
+                    if(pedidosSchema[element].punto_venta){
                         
+                        Notificacion.sendPushToOneUser(data);
+
+                    }
     
-                        const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
+                    const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
     
+                    if(repartidores.length > 0){
     
-                        if(repartidores.length > 0){
+                        await Venta.findOneAndUpdate(
+                            {
+                                "_id":mongoose.Types.ObjectId(venta._id)
+                            },
+                            {
+                                $set:{'pedidos.$[i].repartidor':repartidores[0]._id}
+                            },
+                            {
+                                arrayFilters:[
+                                    {
+                                        "i._id":mongoose.Types.ObjectId(pedidosSchema[element]._id)
+                                    }
+                                ]
+                            }
+                        );
     
-    
-                            try{
-    
-                            await Venta.findOneAndUpdate(
-                                {
-                                    "_id":mongoose.Types.ObjectId(venta._id)
-                                },
-                                {
-                                    $set:{'pedidos.$[i].repartidor':repartidores[0]._id}
-                                },
-                                {
-                                    arrayFilters:[
-                                        {
-                                            "i._id":mongoose.Types.ObjectId(pedidosSchema[element]._id)
-                                        }
-                                    ]
-                                }
-                            );
-    
-    
-                                                
                         const data = {
                             tokenId:repartidores[0].tokenFB,
                             titulo:`Tienes un nuevo pedido!`,
                             mensaje:'Presionar para mas detalles',
                             evento:'1',
                             pedido:JSON.stringify(pedidosSchema[element])
-                        };
-    
-                        try{
-    
+                        };           
+                        
+                        if(repartidores[0].tokenFB){
+
                             Notificacion.sendPushToOneUser(data);
-        
-                        }catch(e){
-                        
+
                         }
                     
-                    
-                        }catch(e){
-                    
-    
-                    
-                        }
-    
-    
                     }
-    
-    
-                    }catch(e){
-                        
-                    
-                    }
-    
-                    
         
                 }
         
