@@ -339,7 +339,7 @@ var controller = {
 
                         await Usuario.findByIdAndUpdate({'_id':repartidores[0]._id},{$set:{'ultima_tarea':new Date()}});
                         
-                        pedidosSchema[element].repartidor = repartidores[0];
+                        pedidosSchema[element].repartidor = repartidores[0]._id;
 
                         await Venta.findOneAndUpdate(
                             {
