@@ -307,15 +307,11 @@ var controller = {
                     pedidosSchema.push(pedidosModel);
                 }
                 
-                
                 venta.abonos = [];
                 
-                
-        
                 await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
 
                 venta.pedidos = pedidosSchema;
-
 
                 await venta.save();
         
@@ -344,10 +340,6 @@ var controller = {
 
                         await Usuario.findByIdAndUpdate({'_id':repartidores[0]._id},{$set:{'ultima_tarea':new Date()}});
                         
-                        venta.pedidos[element].repartidor = repartidores[0]._id;
-
-                        await venta.populate(`pedidos.${element}.repartidor`)
-
                         await Venta.findOneAndUpdate(
                             {
                                 "_id":mongoose.Types.ObjectId(venta._id)
@@ -384,11 +376,27 @@ var controller = {
         
                 }
                 
+                Venta.
+                find({usuario:mongoose.Types.ObjectId(req.uid)}).
+                sort({'updatedAt':-1}).
+                populate('pedidos.repartidor').
+                populate({
+                    path:'pedidos.repartidor',
+                    populate:{path:'negocios'},
+                }).
+                exec(function(err,data){
+
+                    console.log(data);
                 
-                console.log(venta);
+                    if(err) {
+                    
+                        res.status(400).json({ok:false});
+                    
+                    }
                 
-        
-                return res.status(200).json(venta);
+                    return res.status(200).json(data[0]);
+                
+                });
         
             }else{
         
