@@ -524,15 +524,16 @@ var controller = {
                         
                     }
                     
-                    venta.pedidos = pedidosSchema;
                     venta.abonos = [];
-                    
+                
+                    await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
+    
+                    venta.pedidos = pedidosSchema;
+    
                     await venta.save();
             
-                    await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
-                    
                     for(const element in  pedidosSchema){
-        
+            
                         const data = {
                             tokenId:pedidosSchema[element].punto_venta,
                             titulo:`${pedidosSchema[element].tienda}, tienes un nuevo pedido`,
@@ -540,71 +541,79 @@ var controller = {
                             evento:'1',
                             pedido:JSON.stringify(pedidosSchema[element])
                         };
-            
-                        try{
-    
-                        Notificacion.sendPushToOneUser(data);
-    
-                        const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
-    
-    
-                        if(repartidores.length >0){
-                            
-                            try{
-    
-                                await Venta.findOneAndUpdate(
-                                    {
-                                        "_id":mongoose.Types.ObjectId(venta._id)
-                                    },
-                                    {
-                                        $set:{'pedidos.$[i].repartidor':repartidores[0]._id}
-                                    },
-                                    {
-                                        arrayFilters:[
-                                            {
-                                                "i._id":mongoose.Types.ObjectId(pedidosSchema[element]._id)
-                                            }
-                                        ]
-                                    }
-                                );
-    
-                                                
-                                const data = {
-                                    tokenId:repartidores[0].tokenFB,
-                                    titulo:`Tienes un nuevo pedido!`,
-                                    mensaje:'Presionar para mas detalles',
-                                    evento:'1',
-                                    pedido:JSON.stringify(pedidosSchema[element])
-                                };
-    
-                                try{
-    
-                                    Notificacion.sendPushToOneUser(data);
-        
-                                }catch(e){
         
                         
-                                }
-                    
-                    
-                            }catch(e){
-                    
-                    
-                            }
+                        if(pedidosSchema[element].punto_venta){
+                            
+                            Notificacion.sendPushToOneUser(data);
     
                         }
-    
-                        return res.status(200).json(venta);
-    
-                    }catch(e){
-                        
-                        return res.status(200).json(venta);
-                    
-                    }
-    
-                    }
         
-                    return res.status(200).json(venta);
+                        const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
+    
+                        console.log(repartidores[0]);
+        
+                        if(repartidores.length > 0){
+    
+                            await Usuario.findByIdAndUpdate({'_id':repartidores[0]._id},{$set:{'ultima_tarea':new Date()}});
+                            
+                            await Venta.findOneAndUpdate(
+                                {
+                                    "_id":mongoose.Types.ObjectId(venta._id)
+                                },
+                                {
+                                    $set:{'pedidos.$[i].repartidor':repartidores[0]._id}
+                                },
+                                {
+                                    arrayFilters:[
+                                        {
+                                            "i._id":mongoose.Types.ObjectId(pedidosSchema[element]._id)
+                                        }
+                                    ]
+                                }
+                            );
+    
+                            
+        
+                            const data = {
+                                tokenId:repartidores[0].tokenFB,
+                                titulo:`Tienes un nuevo pedido!`,
+                                mensaje:'Presionar para mas detalles',
+                                evento:'1',
+                                pedido:JSON.stringify(pedidosSchema[element])
+                            };           
+                            
+                            if(repartidores[0].tokenFB){
+    
+                                Notificacion.sendPushToOneUser(data);
+    
+                            }
+                        
+                        }
+            
+                    }
+                    
+                    Venta.
+                    find({usuario:mongoose.Types.ObjectId(req.uid)}).
+                    sort({'updatedAt':-1}).
+                    populate('pedidos.repartidor').
+                    populate({
+                        path:'pedidos.repartidor',
+                        populate:{path:'negocios'},
+                    }).
+                    exec(function(err,data){
+    
+                        console.log(data);
+                    
+                        if(err) {
+                        
+                            res.status(400).json({ok:false});
+                        
+                        }
+                    
+                        return res.status(200).json(data[0]);
+                    
+                    });
             
                 }else{
             
