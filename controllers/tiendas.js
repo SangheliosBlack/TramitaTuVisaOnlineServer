@@ -385,7 +385,7 @@ var controller = {
                 }
                 
                 
-
+                console.log(venta);
                 
         
                 return res.status(200).json(venta);
