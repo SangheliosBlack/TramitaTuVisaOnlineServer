@@ -13,6 +13,11 @@ const PedidoSchema = Schema({
         type:String,
         require:true
     },
+    repartidor:{
+        type:Schema.Types.ObjectId,
+        require:false,
+        ref:'Usuario'
+    },
     imagen:{
         type:String,
         require:true
