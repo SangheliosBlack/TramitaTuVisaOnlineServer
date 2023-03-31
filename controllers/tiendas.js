@@ -346,9 +346,7 @@ var controller = {
                         
                         venta.pedidos[element].repartidor = repartidores[0]._id;
 
-                        await venta.pedidos[element].populate('repartidor');
-
-                        venta.pedidos[element].populated('repartidor');
+                        await venta.populate(`pedidos.${element}.repartidor`)
 
                         await Venta.findOneAndUpdate(
                             {
