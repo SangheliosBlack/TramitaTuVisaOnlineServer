@@ -313,6 +313,11 @@ var controller = {
                 
         
                 await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
+
+                venta.pedidos = pedidosSchema;
+
+
+                await venta.save();
         
                 for(const element in  pedidosSchema){
         
@@ -339,7 +344,11 @@ var controller = {
 
                         await Usuario.findByIdAndUpdate({'_id':repartidores[0]._id},{$set:{'ultima_tarea':new Date()}});
                         
-                        pedidosSchema[element].repartidor = repartidores[0]._id;
+                        venta.pedidos[element].repartidor = repartidores[0]._id;
+
+                        await venta.pedidos[element].populate('repartidor');
+
+                        venta.pedidos[element].populated('repartidor');
 
                         await Venta.findOneAndUpdate(
                             {
@@ -377,9 +386,9 @@ var controller = {
         
                 }
                 
-                venta.pedidos = pedidosSchema;
+                
 
-                await venta.save();
+                
         
                 return res.status(200).json(venta);
         
