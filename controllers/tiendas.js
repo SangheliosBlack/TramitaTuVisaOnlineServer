@@ -332,6 +332,8 @@ var controller = {
                     }
     
                     const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
+
+                    console.log(repartidores[0]);
     
                     if(repartidores.length > 0){
 
