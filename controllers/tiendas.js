@@ -307,7 +307,7 @@ var controller = {
                     pedidosSchema.push(pedidosModel);
                 }
                 
-                venta.pedidos = pedidosSchema;
+                
                 venta.abonos = [];
                 
                 
@@ -376,6 +376,8 @@ var controller = {
                     }
         
                 }
+                
+                venta.pedidos = pedidosSchema;
 
                 await venta.save();
         
