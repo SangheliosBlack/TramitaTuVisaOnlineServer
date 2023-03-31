@@ -310,7 +310,7 @@ var controller = {
                 venta.pedidos = pedidosSchema;
                 venta.abonos = [];
                 
-                await venta.save();
+                
         
                 await Usuario.findByIdAndUpdate({_id:req.uid},{'cesta.productos':[],'envio_promo':codigo ? true :false});
         
@@ -331,10 +331,14 @@ var controller = {
 
                     }
     
-                    const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
+                    const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: -1 }).limit(1);
     
                     if(repartidores.length > 0){
-    
+
+                        await Usuario.findByIdAndUpdate({'_id':repartidores[0]._id},{$set:{'ultima_tarea':new Date()}});
+                        
+                        pedidosSchema[element].repartidor = repartidores[0];
+
                         await Venta.findOneAndUpdate(
                             {
                                 "_id":mongoose.Types.ObjectId(venta._id)
@@ -350,6 +354,8 @@ var controller = {
                                 ]
                             }
                         );
+
+                        
     
                         const data = {
                             tokenId:repartidores[0].tokenFB,
@@ -368,6 +374,8 @@ var controller = {
                     }
         
                 }
+
+                await venta.save();
         
                 return res.status(200).json(venta);
         
