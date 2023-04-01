@@ -1505,7 +1505,7 @@ var controller = {
             [
             {$match:{}},
             {$unwind:'$pedidos'},
-            {$project:{'pedido':'$pedidos','apartado':'$apartado','liquidado':'$liquidado','abonos':'$abonos'}},
+            {$project:{'pedido':'$pedidos'}},
             {$project:{
                 "productos": "$pedido.productos",
                 "_id": "$pedido._id",
@@ -1538,9 +1538,6 @@ var controller = {
                 "direccion_negocio":'$pedido.direccion_negocio',
                 "envio":'$pedido.envio',
                 "ruta":"$pedido.ruta",
-                "apartado":"$apartado",
-                "liquidado":"$liquidado",
-                "abonos":"$abonos"
             }},
             {
                 $match:{
@@ -1590,10 +1587,7 @@ var controller = {
                 "direccion_negocio":'$direccion_negocio',
                 "envio":'$envio',
                 "ruta":"$ruta",
-                "apartado":"$apartado",
-                "liquidado":"$liquidado",
                 "fix":true,
-                "abonos":"$abonos"
             }},{
                 $sort:{
                     "createdAt":-1
