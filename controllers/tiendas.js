@@ -22,7 +22,6 @@ var controller = {
     
     crearPedido:async (req,res)=>{
 
-        console.log(req.body);
 
         var {total,tarjeta,productos,efectivo,codigo,direccion} = JSON.parse(req.body.cesta);
 
@@ -334,7 +333,6 @@ var controller = {
     
                     const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
 
-                    console.log(repartidores[0]);
     
                     if(repartidores.length > 0){
 
@@ -386,7 +384,6 @@ var controller = {
                 }).
                 exec(function(err,data){
 
-                    console.log(data);
                 
                     if(err) {
                     
@@ -551,7 +548,6 @@ var controller = {
         
                         const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
     
-                        console.log(repartidores[0]);
         
                         if(repartidores.length > 0){
     
@@ -603,8 +599,6 @@ var controller = {
                     }).
                     exec(function(err,data){
     
-                        console.log(data);
-                    
                         if(err) {
                         
                             res.status(400).json({ok:false});
@@ -1588,14 +1582,16 @@ var controller = {
                 "envio":'$envio',
                 "ruta":"$ruta",
                 "fix":true,
+                "abonos":[]
             }},{
                 $sort:{
                     "createdAt":-1
                 }
             }
+
             
         ])
-    
+        
         function calcularPedidosCompletos( pedidos ){
     
             var completos = 0;
@@ -1619,6 +1615,7 @@ var controller = {
                 pedidos.forEach(element => ganancia += element.entregado_repartidor ? element.total :0 );
 
             }
+
     
             return ganancia;
             
@@ -1810,7 +1807,6 @@ var controller = {
             
         ])
 
-        console.log(pedidos);
     
         function calcularPedidosCompletos( pedidos ){
     
@@ -1965,7 +1961,6 @@ var controller = {
     },
     busquedaQRVenta: async(req,res)=>{
 
-        console.log(req.body);
 
         try{
 
@@ -2016,7 +2011,6 @@ var controller = {
                 
             ]);
 
-            console.log(pedidos);
     
             if(pedidos.length > 0){
 
@@ -2027,7 +2021,6 @@ var controller = {
                 venta_general.liquidado = pedidos[0].liquidado;
                 venta_general.abonos = pedidos[0].abonos;
 
-                console.log(venta_general);
 
                 return res.status(200).json(venta_general);
     
@@ -2162,7 +2155,6 @@ var controller = {
 
         });
 
-        console.log(pedidosPrev);
     
         return res.json(pedidosPrev);
 
@@ -2171,7 +2163,6 @@ var controller = {
 
         try {
 
-            console.log(req.body);
 
             const nuevoAbono = new Abono();
     
@@ -2189,7 +2180,6 @@ var controller = {
 
         } catch (error) {
 
-            console.log(error);
 
             res.status(400).json({
                 ok:false
