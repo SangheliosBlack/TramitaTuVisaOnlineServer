@@ -409,7 +409,6 @@ var controller = {
             }},
             {
                 $match:{
-                'tienda':'Capitan Naza',
                 'createdAt':{
                     $gte : new Date(gte), 
                     $lt :  new Date(lt), 
@@ -446,7 +445,8 @@ var controller = {
                 "direccion_cliente":'$direccion_cliente',
                 "direccion_negocio":'$direccion_negocio',
                 "envio":"$envio",
-                "ruta":"$ruta"
+                "ruta":"$ruta",
+                "abonos":[]
             }},{
                 $sort:{
                     "createdAt":-1

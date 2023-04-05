@@ -692,7 +692,12 @@ var controller = {
                         imagen_perfil:'$imagen_perfil',
                         listaProductos:'$listaProductos.productos'
                 },
+                
     
+            },{
+                $sort:{
+                    "nombre":1
+                }
             }
                 
             ]
@@ -1007,6 +1012,10 @@ var controller = {
                         'uid':'$_id',
                         'listaProductos':[]
                     }
+                },{
+                    $sort:{
+                        "nombre":1
+                    }
                 }
                 
                 
@@ -1118,6 +1127,8 @@ var controller = {
                 }
             ]
         );
+
+        categorias[0].categorias.sort();
     
         return res.json(
                 categorias[0].categorias
