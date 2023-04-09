@@ -1096,6 +1096,8 @@ var controller = {
             });
       
         }
+
+        definitivo.sort((a, b) => a.titulo.localeCompare(b.titulo));
     
         return res.json(
             {
