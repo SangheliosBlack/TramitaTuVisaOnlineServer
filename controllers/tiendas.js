@@ -25,7 +25,7 @@ var controller = {
 
         var {total,tarjeta,productos,efectivo,codigo,direccion} = JSON.parse(req.body.cesta);
 
-        var {abonoReq,envio,usuario,servicio,customer,tienda_ropa,liquidado,apartado} = req.body;
+        var {abonoReq,envio,usuario,servicio,customer,tienda_ropa,liquidado,apartado,envioValores} = req.body;
     
         var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
     
@@ -247,7 +247,7 @@ var controller = {
                         subElement.efectivo = efectivo;
                         subElement.usuario = usuarioVenta;
                         subElement.tiempo_espera = datos_tienda.tiempo_espera;
-                        subElement.envio = (envioMultiplicado+8.2).toFixed(2);
+                        subElement.envio = envioValores.find(item=>item.tienda ===  productos[element].tienda ).cantidad;
                         subElement.direccion_negocio = direccion_negocio;
                         subElement.direccion_cliente = direccion;
                         
@@ -331,12 +331,12 @@ var controller = {
 
                     }
     
-                    const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
+                    const repartidores = await Usuario.find({notificado:false,transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
 
     
                     if(repartidores.length > 0){
 
-                        await Usuario.findByIdAndUpdate({'_id':repartidores[0]._id},{$set:{'ultima_tarea':new Date()}});
+                        await Usuario.findByIdAndUpdate({'_id':repartidores[0]._id},{$set:{'ultima_tarea':new Date(),'notificado':true}});
                         
                         await Venta.findOneAndUpdate(
                             {
@@ -464,7 +464,7 @@ var controller = {
                             subElement.efectivo = efectivo;
                             subElement.usuario = usuarioVenta;
                             subElement.tiempo_espera = datos_tienda.tiempo_espera;
-                            subElement.envio = (envioMultiplicado+8.2);
+                            subElement.envio = envioValores.find(item=>item.tienda ===  productos[element].tienda ).cantidad;
                             subElement.direccion_negocio = direccion_negocio;
                             subElement.direccion_cliente = direccion;
                             
@@ -546,12 +546,12 @@ var controller = {
     
                         }
         
-                        const repartidores = await Usuario.find({transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
+                        const repartidores = await Usuario.find({notificado:false,transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
     
         
                         if(repartidores.length > 0){
     
-                            await Usuario.findByIdAndUpdate({'_id':repartidores[0]._id},{$set:{'ultima_tarea':new Date()}});
+                            await Usuario.findByIdAndUpdate({'_id':repartidores[0]._id},{$set:{'ultima_tarea':new Date()},'notificado':true});
                             
                             await Venta.findOneAndUpdate(
                                 {
@@ -1430,7 +1430,7 @@ var controller = {
     
             if(value){
     
-                await Usuario.findByIdAndUpdate(req.uid,{$set:{transito:false,ultima_tarea:new Date()}});
+                await Usuario.findByIdAndUpdate(req.uid,{$set:{notificado:false,transito:false,ultima_tarea:new Date()}});
     
                 return res.status(200).json({ok:true});
     

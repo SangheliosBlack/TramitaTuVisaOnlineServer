@@ -96,6 +96,10 @@ const UsuarioSchema =  Schema({
         type:Boolean,
         require:true
     },
+    notificado:{
+        type:Boolean,
+        require:false
+    },
     recargas:[
         {
             type:Schema(
