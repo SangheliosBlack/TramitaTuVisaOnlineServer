@@ -100,6 +100,10 @@ const UsuarioSchema =  Schema({
         type:Boolean,
         require:false
     },
+    hibrido:{
+        type:Boolean,
+        require:false
+    },
     recargas:[
         {
             type:Schema(

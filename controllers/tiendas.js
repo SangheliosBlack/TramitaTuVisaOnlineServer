@@ -25,9 +25,11 @@ var controller = {
 
         var {total,tarjeta,productos,efectivo,codigo,direccion} = JSON.parse(req.body.cesta);
 
-        var {abonoReq,envio,usuario,servicio,customer,tienda_ropa,liquidado,apartado,envioValores} = req.body;
+        var {abonoReq,envio,usuario,servicio,customer,tienda_ropa,liquidado,apartado} = req.body;
     
         var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
+
+        var envioValores = JSON.parse(req.body.envioValores)
     
         const decimalCount = num => {
             const numStr = String(num);
@@ -226,15 +228,6 @@ var controller = {
                         direccion_negocio.titulo = datos_tienda.direccion;
                         direccion_negocio.predeterminado = false;
                         
-                        const a = { latitude: direccion_negocio.coordenadas.latitud, longitude: direccion_negocio.coordenadas.longitud }
-                        const b = { latitude: direccion.coordenadas.lat, longitude: direccion.coordenadas.lng}
-        
-                        var p = 0.017453292519943295;
-                        var c = Math.cos;
-                        var a2 = 0.5 - c((b.latitude - a.latitude) * p) / 2 + c(a.latitude * p) * c(b.latitude * p) * (1 - c((b.longitude - a.longitude) * p)) / 2;
-                        var envioCast = 12745*Math.asin(Math.sqrt(a2));
-                        var envioMultiplicado = (envioCast<= 3 ? 19.8 :((envioCast-3)*7.2)+19.8)-0.01;
-        
                         usuarioVenta.imagen = 'https://www.blogdelfotografo.com/wp-content/uploads/2020/02/apoyado12-scaled.jpg';
                         usuarioVenta.nombre = usuarioData.nombre;
                         usuarioVenta._id = usuarioData._id;
@@ -443,15 +436,6 @@ var controller = {
                             direccion_negocio.titulo = datos_tienda.direccion;
                             direccion_negocio.predeterminado = false;
                             
-                            const a = { latitude: direccion_negocio.coordenadas.latitud, longitude: direccion_negocio.coordenadas.longitud }
-                            const b = { latitude: direccion.coordenadas.lat, longitude: direccion.coordenadas.lng}
-        
-                            var p = 0.017453292519943295;
-                            var c = Math.cos;
-                            var a2 = 0.5 - c((b.latitude - a.latitude) * p) / 2 + c(a.latitude * p) * c(b.latitude * p) * (1 - c((b.longitude - a.longitude) * p)) / 2;
-                            var envioCast = 12745*Math.asin(Math.sqrt(a2));
-                            var envioMultiplicado = (envioCast<= 3 ? 19.8 :((envioCast-3)*7.2)+19.8)-0.01;
-        
                             usuarioVenta.imagen = 'https://www.blogdelfotografo.com/wp-content/uploads/2020/02/apoyado12-scaled.jpg';
                             usuarioVenta.nombre = usuarioData.nombre;
                             usuarioVenta._id = usuarioData._id;

@@ -326,6 +326,30 @@ var controller = {
         return res.json(pedidos);
 
     },
+    hibridoOn:async function(req,res){
+
+        await Usuario.findByIdAndUpdate({'_id':req.body._id},{$set:{hibrido:true}});
+
+        return res.status(200).json({ok:false});
+
+    },
+    hibridoOff:async function(req,res){
+
+        var usuario = await Usuario.find({"_id":req.body._id,"notificado":false});
+
+        if(usuario){
+
+            await Usuario.findByIdAndUpdate({'_id':req.body._id},{$set:{hibrido:false}});
+
+            return res.status(200).json({ok:true});
+        
+        }else{
+
+            return res.status(400).json({ok:false});
+        
+        }
+
+    },
     obtenerEnvios:async function(req,res){
         
 

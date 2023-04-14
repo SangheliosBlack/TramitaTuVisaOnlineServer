@@ -9,7 +9,11 @@ router.post('/envioPendiente',          validarJWT,controller.buscarEnvioPendien
 router.post('/enviosMomento',           validarJWT,controller.obtenerEnviosMomento);
 router.post('/transitoUsuario',         validarJWT,controller.transitoUsuario);
 router.post('/desconectar',             validarJWT,controller.desconectar);
-router.post('/envios',                  validarJWT,controller.obtenerEnvios);
+router.post('/hibridoOff',                validarJWT,controller.hibridoOff);
+router.post('/hibridoOn',                validarJWT,controller.hibridoOn);
 router.post('/conectar',                validarJWT,controller.conectar);
+router.post('/envios',                  validarJWT,controller.obtenerEnvios);
+
+
 
 module.exports = router;
