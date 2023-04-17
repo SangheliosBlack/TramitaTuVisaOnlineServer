@@ -27,8 +27,6 @@ var controller = {
 
         var {abonoReq,envio,usuario,servicio,customer,tienda_ropa,liquidado,apartado} = req.body;
     
-        var totalConfirmar = productos.reduce((previusValue,currentValue)=> previusValue+(currentValue.cantidad * currentValue.precio),0);
-
         var envioValores = JSON.parse(req.body.envioValores)
     
         const decimalCount = num => {
@@ -46,21 +44,18 @@ var controller = {
         var venta = new Venta();
     
         venta.total = tienda_ropa ? total-10.2 : total;
-        venta.efectivo = efectivo;
-        venta.envio = envio.toFixed(2);
-        venta.usuario = usuario;
-        venta.servicio = servicio;
         venta.envioPromo = codigo ? envio.toFixed(2) :0;
-        venta.direccion = direccion;
         venta.codigo_promo = codigo ? codigo : '';
-        
-        
+        venta.envio = envio.toFixed(2);
+        venta.direccion = direccion;
+        venta.efectivo = efectivo;
+        venta.servicio = servicio;
+        venta.usuario = usuario;
     
         if(tienda_ropa){
 
             venta.apartado = apartado;
             venta.liquidado = liquidado;
-            
 
             if(venta.apartado){
 
@@ -68,9 +63,9 @@ var controller = {
 
                 var abono = new Abono();
 
-                abono.fecha = new Date();
                 abono.cantidad =  abonoReq;
                 abono.titulo = 'Apartado'
+                abono.fecha = new Date();
 
                 abonos.push(abono);
 
@@ -82,8 +77,8 @@ var controller = {
 
                 var abono = new Abono();
 
-                abono.fecha = new Date();
                 abono.cantidad =   total-10.2;
+                abono.fecha = new Date();
                 abono.titulo = 'Compra'
 
                 abonos.push(abono);
@@ -390,7 +385,7 @@ var controller = {
         
             }else{
         
-                const paymentIntent = await stripe.paymentIntents.create({
+                const paymentIntent = await stripe.paymentIntents.create({  
                     amount: total.toFixed(2)*100,
                     currency: 'mxn',
                     customer:customer,
