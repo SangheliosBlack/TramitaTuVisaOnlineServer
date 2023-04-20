@@ -2,6 +2,7 @@ const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a
 const { generarNombre } = require("../helpers/generar_nombre");
 const { generarJWT } = require("../helpers/jwt");
 const Usuario = require("../models/usuario");
+const Estado = require("../models/estado");
 const Tienda = require("../models/tiendas");
 const bcrypt = require("bcryptjs");
 const mongoose = require('mongoose');
@@ -274,6 +275,43 @@ var controller = {
       }
 
     });
+
+  },
+  revisarEstado: async(req,res)=>{
+
+    const version = req.header('x-version');
+
+    console.log(version);
+
+    if(version){
+
+      const estado = await Estado.findOne({'_id':'644031c2199bafb28ba36532'});
+
+      if(version== estado.version){
+
+        estado.version = true;
+
+        console.log(estado);
+
+        return res.status(200).json(estado);
+        
+      }else{
+        
+        estado.version = false;
+        
+        return res.status(200).json(estado);
+      
+      }
+  
+    }else{
+
+      const estado = await Estado.findOne({'_id':'644031c2199bafb28ba36532'});
+
+      estado.version = false;
+      
+      return res.status(200).json(estado);
+
+    }
 
   }
   

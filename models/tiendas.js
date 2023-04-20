@@ -92,6 +92,10 @@ const TiendasSchema = Schema({
     promociones:{
         type:Array,
         require:false
+    },
+    stripe_account_id:{
+        type:String,
+        require:false
     }
 },{
     timestamps:true

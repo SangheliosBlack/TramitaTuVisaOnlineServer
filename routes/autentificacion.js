@@ -44,4 +44,6 @@ router.post('/iniciarUsuarioTelefono',controller.iniciarUsuarioTelefono);
 
 router.get('/renovarCodigo',validarJWT,controller.renovarToken);
 
+router.get('/revisarEstado',validarJWT,controller.revisarEstado);
+
 module.exports = router;

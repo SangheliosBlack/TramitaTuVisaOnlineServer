@@ -191,14 +191,6 @@ var controller = {
 
             if(efectivo){
     
-                await stripe.transfers.create({
-                    amount: 10,
-                    currency: 'mxn',
-                    destination: 'acct_1JOjHVPOnuOXNxOm',
-                    transfer_group: venta.id
-                });
-    
-        
                 var pedidos = [];
             
                 for(const element in productos){
@@ -402,12 +394,6 @@ var controller = {
             
                     venta.metodoPago = paymentIntentConfirm;
                 
-                    await stripe.transfers.create({
-                        amount: 10,
-                        currency: 'mxn',
-                        destination: 'acct_1JOjHVPOnuOXNxOm',
-                        transfer_group: venta.id
-                    });
                     
                     var pedidos = [];
                 
@@ -1358,7 +1344,7 @@ var controller = {
 
         try{
 
-            const value = await Venta.findOneAndUpdate(
+            await Venta.findOneAndUpdate(
                 {
                     "_id":mongoose.Types.ObjectId(req.body.uid)
                 },{
@@ -1371,16 +1357,18 @@ var controller = {
                     ]
                 }
             )
+
+            const tienda = Tienda.findById(req.body.tienda);
+            
+            await stripe.payouts.create({
+                amount: (req.body.total*86.4).toFixed(2)*100,
+                currency: 'mxn',
+                method: 'instant',
+            }, {
+                stripe_account: tienda.stripe_account_id,
+            });
     
-            if(value){
-    
-                return res.status(200).json({ok:true});
-    
-            }else{
-    
-                return res.status(400).json({ok:false});
-    
-            }
+            return res.status(200).json({ok:true});
 
         }catch(e){
     
@@ -1393,7 +1381,7 @@ var controller = {
 
         try{
 
-            const value = await Venta.findOneAndUpdate(
+            await Venta.findOneAndUpdate(
                 {
                     "_id":mongoose.Types.ObjectId(req.body.uid)
                 },{
@@ -1407,17 +1395,18 @@ var controller = {
                 }
             )
     
-            if(value){
     
-                await Usuario.findByIdAndUpdate(req.uid,{$set:{notificado:false,transito:false,ultima_tarea:new Date()}});
-    
-                return res.status(200).json({ok:true});
-    
-            }else{
-    
-                return res.status(400).json({ok:false});
-    
-            }
+            const usuarioCheck =  await Usuario.findByIdAndUpdate(req.uid,{$set:{notificado:false,transito:false,ultima_tarea:new Date()}});
+            
+            await stripe.payouts.create({
+                amount: req.body.envio.toFixed(2)*100,
+                currency: 'mxn',
+                method: 'instant',
+            }, {
+                stripe_account: usuarioCheck.stripe_account_id,
+            });
+
+            return res.status(200).json({ok:true});
 
         }catch(e){
     

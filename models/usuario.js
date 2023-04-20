@@ -104,6 +104,10 @@ const UsuarioSchema =  Schema({
         type:Boolean,
         require:false
     },
+    stripe_account_id:{
+        type:String,
+        require:false
+    },
     recargas:[
         {
             type:Schema(
