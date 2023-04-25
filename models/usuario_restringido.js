@@ -22,4 +22,4 @@ RestringidoSchema.method('toJson',function(){
 
 });
 
-module.exports = model('Restringidos',RutaSchema);
+module.exports = model('Restringidos',RestringidoSchema);
