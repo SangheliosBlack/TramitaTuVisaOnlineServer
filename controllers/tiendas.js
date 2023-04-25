@@ -17,6 +17,7 @@ const pedido = require('../models/pedido');
 const Abono = require('../models/abono');
 const { json } = require('express');
 const Estado = require("../models/estado");
+const { TrustProductsEntityAssignmentsList } = require('twilio/lib/rest/trusthub/v1/trustProducts/trustProductsEntityAssignments');
 
 var controller = {
 
@@ -994,7 +995,8 @@ var controller = {
             [
                 {
                     $match:{
-                        tienda_ropa:false
+                        tienda_ropa:false,
+                        disponible:TrustProductsEntityAssignmentsList
                     }
                 
                 },
