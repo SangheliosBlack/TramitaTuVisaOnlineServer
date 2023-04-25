@@ -996,7 +996,7 @@ var controller = {
                 {
                     $match:{
                         tienda_ropa:false,
-                        disponible:TrustProductsEntityAssignmentsList
+                        disponible:true
                     }
                 
                 },
