@@ -4,6 +4,7 @@ const { generarJWT } = require("../helpers/jwt");
 const Usuario = require("../models/usuario");
 const Estado = require("../models/estado");
 const Tienda = require("../models/tiendas");
+const Restringidos = require("../models/usuario_restringido");
 const bcrypt = require("bcryptjs");
 const mongoose = require('mongoose');
 
@@ -281,37 +282,58 @@ var controller = {
 
     const version = req.header('x-version');
 
-    console.log(version);
+    const restringido = await Restringidos.findById(req.uid);
 
-    if(version){
-
-      const estado = await Estado.findOne({'_id':'644031c2199bafb28ba36532'});
-
-      if(version== estado.version){
-
-        estado.version = true;
-
-        console.log(estado);
-
-        return res.status(200).json(estado);
-        
-      }else{
-        
-        estado.version = false;
-        
-        return res.status(200).json(estado);
+    if(restringido){
       
-      }
-  
-    }else{
+      var estado = new Estado();
 
-      const estado = await Estado.findOne({'_id':'644031c2199bafb28ba36532'});
-
+      estado.mantenimiendo = false;
+      estado.disponible = false;
+      estado.cerrada = false;
       estado.version = false;
-      
+      estado.restringido = true;
+
       return res.status(200).json(estado);
 
+    }else{
+      
+      if(version){
+  
+        const estado = await Estado.findOne({'_id':'644031c2199bafb28ba36532'});
+  
+        if(version== estado.version){
+  
+          estado.version = true;
+  
+          estado.restringido = false;
+          
+          return res.status(200).json(estado);
+          
+        }else{
+          
+          estado.version = false;
+
+          estado.restringido = false;
+          
+          return res.status(200).json(estado);
+        
+        }
+    
+      }else{
+  
+        const estado = await Estado.findOne({'_id':'644031c2199bafb28ba36532'});
+  
+        estado.version = false;
+
+        estado.restringido = false;
+        
+        return res.status(200).json(estado);
+  
+      }
+
     }
+
 
   }
   

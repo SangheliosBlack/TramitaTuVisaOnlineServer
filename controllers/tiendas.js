@@ -617,7 +617,8 @@ var controller = {
             [
                 {
                     $match:{
-                        tienda_ropa:false
+                        tienda_ropa:false,
+                        disponible:true
                     }
                 
                 },{
@@ -704,7 +705,8 @@ var controller = {
             [
                 {
                         $match:{
-                            tienda_ropa:false
+                            tienda_ropa:false,
+                            disponible:true
                         }
                 
                 },{

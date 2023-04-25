@@ -16,8 +16,11 @@ const EstadoSchema = Schema({
     version:{
         type:String,
         require:true
+    },
+    restringido:{
+        type:Boolean,
+        require:false
     }
-        
 });
 
 EstadoSchema.method('JSON',function(){
