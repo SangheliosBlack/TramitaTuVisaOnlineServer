@@ -12,7 +12,7 @@ var controller = {
                 bounds:'21.3533019 -101.952672',
                 language:'es-419',
                 location_type:'ROOFTOP',
-                components:'MEX|47400|Lagos de Moreno'
+                components:'country:ME| postal_code:47400| locality: Lagos de Moreno'
             }
         }).then(function(response){
             return res.json(response.data);
@@ -71,6 +71,7 @@ var controller = {
                 key: process.env.GOOGLE_PLACES_API,
                 language:'es-419',
                 region:'mx',
+
                 location:'21.3533019 -101.952672',
                 radius:7000,
                 strictbounds:true,
