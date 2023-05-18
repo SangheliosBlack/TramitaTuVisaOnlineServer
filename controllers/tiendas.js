@@ -323,6 +323,8 @@ var controller = {
             
                             const repartidores = await Usuario.find({notificado:false,transito:false,repartidor:true,online_repartidor:true}).sort( { ultima_tarea: 1 }).limit(1);
         
+
+                            console.log(repartidores);
             
                             if(repartidores.length > 0){
         
@@ -344,11 +346,11 @@ var controller = {
                                     }
                                 );
         
-                                
+                                let arr = repartidores[0].nombre.split(' ');
             
                                 const data = {
                                     tokenId:repartidores[0].tokenFB,
-                                    titulo:`Tienes un nuevo pedido!`,
+                                    titulo:`${arr[0]} tienes un nuevo pedido!`,
                                     mensaje:'Presionar para mas detalles',
                                     evento:'1',
                                     pedido:JSON.stringify(pedidosSchema[element])
@@ -546,13 +548,15 @@ var controller = {
             
                                     
                 
-                                    const data = {
-                                        tokenId:repartidores[0].tokenFB,
-                                        titulo:`Tienes un nuevo pedido!`,
-                                        mensaje:'Presionar para mas detalles',
-                                        evento:'1',
-                                        pedido:JSON.stringify(pedidosSchema[element])
-                                    };           
+                                    let arr = repartidores[0].nombre.split(' ');
+            
+                                const data = {
+                                    tokenId:repartidores[0].tokenFB,
+                                    titulo:`${arr[0]} tienes un nuevo pedido!`,
+                                    mensaje:'Presionar para mas detalles',
+                                    evento:'1',
+                                    pedido:JSON.stringify(pedidosSchema[element])
+                                };                  
                                     
                                     if(repartidores[0].tokenFB){
             

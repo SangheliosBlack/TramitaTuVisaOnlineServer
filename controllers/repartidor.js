@@ -310,6 +310,7 @@ var controller = {
                 "direccion_negocio":'$direccion_negocio',
                 "envio":"$envio",
                 "ruta":"$ruta",
+                "abonos":[]
             }},{
                 $sort:{
                     "createdAt":-1
