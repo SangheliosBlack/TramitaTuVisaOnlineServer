@@ -45,7 +45,7 @@ var controller = {
     
         var venta = new Venta();
     
-        venta.total = tienda_ropa ? total-10.2 : total;
+        venta.total = tienda_ropa ? total: total;
         venta.envioPromo = codigo ? envio.toFixed(2) :0;
         venta.codigo_promo = codigo ? codigo : '';
         venta.envio = envio.toFixed(2);
