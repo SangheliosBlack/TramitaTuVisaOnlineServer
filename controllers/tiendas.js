@@ -139,7 +139,7 @@ var controller = {
                     subElement.efectivo = efectivo;
                     subElement.usuario = usuarioVenta;
                     subElement.tiempo_espera = datos_tienda.tiempo_espera;
-                    subElement.envio = 0;
+                    subElement.envio = envio;
                     subElement.direccion_negocio = direccion_negocio;
                     subElement.direccion_cliente = direccion;
                     
