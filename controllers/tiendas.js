@@ -131,7 +131,7 @@ var controller = {
                     usuarioVenta.nombre = usuarioData.nombre;
                     usuarioVenta._id = usuarioData._id;
                         
-                    subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad;
+                    subElement.total = (productos[element].precio + productos[element].extra) * productos[element].cantidad + envio ;
                     subElement.tienda = productos[element].tienda;
                     subElement.productos = [productos[element]];
                     subElement.imagen = datos_tienda.imagen_perfil;
