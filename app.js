@@ -30,7 +30,8 @@ class Server {
             stripe:'/api/stripe',
             twilio:'/api/twilio',
             google:'/api/google',
-            test:'/api/test'
+            test:'/api/test',
+            mor:'/api/mor'
         }
 
         this.middlewares();
@@ -68,6 +69,8 @@ class Server {
         this.app.use(this.paths.google,     require('./routes/google'));
         this.app.use(this.paths.test,       require('./routes/test'));
         this.app.use(this.paths.lakesFell,  require('./routes/lakes_feel'));
+        this.app.use(this.paths.lakesFell,  require('./routes/lakes_feel'));
+        this.app.use(this.paths.mor,  require('./routes/mor'));
 
     }
 
