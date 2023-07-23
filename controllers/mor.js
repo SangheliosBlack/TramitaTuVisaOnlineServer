@@ -26,7 +26,7 @@ var controller = {
     agregarAmigos:async(req,res)=>{
 
         try {
-            var busqueda = Usuarios.findOne({numero_celular:"4775181093"});
+            var busqueda = await Usuarios.findOne({numero_celular:"4775181093"});
             if(busqueda){       
                 await Usuarios.findByIdAndUpdate({_id:"6352dde2642e410016f994fc"},{$push:{amigos:"Luis Jaman"}})
                 return res.status(200).json({ok:true,msg:"Amigo agregado"});
@@ -41,8 +41,7 @@ var controller = {
     obtenerListadoAmigos:async(req,res)=>{
 
         try {
-            const listaAmigos = Usuarios.findById({_id:"6352dde2642e410016f994fc"});
-
+            const listaAmigos = await Usuarios.findById({_id:"6352dde2642e410016f994fc"});
             return res.status(200).json(listaAmigos.amigos);
         } catch (error) {
             return res.status(400);
