@@ -10,7 +10,7 @@ var controller = {
 
             console.log(eventos);
 
-            return res.status(200).json({eventos});
+            return res.status(200).json(eventos);
 
         } catch (error) {
 
