@@ -29,12 +29,12 @@ var controller = {
             var busqueda = await Usuarios.findOne({numero_celular:"4775181093"});
             if(busqueda){       
                 await Usuarios.findByIdAndUpdate({_id:"6352dde2642e410016f994fc"},{$push:{amigos:"Luis Jaman"}})
-                return res.status(200).json({ok:true,msg:"Amigo agregado"});
+                return res.status(200).json({ok:true,msg:"Amigo agregado",usuario:"Luis Jaman"});
             }else{
-                return res.status(200).json({ok:false,msg:"Este usuario no existe"});
+                return res.status(200).json({ok:false,msg:"Este usuario no existe",usuario:""});
             }
         } catch (error) {
-            return res.status(200).json({ok:false,msg:"Error"});
+            return res.status(200).json({ok:false,msg:"Error",usuario:""});
         }
 
     },
