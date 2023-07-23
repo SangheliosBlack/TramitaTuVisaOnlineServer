@@ -1,4 +1,6 @@
 const Eventos = require('../models/evento');
+const Usuarios = require('../models/usuario');
+
 
 var controller = {
 
@@ -10,7 +12,7 @@ var controller = {
 
             console.log(eventos);
 
-            return res.status(200).json(eventos);
+            return res.status(200).json(eventos );
 
         } catch (error) {
 
@@ -18,6 +20,32 @@ var controller = {
         
             return res.status(400);
 
+        }
+
+    },
+    agregarAmigos:async(req,res)=>{
+
+        try {
+            var busqueda = Usuarios.findOne({numero_celular:"4775181093"});
+            if(busqueda){       
+                await Usuarios.findByIdAndUpdate({_id:"6352dde2642e410016f994fc"},{$push:{amigos:"Luis Jaman"}})
+                return res.status(200).json({ok:true,msg:"Todoa correcto"});
+            }else{
+                return res.status(200).json({ok:false,msg:"Este usuario no existe"});
+            }
+        } catch (error) {
+            return res.status(200).json({ok:false,msg:"Error"});
+        }
+
+    },
+    obtenerListadoAmigos:async(req,res)=>{
+
+        try {
+            const listaAmigos = Usuarios.findById({_id:"6352dde2642e410016f994fc"});
+
+            return res.status(200).json(listaAmigos.amigos);
+        } catch (error) {
+            return res.status(400);
         }
 
     }
