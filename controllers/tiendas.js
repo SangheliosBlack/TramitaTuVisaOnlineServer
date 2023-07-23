@@ -24,6 +24,7 @@ var controller = {
     
     crearPedido:async (req,res)=>{
 
+
         var {total,tarjeta,productos,efectivo,codigo,direccion} = JSON.parse(req.body.cesta);
 
         var {abonoReq,envio,usuario,servicio,customer,tienda_ropa,liquidado,apartado} = req.body;
@@ -909,7 +910,7 @@ var controller = {
                 {
                     $match:{
                         'tienda':{
-                                $eq:'Capitan Naza'
+                                $eq:'Black Shop'
                         }
                     }
                 },{
