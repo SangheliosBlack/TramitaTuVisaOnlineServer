@@ -929,7 +929,7 @@ var controller = {
                         comentarios:'$productos.comentarios',
                         opciones:'$productos.opciones',
                         tienda:'$productos.tienda',
-                        sku:''
+                        sku:'$productos.sku'
                     }
                 }
             ]
