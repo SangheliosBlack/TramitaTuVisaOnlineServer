@@ -929,7 +929,7 @@ var controller = {
                         comentarios:'$productos.comentarios',
                         opciones:'$productos.opciones',
                         tienda:'$productos.tienda',
-                        sku:'$productos.sku'
+                        sku:''
                     }
                 }
             ]
@@ -943,7 +943,7 @@ var controller = {
             }
             var reg = new RegExp(input)
             
-            return listaProductos.filter(function(term) {
+            return listaProductos.filter(function(term) { 
                 if (term.nombre.toLowerCase().match(reg) || term.sku.match(reg)) {
                   return term;
                 }
