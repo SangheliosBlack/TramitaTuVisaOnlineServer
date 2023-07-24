@@ -106,7 +106,7 @@ const UsuarioSchema =  Schema({
     },
     amigos:[{
         type:Schema.Types.ObjectId,
-        ref:'Usuarios'
+        ref:'Usuario'
     }],
     stripe_account_id:{
         type:String,
