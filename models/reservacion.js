@@ -26,12 +26,22 @@ const ReservacionSchema = Schema({
         type:Number,
         require:true
     },
+    regular:{
+        type:Boolean,
+        require:true
+    },
+    regular_mesa:{
+        type:Boolean,
+        require:true
+    },
+    vip:{
+        type:Boolean,
+        require:true
+    },
     premium:{
         type:Boolean,
         require:true
     },
-
-
 })
 
 ReservacionSchema.method('toJson',function(){

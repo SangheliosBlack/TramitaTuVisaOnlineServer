@@ -1,6 +1,8 @@
 const Eventos = require('../models/evento');
 const Usuarios = require('../models/usuario');
 const Amigo = require('../models/amigo');
+const Reservacion = require('../models/reservacion');
+
 
 
 var controller = {
@@ -55,6 +57,23 @@ var controller = {
         return res.status(200).json(amigos.amigos);
 
     },
+    crearNuevoMesa: async(req,res)=>{
+
+        var nuevaMesa = new Reservacion();
+
+        nuevaMesa.mesa_id = "MR1";
+        nuevaMesa.lista_invitados = [];
+        nuevaMesa.disponible = true;
+        nuevaMesa.consumo_minimo = 1500;
+        nuevaMesa.maximo_personas = 8;
+        nuevaMesa.regular = true;
+        nuevaMesa.regular_mesa = false ;
+        nuevaMesa.vip = false;
+        nuevaMesa.premium = false;
+
+        await Eventos.findByIdAndUpdate({_id:"64bd5f6d0af7201d09d04a8b"},{$push:{reservaciones:nuevaMesa}});
+
+    }
     
 
 }
