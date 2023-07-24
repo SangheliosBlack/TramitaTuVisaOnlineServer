@@ -34,8 +34,12 @@ var controller = {
 
                 console.log(nuevoAmigo);
 
-                await Usuarios.findByIdAndUpdate({_id:"6352dde2642e410016f994fc"},{$push:{amigos:nuevoAmigo}})
-                return res.status(200).json({ok:true,msg:"Amigo agregado",usuario:busqueda});
+                try {
+                    await Usuarios.findByIdAndUpdate({_id:"6352dde2642e410016f994fc"},{$push:{amigos:nuevoAmigo}})
+                    return res.status(200).json({ok:true,msg:"Amigo agregado",usuario:busqueda});
+                } catch (error) {
+                    console.log(error);
+                }
             }else{
                 return res.status(200).json({ok:false,msg:"Este usuario no existe",usuario:""});
             }
