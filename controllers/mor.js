@@ -66,10 +66,10 @@ var controller = {
         nuevaMesa.mesa_id = req.body.mesa;
         nuevaMesa.lista_invitados = [];
         nuevaMesa.disponible = true;
-        nuevaMesa.consumo_minimo = 1500;
+        nuevaMesa.consumo_minimo = 2000;
         nuevaMesa.maximo_personas = 8;
-        nuevaMesa.regular = true;
-        nuevaMesa.regular_mesa = false ;
+        nuevaMesa.regular = false;
+        nuevaMesa.regular_mesa = true ;
         nuevaMesa.vip = false;
         nuevaMesa.premium = false;
 
