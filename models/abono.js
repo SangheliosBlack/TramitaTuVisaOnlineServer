@@ -14,7 +14,7 @@ const AbonoSchema = Schema({
         require:true
     }
 });
-;
+
 AbonoSchema.method('toJson',function(){
     const{__v,id,...object} = this.toObject();
     return object;

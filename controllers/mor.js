@@ -47,6 +47,16 @@ var controller = {
             return res.status(400);
         }
 
+    },
+    eliminarAmigo:async(req,res)=>{
+
+        try {   
+            await Usuarios.findByIdAndUpdate({_id:"6352dde2642e410016f994fc"},{$pull:});
+            doc.subdocs.pull({ _id: 4815162342 })
+        } catch (error) {
+            return res.status(400);
+        }
+
     }
 
 }
