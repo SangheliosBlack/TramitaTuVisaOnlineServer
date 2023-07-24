@@ -11,7 +11,7 @@ const AmigoSchema = Schema({
     }
 });
 
-AmigoSchemaSchema.method('toJson',function(){
+AmigoSchema.method('toJson',function(){
     const{__v,id,...object} = this.toObject();
     return object;
 })
