@@ -66,12 +66,12 @@ var controller = {
         nuevaMesa.mesa_id = req.body.mesa;
         nuevaMesa.lista_invitados = [];
         nuevaMesa.disponible = true;
-        nuevaMesa.consumo_minimo = 3000;
+        nuevaMesa.consumo_minimo = 4000;
         nuevaMesa.maximo_personas = 8;
         nuevaMesa.regular = false;
         nuevaMesa.regular_mesa = false ;
-        nuevaMesa.vip = true;
-        nuevaMesa.premium = false;
+        nuevaMesa.vip = false;
+        nuevaMesa.premium = true;
 
         await Eventos.findByIdAndUpdate({_id:"64bd5f6d0af7201d09d04a8b"},{$push:{reservaciones:nuevaMesa}});
 
