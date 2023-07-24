@@ -44,6 +44,7 @@ var controller = {
                 return res.status(200).json({ok:false,msg:"Este usuario no existe",usuario:""});
             }
         } catch (error) {
+            console.log(error);
             return res.status(200).json({ok:false,msg:"Error",usuario:""});
         }
 
