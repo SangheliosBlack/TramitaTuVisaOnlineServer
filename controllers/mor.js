@@ -59,12 +59,14 @@ var controller = {
     },
     crearNuevoMesa: async(req,res)=>{
 
+        
+
         var nuevaMesa = new Reservacion();
 
-        nuevaMesa.mesa_id = "MR1";
+        nuevaMesa.mesa_id = req.body.mesa;
         nuevaMesa.lista_invitados = [];
         nuevaMesa.disponible = true;
-        nuevaMesa.consumo_minimo = 1500;
+        nuevaMesa.consumo_minimo = req.body.consumo;
         nuevaMesa.maximo_personas = 8;
         nuevaMesa.regular = true;
         nuevaMesa.regular_mesa = false ;
