@@ -104,10 +104,10 @@ const UsuarioSchema =  Schema({
         type:Boolean,
         require:false
     },
-    amigos:[{
-        type:Schema.Types.ObjectId,
-        ref:'Usuario'
-    }],
+    amigos:{
+        type:Array,
+        require:true
+    },
     stripe_account_id:{
         type:String,
         require:false
