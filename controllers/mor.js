@@ -39,7 +39,7 @@ var controller = {
 
             }
 
-
+            console.log(miPerfil.amigos);
 
             for (let i = 0; i <= miPerfil.amigos.lenght; i++) {
                 console.log(miPerfil.amigos[i].id_usuario);
