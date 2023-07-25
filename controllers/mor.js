@@ -31,6 +31,7 @@ var controller = {
             var miPerfil = await Usuarios.findById({_id:req.uid});
             var busqueda = await Usuarios.findOne({numero_celular:req.body.numero});
 
+            console.log(req.uid);
             console.log(miPerfil.numero);
             console.log(req.body.numero);
 
