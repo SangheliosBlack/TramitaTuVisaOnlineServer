@@ -39,21 +39,11 @@ var controller = {
 
             }
 
-            var size = Object.keys(miPerfil.amigos).length;
+            const checkUser = obj => obj._id === busqueda._id;
 
+            if(miPerfil.amigos.some(checkUser)){
 
-            for (let i = 0; i < size; i++) {
-                console.log("__");
-                console.log(miPerfil.amigos[i].id_usuario);
-                console.log(busqueda._id);
-                console.log("__");
-                if(miPerfil.amigos[i].id_usuario.toStrin == busqueda._id){
-                    console.log("porque no");
-                    return res.status(200).json({ok:false,msg:"Este esta repetido",usuario:""});
-                }else{
-                    console.log("nada");
-                }
-                
+                return res.status(200).json({ok:false,msg:"Este esta repetido",usuario:""});
             }
 
             if(busqueda){       
