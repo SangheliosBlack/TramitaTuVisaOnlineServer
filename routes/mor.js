@@ -9,6 +9,8 @@ router.get('/obtenerEventos',controller.obtenerEventos);
 router.post('/agregarAmigo',validarJWT,controller.agregarAmigos);
 router.post('/crearNuevoMesa',controller.crearNuevoMesa);
 router.post('/crearNuevaReserva',validarJWT,controller.crearNuevaReserva);
+router.post('/agregarInvitado',validarJWT,controller.crearNuevaReserva);
+router.post('/eliminarInvitado',validarJWT,controller.eliminarInvitado);
 
 
 module.exports = router;

@@ -80,6 +80,44 @@ var controller = {
         await Eventos.findByIdAndUpdate({_id:"64bd5f6d0af7201d09d04a8b"},{$push:{reservaciones:nuevaMesa}});
 
     },
+    agregarInvitado:async(req,res)=>{
+
+        await Eventos.findOneAndUpdate(
+            {
+                "_id":mongoose.Types.ObjectId(req.body.evento)
+            },
+            {
+                $push:{"reservaciones.$[i].lista_invitados":mongoose.Types.ObjectId(req.uid)}
+            },
+            {
+                arrayFilters:[
+                    {
+                        "i._id":mongoose.Types.ObjectId(req.body.reservacion)
+                    }
+                ]
+            }
+        );
+
+    },
+    eliminarInvitado:async(req,res)=>{
+
+        await Eventos.findOneAndUpdate(
+            {
+                "_id":mongoose.Types.ObjectId(req.body.evento)
+            },
+            {
+                $pull:{"reservaciones.$[i].lista_invitados":mongoose.Types.ObjectId(req.uid)}
+            },
+            {
+                arrayFilters:[
+                    {
+                        "i._id":mongoose.Types.ObjectId(req.body.reservacion)
+                    }
+                ]
+            }
+        );
+
+    },
     crearNuevaReserva:async(req,res)=>{
 
         try {
