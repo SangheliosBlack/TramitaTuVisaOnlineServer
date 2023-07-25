@@ -153,7 +153,7 @@ var controller = {
                     "_id":mongoose.Types.ObjectId(req.body.evento)
                 },
                 {
-                    $push:{"reservaciones.$[i].lista_invitados":mongoose.Types.ObjectId(req.body.reservacion)}
+                    $push:{"reservaciones.$[i].lista_invitados":mongoose.Types.ObjectId(req.uid)}
                 },
                 {
                     arrayFilters:[
