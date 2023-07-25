@@ -104,6 +104,22 @@ var controller = {
                 }
             );
 
+            await Eventos.findOneAndUpdate(
+                {
+                    "_id":mongoose.Types.ObjectId(req.body.evento)
+                },
+                {
+                    $push:{"reservaciones.$[i].lista_invitados":req.uid}
+                },
+                {
+                    arrayFilters:[
+                        {
+                            "i._id":mongoose.Types.ObjectId(req.body.reservacion)
+                        }
+                    ]
+                }
+            );
+
             return res.status(200).json({ok:true});
             
         } catch (error) {
