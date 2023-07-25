@@ -100,6 +100,8 @@ var controller = {
             }
         );
 
+        return res.status(200).json({ok:true});
+
     },
     eliminarInvitado:async(req,res)=>{
 
@@ -118,6 +120,8 @@ var controller = {
                 ]
             }
         );
+
+        return res.status(200).json({ok:true});
 
     },
     crearNuevaReserva:async(req,res)=>{
