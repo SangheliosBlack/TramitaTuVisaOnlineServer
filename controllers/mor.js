@@ -31,9 +31,7 @@ var controller = {
             var miPerfil = await Usuarios.findById(req.uid);
             var busqueda = await Usuarios.findOne({numero_celular:req.body.numero});
 
-            console.log(req.uid);
-            console.log(miPerfil.numero);
-            console.log(req.body.numero);
+            
 
             if(miPerfil.numero_celular==req.body.numero){
 
@@ -41,8 +39,11 @@ var controller = {
 
             }
 
-            for (let i = 0; i < miPerfil.amigos.lenght; i++) {
-            
+
+
+            for (let i = 0; i <= miPerfil.amigos.lenght; i++) {
+                console.log(miPerfil.amigos[i].id_usuario);
+                console.log(busqueda._id);
                 if(miPerfil.amigos[i].id_usuario == busqueda._id){
                     return res.status(200).json({ok:false,msg:"Este esta repetido",usuario:""});
                 }
