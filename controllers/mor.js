@@ -31,6 +31,9 @@ var controller = {
             var miPerfil = await Usuarios.findById({_id:req.uid});
             var busqueda = await Usuarios.findOne({numero_celular:req.body.numero});
 
+            console.log(miPerfil.numero);
+            console.log(req.body.numero);
+
             if(miPerfil.numero==req.body.numero){
 
                 return res.status(200).json({ok:false,msg:"No es posible esta accion",usuario:""});
