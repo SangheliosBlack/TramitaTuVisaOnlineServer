@@ -33,6 +33,10 @@ var controller = {
             var busqueda = await Usuarios.findOne({numero_celular:req.body.numero});
 
             if(busqueda){   
+
+                var busqueda2 = await Usuarios.find({numero_celular:req.body.numero},{"amigos.id_usuario":busqueda._id});
+
+                console.log(busqueda2);
                 
                 var miPerfil = await Usuarios.findById(req.uid);
 
