@@ -84,6 +84,10 @@ var controller = {
 
         try {
 
+            console.log(req.body);
+
+            console.log(req.uid);
+
             await Eventos.findOneAndUpdate(
                 {
                     "_id":mongoose.Types.ObjectId(req.body.evento)
