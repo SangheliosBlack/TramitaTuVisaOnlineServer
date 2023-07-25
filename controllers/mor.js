@@ -82,6 +82,8 @@ var controller = {
     },
     agregarInvitado:async(req,res)=>{
 
+        console.req.body;
+
         await Eventos.findOneAndUpdate(
             {
                 "_id":mongoose.Types.ObjectId(req.body.evento)
