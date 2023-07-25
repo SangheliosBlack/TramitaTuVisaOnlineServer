@@ -93,7 +93,7 @@ var controller = {
                     "_id":mongoose.Types.ObjectId(req.body.evento)
                 },
                 {
-                    $set:{"reservaciones.$[i].administrador":req.uid}
+                    $set:{"reservaciones.$[i].administrador":mongoose.Types.ObjectId(req.uid)}
                 },
                 {
                     arrayFilters:[
