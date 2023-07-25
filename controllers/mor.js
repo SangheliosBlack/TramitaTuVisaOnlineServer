@@ -27,7 +27,24 @@ var controller = {
     agregarAmigos:async(req,res)=>{
 
         try {
+
+            var miPerfil = await Usuarios.findByIdAndUpdate({_id:req.uid});
             var busqueda = await Usuarios.findOne({numero_celular:req.body.numero});
+
+            if(miPerfil.numero==numero){
+
+                return res.status(200).json({ok:false,msg:"No es posible esta accion",usuario:""});
+
+            }
+
+            for (let i = 0; i < miPerfil.amigos.lenght; i++) {
+            
+                if(miPerfil.amigos[i].id_usuario== busqueda._id){
+                    return res.status(200).json({ok:false,msg:"Este esta repetido",usuario:""});
+                }
+                
+            }
+
             if(busqueda){       
 
                 var nuevoAmigo = new Amigo();
