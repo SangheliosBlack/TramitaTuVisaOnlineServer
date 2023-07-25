@@ -96,9 +96,6 @@ var controller = {
                     $set:{"reservaciones.$[i].administrador":req.uid}
                 },
                 {
-                    $push:{"reservaciones.$[i].lista_invitados":req.uid}
-                },
-                {
                     arrayFilters:[
                         {
                             "i._id":mongoose.Types.ObjectId(req.body.reservacion)
