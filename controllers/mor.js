@@ -27,17 +27,16 @@ var controller = {
     agregarAmigos:async(req,res)=>{
 
         try {
-            var busqueda = await Usuarios.findOne({numero_celular:"4775181093"});
+            var busqueda = await Usuarios.findOne({numero_celular:req.body.numero});
             if(busqueda){       
 
                 var nuevoAmigo = new Amigo();
                 nuevoAmigo.nombre = busqueda.nombre;
                 nuevoAmigo.id_usuario = busqueda._id;
 
-                console.log(nuevoAmigo);
 
                 try {
-                    await Usuarios.findByIdAndUpdate({_id:"6352dde2642e410016f994fc"},{$push:{amigos:nuevoAmigo}})
+                    await Usuarios.findByIdAndUpdate({_id:req.uid},{$push:{amigos:nuevoAmigo}})
                     return res.status(200).json({ok:true,msg:"Amigo agregado",usuario:nuevoAmigo});
                 } catch (error) {
                     console.log(error);

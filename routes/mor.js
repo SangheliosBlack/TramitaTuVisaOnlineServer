@@ -6,7 +6,7 @@ const router = Router();
 
 router.post('/obtenerListadoAmigos',validarJWT,controller.obtenerListadoAmigos);
 router.get('/obtenerEventos',controller.obtenerEventos);
-router.post('/agregarAmigo',controller.agregarAmigos);
+router.post('/agregarAmigo',validarJWT,controller.agregarAmigos);
 router.post('/crearNuevoMesa',controller.crearNuevoMesa);
 
 
