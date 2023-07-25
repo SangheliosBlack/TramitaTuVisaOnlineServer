@@ -3,6 +3,7 @@ const Usuarios = require('../models/usuario');
 const Amigo = require('../models/amigo');
 const Reservacion = require('../models/reservacion');
 const { json } = require('express');
+const mongoose = require('mongoose');
 
 
 
@@ -77,6 +78,39 @@ var controller = {
         nuevaMesa.premium = true;
 
         await Eventos.findByIdAndUpdate({_id:"64bd5f6d0af7201d09d04a8b"},{$push:{reservaciones:nuevaMesa}});
+
+    },
+    crearNuevaReserva:async(req,res)=>{
+
+        try {
+
+            await Eventos.findOneAndUpdate(
+                {
+                    "_id":mongoose.Types.ObjectId(req.body.evento)
+                },
+                {
+                    $set:{"reservaciones.$[i].administrador":req.uid}
+                },
+                {
+                    $push:{"reservaciones.$[i].lista_invitados":req.uid}
+                },
+                {
+                    arrayFilters:[
+                        {
+                            "i._id":mongoose.Types.ObjectId(req.body.reservacion)
+                        }
+                    ]
+                }
+            );
+
+            return res.status(200).json({ok:true});
+            
+        } catch (error) {
+
+            
+            
+            return res.status(400).json({ok:false});
+        }
 
     }
     
