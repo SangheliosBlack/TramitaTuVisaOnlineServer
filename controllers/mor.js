@@ -28,7 +28,7 @@ var controller = {
 
         try {
 
-            var miPerfil = await Usuarios.findByIdAndUpdate({_id:req.uid});
+            var miPerfil = await Usuarios.findById({_id:req.uid});
             var busqueda = await Usuarios.findOne({numero_celular:req.body.numero});
 
             if(miPerfil.numero==numero){
