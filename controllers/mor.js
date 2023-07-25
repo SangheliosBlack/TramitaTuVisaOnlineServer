@@ -35,7 +35,7 @@ var controller = {
             console.log(miPerfil.numero);
             console.log(req.body.numero);
 
-            if(miPerfil.numero==req.body.numero){
+            if(miPerfil.numero_celular==req.body.numero){
 
                 return res.status(200).json({ok:false,msg:"No es posible esta accion",usuario:""});
 
@@ -43,7 +43,7 @@ var controller = {
 
             for (let i = 0; i < miPerfil.amigos.lenght; i++) {
             
-                if(miPerfil.amigos[i].id_usuario== busqueda._id){
+                if(miPerfil.amigos[i].id_usuario == busqueda._id){
                     return res.status(200).json({ok:false,msg:"Este esta repetido",usuario:""});
                 }
                 
