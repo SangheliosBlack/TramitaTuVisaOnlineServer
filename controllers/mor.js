@@ -2,6 +2,7 @@ const Eventos = require('../models/evento');
 const Usuarios = require('../models/usuario');
 const Amigo = require('../models/amigo');
 const Reservacion = require('../models/reservacion');
+const { json } = require('express');
 
 
 
@@ -39,9 +40,11 @@ var controller = {
 
             }
 
-            console.log(miPerfil.amigos.some(e=> e.id_usuario == busqueda._id));
+            var amigosPre = JSON.parse(miPerfil.amigos);
 
-            if(miPerfil.amigos.some(e=> e.id_usuario == busqueda._id)){
+            console.log(amigosPre.some(e=> e.id_usuario == busqueda._id));
+
+            if(amigosPre.some(e=> e.id_usuario == busqueda._id)){
 
                 return res.status(200).json({ok:false,msg:"Este esta repetido",usuario:""});
             }
