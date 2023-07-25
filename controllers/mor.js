@@ -41,7 +41,8 @@ var controller = {
 
             var size = Object.keys(miPerfil.amigos).length;
 
-            for (let i = 0; i <= size; i++) {
+            
+            for (let i = 0; i < size; i++) {
                 console.log(miPerfil.amigos[i].id_usuario);
                 console.log(busqueda._id);
                 if(miPerfil.amigos[i].id_usuario == busqueda._id){
