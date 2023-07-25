@@ -53,7 +53,7 @@ var controller = {
     },
     obtenerListadoAmigos:async(req,res)=>{
 
-        var amigos = await Usuarios.findById({_id:"6352dde2642e410016f994fc"});
+        var amigos = await Usuarios.findById({_id:req.uid});
         return res.status(200).json(amigos.amigos);
 
     },
