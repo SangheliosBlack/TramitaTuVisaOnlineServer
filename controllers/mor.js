@@ -34,32 +34,10 @@ var controller = {
 
             if(busqueda){   
 
-                var busqueda2 = await Usuarios.find({numero_celular:req.body.numero},{"amigos.id_usuario":busqueda._id});
-
-                console.log(busqueda2);
-                
-                var miPerfil = await Usuarios.findById(req.uid);
-
-                if(miPerfil.numero_celular==req.body.numero){
-
-                    return res.status(200).json({ok:false,msg:"No es posible esta accion",usuario:""});
-    
-                }
-    
-                for (let a of miPerfil.amigos) {
-    
-                    if(a.id_usuario == busqueda._id){
-    
-                        return res.status(200).json({ok:false,msg:"Este esta repetido",usuario:""});
-    
-                    }
-    
-                }
-
                 var nuevoAmigo = new Amigo();
                 nuevoAmigo.nombre = busqueda.nombre;
                 nuevoAmigo.id_usuario = busqueda._id;
-
+                nuevoAmigo.celular = busqueda.numero_celular;
 
                 try {
                     await Usuarios.findByIdAndUpdate({_id:req.uid},{$push:{amigos:nuevoAmigo}})

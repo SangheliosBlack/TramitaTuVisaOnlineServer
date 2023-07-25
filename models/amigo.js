@@ -8,6 +8,14 @@ const AmigoSchema = Schema({
     nombre:{
         type:String,
         require:true
+    },
+    nombre:{
+        type:String,
+        require:true
+    },
+    celular:{
+        type:String,
+        require
     }
 });
 
