@@ -39,9 +39,9 @@ var controller = {
 
             }
 
-            const checkUser = obj => obj._id === busqueda._id;
+            console.log(miPerfil.amigos.some(e=> e._id_usuario === busqueda._id));
 
-            if(miPerfil.amigos.some(checkUser)){
+            if(miPerfil.amigos.some(e=> e._id_usuario === busqueda._id)){
 
                 return res.status(200).json({ok:false,msg:"Este esta repetido",usuario:""});
             }
