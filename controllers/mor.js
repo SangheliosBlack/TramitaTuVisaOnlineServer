@@ -82,7 +82,7 @@ var controller = {
     },
     agregarInvitado:async(req,res)=>{
 
-        console.req.body;
+        console.req.body;   
 
         await Eventos.findOneAndUpdate(
             {
