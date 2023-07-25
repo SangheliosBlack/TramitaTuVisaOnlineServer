@@ -111,6 +111,7 @@ var controller = {
             
         } catch (error) {
 
+                console.log(error);
             
             
             return res.status(400).json({ok:false});
