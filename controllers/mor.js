@@ -87,7 +87,7 @@ var controller = {
                 "_id":mongoose.Types.ObjectId(req.body.evento)
             },
             {
-                $push:{"reservaciones.$[i].lista_invitados":mongoose.Types.ObjectId(req.uid)}
+                $push:{"reservaciones.$[i].lista_invitados":mongoose.Types.ObjectId(req.body.usuario)}
             },
             {
                 arrayFilters:[
@@ -106,7 +106,7 @@ var controller = {
                 "_id":mongoose.Types.ObjectId(req.body.evento)
             },
             {
-                $pull:{"reservaciones.$[i].lista_invitados":mongoose.Types.ObjectId(req.uid)}
+                $pull:{"reservaciones.$[i].lista_invitados":mongoose.Types.ObjectId(req.body.usuario)}
             },
             {
                 arrayFilters:[
