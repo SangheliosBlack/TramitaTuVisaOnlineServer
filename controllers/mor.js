@@ -29,27 +29,28 @@ var controller = {
 
         try {
 
-            var miPerfil = await Usuarios.findById(req.uid);
+           
             var busqueda = await Usuarios.findOne({numero_celular:req.body.numero});
 
-            
+            if(busqueda){   
+                
+                var miPerfil = await Usuarios.findById(req.uid);
 
-            if(miPerfil.numero_celular==req.body.numero){
+                if(miPerfil.numero_celular==req.body.numero){
 
-                return res.status(200).json({ok:false,msg:"No es posible esta accion",usuario:""});
-
-            }
-
-            var amigosPre = JSON.parse(miPerfil.amigos);
-
-            console.log(amigosPre.some(e=> e.id_usuario == busqueda._id));
-
-            if(amigosPre.some(e=> e.id_usuario == busqueda._id)){
-
-                return res.status(200).json({ok:false,msg:"Este esta repetido",usuario:""});
-            }
-
-            if(busqueda){       
+                    return res.status(200).json({ok:false,msg:"No es posible esta accion",usuario:""});
+    
+                }
+    
+                for (let a of miPerfil.amigos) {
+    
+                    if(a.id_usuario == busqueda._id){
+    
+                        return res.status(200).json({ok:false,msg:"Este esta repetido",usuario:""});
+    
+                    }
+    
+                }
 
                 var nuevoAmigo = new Amigo();
                 nuevoAmigo.nombre = busqueda.nombre;
