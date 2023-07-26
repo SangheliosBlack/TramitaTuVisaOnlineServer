@@ -155,7 +155,7 @@ var controller = {
                     "_id":mongoose.Types.ObjectId(req.body.evento)
                 },
                 {
-                    $set:{"reservaciones.$[i].nombre_administrador":mongoose.Types.ObjectId(usuario.nombre)}
+                    $set:{"reservaciones.$[i].nombre_administrador":usuario.nombre}
                 },
                 {
                     arrayFilters:[
