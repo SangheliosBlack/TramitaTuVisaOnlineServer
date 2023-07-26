@@ -84221,7 +84221,7 @@ D(a){var s,r,q=null
 A.aCz(B.a6Q)
 s=$.aEJ().a
 r=A.Uk(q,q,B.M,q)
-return new A.A4(s,"/",$.aE3().gV1(),new A.auk(a),"Flutter Demo",r,B.RS,B.Uo,!1,q)}}
+return new A.A4(s,"/",$.aE3().gV1(),new A.auk(a),"MOR THE EXPERIENCE CLUB",r,B.RS,B.Uo,!1,q)}}
 A.auk.prototype={
 $2(a,b){return new A.nh(A.a([A.lt(new A.auj(A.fJ(this.a,!0,t.g),b),!1)],t.wi),B.I,null)},
 $S:503}
