@@ -132,12 +132,30 @@ var controller = {
 
             console.log(req.uid);
 
+            var usuario = await Usuarios.findById(req.uid);
+
             await Eventos.findOneAndUpdate(
                 {
                     "_id":mongoose.Types.ObjectId(req.body.evento)
                 },
                 {
-                    $set:{"reservaciones.$[i].administrador":mongoose.Types.ObjectId(req.uid)}
+                    $set:{"reservaciones.$[i].administrador":mongoose.Types.ObjectId(usuario._id)}
+                },
+                {
+                    arrayFilters:[
+                        {
+                            "i._id":mongoose.Types.ObjectId(req.body.reservacion)
+                        }
+                    ]
+                }
+            );
+
+            await Eventos.findOneAndUpdate(
+                {
+                    "_id":mongoose.Types.ObjectId(req.body.evento)
+                },
+                {
+                    $set:{"reservaciones.$[i].nombre_administrador":mongoose.Types.ObjectId(usuario.nombre)}
                 },
                 {
                     arrayFilters:[
