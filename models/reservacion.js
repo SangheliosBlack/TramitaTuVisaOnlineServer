@@ -10,6 +10,10 @@ const ReservacionSchema = Schema({
         type:Schema.Types.ObjectId,
         require:true
     },
+    numero_administrador:{
+        type:String,
+        require:true
+    },
     nombre_administrador:{
         type:String,
         require:true

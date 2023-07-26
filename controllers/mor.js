@@ -155,6 +155,21 @@ var controller = {
                     "_id":mongoose.Types.ObjectId(req.body.evento)
                 },
                 {
+                    $set:{"reservaciones.$[i].numero_administrador":usuario.numero_celular}
+                },
+                {
+                    arrayFilters:[
+                        {
+                            "i._id":mongoose.Types.ObjectId(req.body.reservacion)
+                        }
+                    ]
+                }
+            );
+            await Eventos.findOneAndUpdate(
+                {
+                    "_id":mongoose.Types.ObjectId(req.body.evento)
+                },
+                {
                     $set:{"reservaciones.$[i].nombre_administrador":usuario.nombre}
                 },
                 {
