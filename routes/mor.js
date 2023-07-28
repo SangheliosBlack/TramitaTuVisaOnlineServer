@@ -11,6 +11,7 @@ router.post('/crearNuevoMesa',controller.crearNuevoMesa);
 router.post('/crearNuevaReserva',validarJWT,controller.crearNuevaReserva);
 router.post('/agregarInvitado',validarJWT,controller.agregarInvitado);
 router.post('/eliminarInvitado',validarJWT,controller.eliminarInvitado);
+router.post('/revisar_reservacion',validarJWT,controller.revisar_reservacion);
 
 
 module.exports = router;

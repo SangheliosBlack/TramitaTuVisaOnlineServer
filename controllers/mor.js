@@ -124,6 +124,33 @@ var controller = {
         return res.status(200).json({ok:true});
 
     },
+    revisar_reservacion:async(req,res)=>{
+
+        try {
+
+           var reservacionAwait = await Eventos.aggregate(
+            [
+            {$match:{_id:mongoose.Types.ObjectId(req.body.event)}},
+            {$unwind:"$reservaciones"},
+            {$project:{
+                lista:{$filter:{
+                    input:"$reservaciones.lista_invitados",
+                    as:"reservacion",
+                    cond:{$eq:["$$reservacion",mongoose.Types.ObjectId(req.body.usuario)]}
+                }}
+            }}
+            ]);
+            
+            if(reservacionAwait[0].lista.lenght>=1){
+                return res.status(200).json({"ok":true});
+            }else{
+                return res.status(400).json({"ok":false});
+            }
+
+        } catch (error) {
+            return res.status(400).json({ok:false});        
+        }
+    },
     crearNuevaReserva:async(req,res)=>{
 
         try {
