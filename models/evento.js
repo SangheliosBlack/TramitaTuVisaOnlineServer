@@ -32,7 +32,12 @@ const EventoSchema = Schema({
     line_up:{
         type:Array,
         require:true
-    }
+    },
+    imagen:{
+        type:String,
+        require:true
+    },
+    
 })
 
 EventoSchema.method('toJson',function(){
