@@ -108,6 +108,10 @@ const UsuarioSchema =  Schema({
         type:Array,
         require:true
     },
+    puesto:{
+        type:String,
+        require:false
+    },
     stripe_account_id:{
         type:String,
         require:false
