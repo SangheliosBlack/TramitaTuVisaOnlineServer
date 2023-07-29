@@ -910,7 +910,7 @@ var controller = {
                 {
                     $match:{
                         'tienda':{
-                                $eq:'Capitan Naza'
+                                $eq:'Mor'
                         }
                     }
                 },{
