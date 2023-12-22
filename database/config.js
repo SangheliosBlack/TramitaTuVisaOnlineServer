@@ -1,21 +1,21 @@
 const mongoose = require('mongoose');
+const logger = require('../helpers/logger');
 
 const dbConnection = async()=>{
     
     try{
-        mongoose.connect(process.env.DB_CNN, {
+        mongoose.connect(process.env.DB_ATLAS, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useCreateIndex: true,
             useFindAndModify: false
         });
     
-        console.log('Base de datos conectada');
+        logger.info('Base de datos conectada');
 
     }catch(error){
         
-        console.log(error);
-        throw new Error('Error en la base de datos - Hable con el Admin');
+        new AppError('Error en la base de datos - Hable con el Admin', 404);
 
     }
 }

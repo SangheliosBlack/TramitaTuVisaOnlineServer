@@ -1,5 +1,4 @@
 const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
-const { generarNombre } = require("../helpers/generar_nombre");
 const { generarJWT } = require("../helpers/jwt");
 const Usuario = require("../models/usuario");
 const Estado = require("../models/estado");
@@ -15,9 +14,11 @@ var controller = {
     const { correo, contrasena } = req.body;
   
     try {
+
       const existeEmail = await Usuario.findOne({correo: correo.toLowerCase()});
   
       if (existeEmail) {
+        
         console.log('correo repetido');
   
         res.status(400).json({

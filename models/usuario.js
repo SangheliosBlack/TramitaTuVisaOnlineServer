@@ -1,23 +1,11 @@
 const {Schema,model} = require ('mongoose');
 
 const UsuarioSchema =  Schema({
-    envio_promo:{
-        type:Boolean,
-        required:true
-    },
     codigo:{
         type:String,
         required:false,
         unique:true,
         sparse:true,
-    },
-    avatar:{
-        type:Object,
-        required:false
-    },
-    nombre_usuario:{
-        type:String,
-        require:true
     },
     dialCode:{
         type:String,
@@ -26,14 +14,6 @@ const UsuarioSchema =  Schema({
     nombre:{
         type:String,
         require:true
-    },
-    online:{
-        type:Boolean,
-        default:false
-    },
-    online_repartidor:{
-        type:Boolean,
-        default:false
     },
     correo:{
         type:String,
@@ -45,20 +25,6 @@ const UsuarioSchema =  Schema({
         type:String,
         required:true
     },
-    direcciones:{
-        type:Array,
-        required:false
-    },
-    socio:{
-        type:Boolean,
-        required:true
-    },
-    customer_id:{
-        type:String,
-        required:false,
-        sparse:true,
-        unique:true,
-    },
     profile_photo_key:{
         type:String,
         require: false
@@ -68,74 +34,6 @@ const UsuarioSchema =  Schema({
         unique:true,
         required:false
     },
-    negocios:[{
-        type:Schema.Types.ObjectId,
-        ref:'Tiendas'
-    }],
-    cesta:{
-        type:Object,
-        require :true
-    },
-    tokenFB:{
-        type:String,
-        require:false
-    },
-    impresora:{
-        type:Object,
-        require:false
-    },
-    repartidor:{
-        type:Boolean,
-        require:true
-    },
-    ultima_tarea:{
-        type:Date,
-        require:true
-    },
-    transito:{
-        type:Boolean,
-        require:true
-    },
-    notificado:{
-        type:Boolean,
-        require:false
-    },
-    hibrido:{
-        type:Boolean,
-        require:false
-    },
-    amigos:{
-        type:Array,
-        require:true
-    },
-    puesto:{
-        type:String,
-        require:false
-    },
-    stripe_account_id:{
-        type:String,
-        require:false
-    },
-    recargas:[
-        {
-            type:Schema(
-                {
-                    cantidad:{
-                        type:Number,
-                        require:true
-                    },
-                    usuario:{
-                        type:Schema.Types.ObjectId,
-                        require:true
-                    }
-                },
-                {
-                    timestamps: true
-                }
-            )
-        }
-    ]
-    
 },{
     timestamps:true
 });
