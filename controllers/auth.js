@@ -1,4 +1,3 @@
-const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
 const { generarJWT } = require("../helpers/jwt");
 const Usuario = require("../models/usuario");
 const bcrypt = require("bcryptjs");
@@ -31,15 +30,6 @@ var controller = {
       
       const usuario = new Usuario(req.body);
   
-      const numero = req.body.numero_celular.replace(/ /g,'');
-      
-      const customer = await stripe.customers.create({
-        description: `Cliente creado con el ID : ${usuario._id}`,
-        email:correo,
-        name:req.body.nombre,
-        phone:numero
-      });
-  
       const salt = bcrypt.genSaltSync();
   
       const str = req.body.nombre.toLowerCase();
@@ -61,7 +51,6 @@ var controller = {
       usuario.socio = false;
       usuario.online = false;
       usuario.envio_promo = false;
-      usuario.customer_id = customer.id;
       usuario.tokenFB = req.body.tokenFB;
       usuario.cesta ={
         productos:[],
