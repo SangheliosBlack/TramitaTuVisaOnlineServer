@@ -1,6 +1,5 @@
 const s3 = require("../config/s3.config.js");
 const Usuario = require('../models/usuario');
-const { repartidores } = require('./test');
 const mongoose = require('mongoose');
 const path = require('path');
 const fs = require("fs");

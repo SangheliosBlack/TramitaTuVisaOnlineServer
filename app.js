@@ -36,10 +36,6 @@ class Server {
 
             auth:'/autentificacion',
             usuario:'/usuario',
-            stripe:'/stripe',
-            twilio:'/twilio',
-            google:'/google',
-            test:'/test'
 
         }
 
@@ -95,10 +91,6 @@ class Server {
 
       this.app.use(`${this.apiVersion}${this.paths.auth}`,       require('./routes/autentificacion'));
       this.app.use(`${this.apiVersion}${this.paths.usuario}`,    require('./routes/usuarios'));
-      this.app.use(`${this.apiVersion}${this.paths.stripe}`,     require('./routes/stripe'));
-      this.app.use(`${this.apiVersion}${this.paths.twilio}`,     require('./routes/twilio'));
-      this.app.use(`${this.apiVersion}${this.paths.google}`,     require('./routes/google'));
-      this.app.use(`${this.apiVersion}${this.paths.test}`,       require('./routes/test'));
 
       this.app.all('*', (req, res, next) => {
         console.log(`${this.apiVersion}${this.paths.usuario}`);
