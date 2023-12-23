@@ -1,31 +1,11 @@
-const Producto = require('../models/producto');
 const s3 = require("../config/s3.config.js");
 const Usuario = require('../models/usuario');
 const { repartidores } = require('./test');
-const Venta = require('../models/venta');
 const mongoose = require('mongoose');
 const path = require('path');
 const fs = require("fs");
 
  var controller = {
-    updateDireccionFavorita : async(req,res)=>{
-        
-        await  Usuario.findByIdAndUpdate({'_id':req.uid},{$set:{direccionFavorita:req.body.direccionFavorita}});
-      
-        res.json({
-          ok:true
-        });
-
-    },
-    modificarTiendaFavorita  : async( req,res) => {
-    
-        await Usuario.findOneAndUpdate({_id:req.uid},{$set:{tiendaFavorita:req.body.tienda}});
-    
-        res.json({
-            ok:true
-        });
-
-    },
     guardarFotoPerfil : async(req,res)=>{
 
         const usuario = await Usuario.findById(req.uid);
@@ -84,41 +64,6 @@ const fs = require("fs");
         });
     
     } ,
-    getUsuarios :async (req,res)=>{
-    
-        const data = await Usuario.aggregate([
-            {
-                $match:{_id:mongoose.Types.ObjectId(req.uid)}
-            },
-            {
-                $lookup:{
-                    from:'usuarios',
-                    let:{'store':'$store','admin':'$admin'},
-                    pipeline:[{
-                        $match:{
-                            $expr:{
-                                $and:[
-                                    {$eq:['$$store','$store']},
-                                    {$eq:[false,'$admin']}
-                                ]
-                            }
-                        }
-                    }],
-                    as:'usuarios'
-                }
-            }
-        ]);
-    
-        const users = data[0].usuarios;
-        
-        //const usuarios = await Usuario.find({_id:{$ne:req.uid}}).sort('-online').skip(desde).limit(20);
-    
-        res.json({
-            ok:true,
-            usuarios:users
-        });
-    
-    },
     modificarNombre : async(req, res)=>{
         
         await Usuario.findOneAndUpdate({_id:req.uid},{$set:{nombre:req.body.nombre}});

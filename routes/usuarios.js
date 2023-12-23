@@ -7,11 +7,8 @@ const upload = require("../multer");
 const router = Router();
 
 router.get('/ordenes',validarJWT,controller.ordenes);
-router.get('/',       validarJWT,controller.getUsuarios);
 
 router.post('/modificarCantidadProductoCesta',validarJWT,controller.modificarCantidadProductoCesta);
-router.post('/updateDireccionFavorita',       validarJWT,controller.updateDireccionFavorita);
-router.post('/modificarTiendaFavorita',       validarJWT,controller.modificarTiendaFavorita);
 router.post('/modificarNombreUsuario',        validarJWT,controller.modificarNombreUsuario);
 router.post('/eliminarCestaProductos',        validarJWT,controller.eliminarCestaProductos);
 router.post('/eliminarProductoCesta',         validarJWT,controller.eliminarProductoCesta);

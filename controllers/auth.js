@@ -1,9 +1,6 @@
 const stripe = require('stripe')('sk_test_51IDv5qAJzmt2piZ3A5q7AeIGihRHapcnknl1a5FbjTcqkgVlQDHyRIE7Tlc4BDST6pEKnXlcomoyFVAjeIS2o7SB00OgsOaWqW');
 const { generarJWT } = require("../helpers/jwt");
 const Usuario = require("../models/usuario");
-const Estado = require("../models/estado");
-const Tienda = require("../models/tiendas");
-const Restringidos = require("../models/usuario_restringido");
 const bcrypt = require("bcryptjs");
 const mongoose = require('mongoose');
 
@@ -228,116 +225,6 @@ var controller = {
     });
 
   },
-  iniciarUsuarioTelefono: async(req,res)=>{
-
-  const {tokenFB} = req.body;
-
-  const numero = req.body.numero.replace(/ /g,'');
-
-  Usuario.find({numero_celular:numero}).
-    populate('negocios').exec(async function(err,data)  {
-
-      if(!data || data.length == 0){
-
-        return res.status(404).json({ok:false});
-        
-      }else{
-
-        const usuario = await Usuario.findOne({numero_celular:numero});
-
-        if(usuario){
-        
-        usuario['tokenFB'] = tokenFB;
-    
-        await usuario.save();
-      
-        }
-      
-        const token = await generarJWT(data[0]._id);
-
-        var checkToken = await Tienda.findOne({punto_venta:req.body.tokenFB});
-    
-        if(checkToken){
- 
-          checkToken = true;
- 
-        }else{
- 
-          checkToken = false;
- 
-        }
-    
-        res.status(200).json({
-          ok: true,
-          usuario: data[0],
-          token,
-          checkToken
-        });
-    
-      }
-
-    });
-
-  },
-  revisarEstado: async(req,res)=>{
-
-    const version = req.header('x-version');
-
-    const restringido = await Restringidos.findById(req.uid);
-
-    if(restringido){
-      
-      var estado = new Estado();
-
-      estado.mantenimiendo = false;
-      estado.disponible = false;
-      estado.cerrada = false;
-      estado.version = false;
-      estado.restringido = true;
-
-      return res.status(200).json(estado);
-
-    }else{
-      
-      if(version){
-  
-        const estado = await Estado.findOne({'_id':'644031c2199bafb28ba36532'});
-  
-        if(version== estado.version){
-  
-          estado.version = true;
-  
-          estado.restringido = false;
-          
-          return res.status(200).json(estado);
-          
-        }else{
-          
-          estado.version = false;
-
-          estado.restringido = false;
-          
-          return res.status(200).json(estado);
-        
-        }
-    
-      }else{
-  
-        const estado = await Estado.findOne({'_id':'644031c2199bafb28ba36532'});
-  
-        estado.version = false;
-
-        estado.restringido = false;
-        
-        return res.status(200).json(estado);
-  
-      }
-
-    }
-
-
-  }
-  
 }
 
 module.exports = controller
