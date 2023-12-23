@@ -9,11 +9,12 @@ const bodyParser = require('body-parser')
 const path = require('path');
 
 const expressWinston = require('express-winston')
-const helmet = require('helmet');
 const xss = require('xss-clean')
 const trim_json_values = require('./utils/trim_json_values');
 
+const AppError = require('./utils/appError');
 const logger = require('./helpers/logger');
+const globalErrorHandler = require('./controllers/errorController');
 
 require('dotenv').config();
 
@@ -33,12 +34,13 @@ class Server {
 
         this.paths = {
 
-            auth:'/api/autentificacion',
-            usuario:'/api/usuario',
-            stripe:'/api/stripe',
-            twilio:'/api/twilio',
-            google:'/api/google',
-            test:'/api/test',
+            auth:'/autentificacion',
+            usuario:'/usuario',
+            stripe:'/stripe',
+            twilio:'/twilio',
+            google:'/google',
+            test:'/test'
+
         }
 
         this.middlewares();
@@ -85,6 +87,8 @@ class Server {
 
     routes(){
 
+      this.app.set('view engine', 'ejs');
+
       this.app.use(`${this.apiVersion}${this.paths.auth}`,       require('./routes/autentificacion'));
       this.app.use(`${this.apiVersion}${this.paths.usuario}`,    require('./routes/usuarios'));
       this.app.use(`${this.apiVersion}${this.paths.stripe}`,     require('./routes/stripe'));
@@ -93,18 +97,12 @@ class Server {
       this.app.use(`${this.apiVersion}${this.paths.test}`,       require('./routes/test'));
 
       this.app.all('*', (req, res, next) => {
+        console.log(`${this.apiVersion}${this.paths.usuario}`);
+        console.log(req.originalUrl);
         next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
       });
 
-      this.app.use((err, req, res, next) => {
-        logger.error(err);
-
-        res.status(err.status || 500).json({
-          error: {
-            message: err.message || 'Internal Server Error',
-          },
-        });
-      });
+      this.app.use(globalErrorHandler);
 
     }
 
@@ -132,7 +130,7 @@ class Server {
     }
 
     setupSecurity() {
-      this.app.use(helmet());
+      
       this.app.use(xss());
     }
     

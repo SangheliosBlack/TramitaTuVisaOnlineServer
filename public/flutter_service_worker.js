@@ -15,8 +15,8 @@ const RESOURCES = {"assets/AssetManifest.bin": "245231c178fcd890ee1d911f7cbf1e62
 "assets/assets/images/icon.png": "10af8ef7c0677d447ccc214df261fa87",
 "assets/assets/svg/name_app.svg": "0a9e421e2513ff9244e929f35dc0fa24",
 "assets/FontManifest.json": "3ddd9b2ab1c2ae162d46e3cc7b78ba88",
-"assets/fonts/MaterialIcons-Regular.otf": "37c3b8bc1c562517993c84b4baf0b8a3",
-"assets/NOTICES": "01c0c87100a646cf71dfce9440e2d346",
+"assets/fonts/MaterialIcons-Regular.otf": "47a99d4050babcd3490bc09ce2a9a16e",
+"assets/NOTICES": "69231aaccd9430b92793dbd926acccf5",
 "assets/packages/fluttertoast/assets/toastify.css": "a85675050054f179444bc5ad70ffc635",
 "assets/packages/fluttertoast/assets/toastify.js": "56e2c9cedd97f10e7e5f1cebd85d53e3",
 "assets/packages/font_awesome_flutter/lib/fonts/fa-brands-400.ttf": "d7791ef376c159f302b8ad90a748d2ab",
@@ -36,9 +36,9 @@ const RESOURCES = {"assets/AssetManifest.bin": "245231c178fcd890ee1d911f7cbf1e62
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
 "icons/Icon-maskable-192.png": "c457ef57daa1d16f64b27b786ec2ea3c",
 "icons/Icon-maskable-512.png": "301a7604d45b3e739efc881eb04896ea",
-"index.html": "435b9596430f892a45beddfeb39468d3",
-"/": "435b9596430f892a45beddfeb39468d3",
-"main.dart.js": "216e8d7a19b0fbd228e83deef6ce15a9",
+"index.html": "b3cda73189ef51438aa15b57500b4d98",
+"/": "b3cda73189ef51438aa15b57500b4d98",
+"main.dart.js": "0eb8f619469d586ffcef93afb7220b1a",
 "manifest.json": "d545373a08bdb525ab2905c299611b9f",
 "version.json": "77d686ffcc369f131ac2ce3372ee35cc"};
 // The application shell files that are downloaded before a service worker can
