@@ -71,7 +71,9 @@ class Server {
 
       console.log(this.env);
 
-      this.app.use(this.env !== 'production' ? morgan('dev') : null);
+      if (process.env.NODE_ENV !== 'production') {
+        this.app.use(morgan('dev'));
+      }
 
       this.app.use(
         bodyParser.urlencoded({
