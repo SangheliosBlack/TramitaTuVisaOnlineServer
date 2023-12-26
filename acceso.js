@@ -11,8 +11,5 @@ module.exports = (function (req, res, next) {
         res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers']);
     }
 
-    console.log(req.headers);
-
-
     return next();
 });

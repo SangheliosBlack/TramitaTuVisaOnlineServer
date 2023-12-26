@@ -7,6 +7,7 @@ const cors = require('cors');
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
 const path = require('path');
+const passport = require('passport');
 
 const expressWinston = require('express-winston')
 const xss = require('xss-clean')
@@ -34,8 +35,9 @@ class Server {
 
         this.paths = {
 
-            auth:'/autentificacion',
+            auth:'/auth',
             usuario:'/usuario',
+            tramites:'/tramites'
 
         }
 
@@ -65,8 +67,6 @@ class Server {
       this.app.use(bodyParser.json(),trim_json_values);
       this.app.use(compression());
 
-      console.log(this.env);
-
       if (process.env.NODE_ENV !== 'production') {
         this.app.use(morgan('dev'));
       }
@@ -77,6 +77,9 @@ class Server {
           extended: true,
         })
       );
+
+      require('./config/authentication');
+      this.app.use(passport.initialize()); 
 
       this.app.use((req, res, next) => {
         req.requestTime = new Date().toISOString();
@@ -91,10 +94,9 @@ class Server {
 
       this.app.use(`${this.apiVersion}${this.paths.auth}`,       require('./routes/autentificacion'));
       this.app.use(`${this.apiVersion}${this.paths.usuario}`,    require('./routes/usuarios'));
+      this.app.use(`${this.apiVersion}${this.paths.tramites}`,    require('./routes/tramites'));
 
       this.app.all('*', (req, res, next) => {
-        console.log(`${this.apiVersion}${this.paths.usuario}`);
-        console.log(req.originalUrl);
         next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
       });
 

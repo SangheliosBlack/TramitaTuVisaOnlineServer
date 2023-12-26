@@ -1,46 +1,29 @@
 const validarCampos = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
-const controller = require('../controllers/auth');
+const controller = require('../controllers/authController');
 const { check } = require('express-validator');
+const messageErrors = require('../utils/messages_errors');
 const {Router} = require('express');
 const upload = require("../multer");
+const validateName = require('../middlewares/validate_name');
+const validatePassword = require('../middlewares/validate-password');
 const router = Router();
 
-router.post('/nuevoUsuario',[
-
-    check('nombre','El nombre es obligatorio').trim().not().isEmpty().custom(async(nombre,{req})=>{
-        
-        const myArray = nombre.split(' ');
-
-        if(myArray.length <= 2 ){
-
-            throw new Error('Formato nombre completo incorrecto')
-        
-        }
-
-    }),
-    check('contrasena').trim().isLength({min:6,max:16}).withMessage('Contraseña minimo 6 caracteres').custom(async(contrasena,{req})=>{
- 
-        const confirmar_contrasena = req.body.confirmar_contrasena;
- 
-        if(contrasena !== confirmar_contrasena ){
-        
-            throw new Error('Las contraseñas no coinciden');
-        
-        }
-
-    }),
-    check('correo','Correo no valido').trim().isEmail(),
+router.post('/createUser',[
+    check('name').trim().not().isEmpty().withMessage(messageErrors.NOMBRE_OBLIGATORIO).custom(validateName),
+    check('phone').isLength({ min: 10, max: 10 }).withMessage(messageErrors.NUMERO_CELULAR_INVALIDO),
+    check('password').trim().isLength({ min: 6, max: 16 }).withMessage(messageErrors.CONTRASENA_MINIMO_CARACTERES).custom(validatePassword),
+    check('email').trim().isEmail().withMessage(messageErrors.CORREO_NO_VALIDO),
     validarCampos
 ],controller.crearUsuario);
 
-router.post('/iniciarUsuario',[
-    check('contrasena','La contraseña es obligatoria').not().isEmpty(),
-    check('correo','Correo no valido').isEmail(),
+router.post('/login',[
+    check('password',messageErrors.CONTRASENA_NO_COINCIDE).not().isEmpty(),
+    check('email',messageErrors.CORREO_NO_VALIDO).isEmail(),
     validarCampos
-],controller.iniciarUsuario);
+],controller.login);
 
 
-router.get('/renovarCodigo',validarJWT,controller.renovarToken);
+router.get('/renewCode',validarJWT,controller.renovarToken);
 
 module.exports = router;
