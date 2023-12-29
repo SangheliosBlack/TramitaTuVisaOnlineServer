@@ -80,8 +80,6 @@ const controller = {
   }),
   login: catchAsync(async (req, res,next) => {
 
-    const { email, password } = req.body;
-
     passport.authenticate(
       'login',
       { session: false },
@@ -115,48 +113,13 @@ const controller = {
 
   }),
   renovarToken: async (req, res) => {
-    const uid = req.uid;
-    const token = await generarJWT(uid);
-    const usuario = await User.findById(uid);
-    usuario.tokenFB = req.header('x-token-firebase');
-    await usuario.save();
+    req.login(req.user,{session: false}, async(error)=>{
+            
+      if(error) return next(error);
 
-    User.find({ _id: mongoose.Types.ObjectId(uid) })
-      .populate('negocios')
-      .exec(async function (err, data) {
-        const token2 = req.header('x-token-firebase');
-        var checkToken = await Tienda.findOne({ punto_venta: token2 });
+      createSendToken(req.user,200,req,res)
 
-        if (checkToken) {
-          checkToken = true;
-        } else {
-          checkToken = false;
-        }
-
-        res.json({
-          ok: true,
-          usuario: data[0],
-          token: token,
-          checkToken
-        });
-      });
-  },restrictTo: (...roles) =>
-  (req, res, next) => {
-    //roles is an array of strings
-    const userRoles = req.user.roles.map((role) => {
-      return role.dataValues.code;
-    });
-
-    if (!roles.some((r) => userRoles.includes(r))) {
-      return next(
-        new AppError(
-          403,
-          'El rol no cuenta con permisos para realizar esta acción',
-          'rol'
-        )
-      );
-    }
-    next();
+    })
   }
 };
 
