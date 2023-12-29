@@ -87,8 +87,6 @@ const controller = {
       { session: false },
       async(err,user,_info)=>{
 
-
-
         try {
           if (err || !user || user === false) {
             return next(
@@ -194,6 +192,8 @@ const createSendToken = (user, status, req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
+      role: user.role
     },
     accessToken: `${token}`,
     expiresIn: `24h`,
