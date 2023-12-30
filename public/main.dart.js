@@ -25343,7 +25343,7 @@ k.c=B.nX
 !q
 k.Ks().jC(new A.auB())
 s=2
-return A.P($.av9().yu(0,".env"),$async$GE)
+return A.P($.av9().yu(0,".enve"),$async$GE)
 case 2:k=self.document.baseURI
 if(k==null)k=null
 if(k==null)A.S(A.dg("Please add a <base> element to your index.html"))
