@@ -23,15 +23,15 @@ Descripción extensa de tu increíble servidor construido con Node.js.
 
 ## Instalación
 
-1. **Clona este repositorio:**
+1. **Clona este repositorio :**
    ```bash
    git clone https://github.com/tuusuario/tuservidor.git
 
-2. **Instala las dependencias:**
+2. **Instala las dependencias :**
     ```bash
     npm install
 
-3. **Inicia el servidor:**
+3. **Inicia el servidor :**
     ```bash
     npm run dev
 
