@@ -35,4 +35,8 @@ Descripción extensa de tu increíble servidor construido con Node.js.
     ```bash
     npm run dev
 
+4. **Configuracion de Variables de Entorno**
+    Crea un archivo .env en el directorio raíz.
+    Sigue el formato especificado en .env.example.
+
 
