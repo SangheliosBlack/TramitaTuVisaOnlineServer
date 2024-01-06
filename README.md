@@ -31,7 +31,7 @@ Descripción extensa de tu increíble servidor construido con Node.js.
     ```bash
     npm install
 
-2. **Inicia el servidor:**
+3. **Inicia el servidor:**
     ```bash
     npm run dev
 
