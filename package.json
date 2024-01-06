@@ -1,12 +1,11 @@
 {
-  "name": "delivery_server",
+  "name": "template_server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Base NodeJs Express Passport Sequelize Backend API",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "start:dev": "nodemon index.js"
+    "dev":"nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
