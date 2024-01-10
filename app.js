@@ -99,7 +99,8 @@ class Server {
       this.app.use(express.static(path.resolve(__dirname, 'public')));
 
       this.app.all('*', (req, res, next) => {
-        next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+        res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+        //next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
       });
 
       this.app.use(globalErrorHandler);
