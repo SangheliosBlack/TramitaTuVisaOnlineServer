@@ -96,6 +96,8 @@ class Server {
       this.app.use(`${this.apiVersion}${this.paths.usuario}`,    require('./routes/usuarios'));
       this.app.use(`${this.apiVersion}${this.paths.tramites}`,    require('./routes/tramites'));
 
+      this.app.use(express.static(path.resolve(__dirname, 'public')));
+
       this.app.all('*', (req, res, next) => {
         next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
       });
