@@ -51,7 +51,7 @@ class Server {
     const expressSwagger = require("express-swagger-generator")(this.app);
     expressSwagger(swaggerOptions.options);
 
-    this.app.use(express.static(path.resolve(__dirname, "public")));
+    this.app.use(express.static(path.resolve(__dirname,'src', "public")));
     this.app.use(bodyParser.json(), trim_json_values);
     this.app.use(compression());
 
@@ -91,10 +91,10 @@ class Server {
       require("./src/routes/tramites")
     );
 
-    this.app.use(express.static(path.resolve(__dirname, 'public')));
+    this.app.use(express.static(path.resolve(__dirname,'src','public')));
 
     this.app.all('*', (req, res, next) => {
-      res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+      res.sendFile(path.resolve(__dirname, 'src', 'public', 'index.html'));
       //next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
     });
 
