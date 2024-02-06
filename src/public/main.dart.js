@@ -83630,8 +83630,8 @@ gd6(){return A.a([this.a],t.f)}}
 A.Tn.prototype={
 gd6(){return A.a(["Error inesperado"],t.f)}}
 A.a7H.prototype={
-adO(){this.c.ajC(B.oT,"Conectado a la direcci\xf3n http://localhost:3000/api/v1",null,null)
-return"http://localhost:3000/api/v1"}}
+adO(){this.c.ajC(B.oT,"Conectado a la direcci\xf3n https://www.tramitesvisaonline.com/api/v1",null,null)
+return"https://www.tramitesvisaonline.com/api/v1"}}
 A.y9.prototype={
 Eh(a){return this.a[B.m.cC(a,4)]}}
 A.adc.prototype={
