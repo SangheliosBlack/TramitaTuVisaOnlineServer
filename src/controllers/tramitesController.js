@@ -1,6 +1,6 @@
 const User = require('../models/user');
 const catchAsync = require('../utils/catchAsync');
-const RequestUtil = require('../utils/requesUtils');
+const RequestUtil = require('../utils/requestUtils');
 
 var controller = {
     crearNuevoTramite : catchAsync(async(req,res,next)=>{

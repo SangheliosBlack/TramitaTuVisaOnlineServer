@@ -1,41 +1,45 @@
 const { generarJWT } = require("../helpers/jwt");
 const User = require("../models/user");
-const mongoose = require('mongoose');
-const catchAsync = require('../utils/catchAsync');
-const RequestUtil = require('../utils/requesUtils');
-const AppError = require('../utils/appError');
-const authConfig = require('../config/jwtConfig');
+const mongoose = require("mongoose");
+const catchAsync = require("../utils/catchAsync");
+const RequestUtil = require("../utils/requestUtils");
+const AppError = require("../utils/appError");
+const authConfig = require("../config/jwtConfig");
 const passport = require("passport");
 const { error } = require("../helpers/logger");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const TOKEN_TIMEOUT = 86400;
 
 const controller = {
   crearUsuario: catchAsync(async (req, res, next) => {
-    const { email, password,phone} = req.body;
+    const { email, password, phone } = req.body;
 
     try {
       const existEmail = await User.findOne({ email: email.toLowerCase() });
-      const existPhone = await User.findOne({ phone: phone})
+      const existPhone = await User.findOne({ phone: phone });
 
       if (existEmail) {
-        return res.status(400).json(
-          RequestUtil.prepareSingleResponse(
-            'success',
-            {},
-            `Este correo electrónico ya está registrado`
-          )
-        );
+        return res
+          .status(400)
+          .json(
+            RequestUtil.prepareSingleResponse(
+              "success",
+              {},
+              `Este correo electrónico ya está registrado`
+            )
+          );
       }
 
-      if(existPhone){
-        return res.status(400).json(
-          RequestUtil.prepareSingleResponse(
-            'success',
-            {},
-            `Este numero telefonico ya está registrado`
-          )
-        );
+      if (existPhone) {
+        return res
+          .status(400)
+          .json(
+            RequestUtil.prepareSingleResponse(
+              "success",
+              {},
+              `Este numero telefonico ya está registrado`
+            )
+          );
       }
 
       const user = new User(req.body);
@@ -58,10 +62,10 @@ const controller = {
 
       return res.status(200).json(
         RequestUtil.prepareSingleResponse(
-          'success',
+          "success",
           {
             user,
-            token
+            token,
           },
           `Useario creado con éxito`
         )
@@ -70,57 +74,49 @@ const controller = {
       return next(
         new AppError(
           500,
-          'Ocurrió un error en esta operación',
-          'APP_00',
-          'data',
+          "Ocurrió un error en esta operación",
+          "APP_00",
+          "data",
           [{ message: error.message }]
         )
       );
     }
   }),
-  login: catchAsync(async (req, res,next) => {
-
+  login: catchAsync(async (req, res, next) => {
     passport.authenticate(
-      'login',
+      "login",
       { session: false },
-      async(err,user,_info)=>{
-
+      async (err, user, _info) => {
         try {
           if (err || !user || user === false) {
             return next(
               new AppError(
                 401,
                 _info ? _info.message : err.message,
-                'USR_10',
-                'login'
+                "USR_10",
+                "login"
               )
-            )
+            );
           }
 
-          req.login(user,{session: false}, async(error)=>{
-            
-            if(error) return next(error);
+          req.login(user, { session: false }, async (error) => {
+            if (error) return next(error);
 
-            createSendToken(user,200,req,res)
-
-          })
-
+            createSendToken(user, 200, req, res);
+          });
         } catch (error) {
           return next(error);
         }
       }
-    )(req,res,next);
-
+    )(req, res, next);
   }),
   renovarToken: async (req, res) => {
-    req.login(req.user,{session: false}, async(error)=>{
-            
-      if(error) return next(error);
+    req.login(req.user, { session: false }, async (error) => {
+      if (error) return next(error);
 
-      createSendToken(req.user,200,req,res)
-
-    })
-  }
+      createSendToken(req.user, 200, req, res);
+    });
+  },
 };
 
 module.exports.restrictTo =
@@ -135,8 +131,8 @@ module.exports.restrictTo =
       return next(
         new AppError(
           403,
-          'El rol no cuenta con permisos para realizar esta acción',
-          'rol'
+          "El rol no cuenta con permisos para realizar esta acción",
+          "rol"
         )
       );
     }
@@ -156,7 +152,8 @@ const createSendToken = (user, status, req, res) => {
       name: user.name,
       email: user.email,
       phone: user.phone,
-      role: user.role
+      role: user.role,
+      createdAt: user.createdAt,
     },
     accessToken: `${token}`,
     expiresIn: `24h`,

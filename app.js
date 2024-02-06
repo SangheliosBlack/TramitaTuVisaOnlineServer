@@ -30,7 +30,7 @@ class Server {
 
     this.paths = {
       auth: "/auth",
-      usuario: "/usuario",
+      usuario: "/users",
       tramites: "/tramites",
     };
 
@@ -84,7 +84,7 @@ class Server {
     );
     this.app.use(
       `${this.apiVersion}${this.paths.usuario}`,
-      require("./src/routes/usuarios")
+      require("./src/routes/userRoutes")
     );
     this.app.use(
       `${this.apiVersion}${this.paths.tramites}`,
