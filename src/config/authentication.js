@@ -38,7 +38,8 @@ passport.use(
         }
 
         //update instance
-        user.last_login_date = Date.now();
+        user.last_connection = Date.now();
+        user.online = true;
         await user.save();
 
         // Send the user information to the next middleware

@@ -55,6 +55,8 @@ const controller = {
       user.name = newName;
       user.email = email.toLowerCase();
       user.phone = phone;
+      user.last_connection = new Date();
+      user.online = true;
 
       await user.save();
 

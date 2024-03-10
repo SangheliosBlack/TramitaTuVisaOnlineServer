@@ -26,7 +26,7 @@ const UserSchema = Schema(
       unique: true,
       required: true,
     },
-    last_login_date: {
+    last_connection: {
       type: Date,
       required: false,
     },
@@ -34,6 +34,10 @@ const UserSchema = Schema(
       type: String,
       required: true,
     },
+    online:{
+      type: Boolean,
+      required: true
+    }
   },
   {
     timestamps: true,
