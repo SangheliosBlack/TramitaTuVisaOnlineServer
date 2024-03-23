@@ -156,6 +156,8 @@ const createSendToken = (user, status, req, res) => {
       phone: user.phone,
       role: user.role,
       createdAt: user.createdAt,
+      online: user.online,
+      last_connection: user.last_connection 
     },
     accessToken: `${token}`,
     expiresIn: `24h`,
